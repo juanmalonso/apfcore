@@ -1,0 +1,24 @@
+{
+    "name": "juanmalonso/apfcore",
+    "description": "Description of project juanmalonso/apfcore",
+    "type": "library",
+    "license": "GPL-3.0-or-later",
+    "authors": [
+        {
+            "name": "Juan Manuel Alonso Vallovera",
+            "email": "manialonso@gmail.com"
+        }
+    ],
+    "require": {
+        
+    },
+    "autoload": {
+      "psr-4": {
+        "Nubesys\\Core\\Apis\\": "src/apis/",
+        "Nubesys\\Core\\Process\\": "src/process/",
+        "Nubesys\\Core\\Web\\Pages\\": "src/web/Pages/",
+        "Nubesys\\Core\\Web\\Views\\": "src/web/Views/",
+        "Nubesys\\Core\\": "src/library/Core/"
+      }
+    }
+}
