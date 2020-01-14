@@ -14,11 +14,7 @@
     },
     "autoload": {
       "psr-4": {
-        "Nubesys\\Core\\Apis\\": "src/apis/",
-        "Nubesys\\Core\\Process\\": "src/process/",
-        "Nubesys\\Core\\Web\\Pages\\": "src/web/Pages/",
-        "Nubesys\\Core\\Web\\Views\\": "src/web/Views/",
-        "Nubesys\\Core\\": "src/library/Core/"
+        "Nubesys\\Core\\": "src/Core/"
       }
     }
 }
