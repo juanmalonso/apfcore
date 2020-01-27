@@ -14,7 +14,9 @@
     },
     "autoload": {
       "psr-4": {
-        "Nubesys\\Core\\": "src/Core/"
+        "Nubesys\\Core\\": "src/Core/",
+        "Nubesys\\Vue\\": "src/Vue/",
+        "Nubesys\\Data\\": "src/Data/"
       }
     }
 }

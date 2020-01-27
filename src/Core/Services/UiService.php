@@ -56,7 +56,7 @@ class UiService extends Common {
 
         $className      = strtolower(array_pop($pathPartes));
 
-        $this->id = implode("-", array_map(function ($e){ return \Phalcon\Text::uncamelize($e);}, $pathPartes)) . "-" . $className .  "-" . md5(time(true));
+        $this->id = implode("-", array_map(function ($e){ return \Phalcon\Text::uncamelize($e);}, $pathPartes)) . "-" . $className .  "-" . md5(microtime(true));
     }
 
     //VIEW VARS
@@ -216,7 +216,7 @@ class UiService extends Common {
             $this->$p_action($p_params);
         }
 
-        $this->view->loadTemplates($this->getDI()->get('config')->ui->defaulttemplates);
+        $this->view->loadTemplates($this->getDI()->get('config')->main->view->template->templates);
 
         //COMPILE CSSSOURCES
         $this->compileCssSources();
@@ -242,7 +242,7 @@ class UiService extends Common {
     private function setView($p_vars){
 
         $view = new \Phalcon\Mvc\View\Simple();
-        //TODO : Que sea configurable las extensiones de volt
+
         $view->registerEngines(array(
             ".phtml"    => 'voltService',
             ".js"       => 'voltService',
@@ -255,8 +255,8 @@ class UiService extends Common {
         
         $volt->setOptions(
             array(
-                "compiledPath"      => $this->getDI()->get('config')->volt->compilepath,
-                "compiledExtension" => $this->getDI()->get('config')->volt->compileext
+                "compiledPath"      => $this->getDI()->get('config')->main->view->compile->path,
+                "compiledExtension" => $this->getDI()->get('config')->main->view->compile->extension
             )
         );
 

@@ -1,11 +1,11 @@
 <?php
 
-namespace Nubesys\Core\Response;
+namespace Nubesys\Core\Response\ResponseAdapters;
 
-use Nubesys\Core\Response\Response;
+use Nubesys\Core\Response\ResponseAdapters\ResponseAdapter;
 use Nubesys\Core\Register;
 
-class WebResponse extends Response {
+class Web extends ResponseAdapter {
 
     protected $html;
     protected $cookies;
@@ -16,7 +16,6 @@ class WebResponse extends Response {
         parent::__construct($p_di);
 
         $this->redirect     = false;
-        $this->type         = "web";
         $this->html         = "EMPTY";
 
         $this->cookies      = new Register();

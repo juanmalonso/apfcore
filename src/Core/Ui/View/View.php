@@ -28,7 +28,7 @@ class View extends Common {
 
         if($p_default){
 
-            $this->defaultBasePath      = $this->getDI()->get('config')->ui->pages->defaultbasepath;
+            $this->defaultBasePath      = $this->getDI()->get('config')->main->view->template->basepath;
         }else{
 
             $this->defaultBasePath      = $this->basePath;

@@ -18,32 +18,32 @@ class CoreUiController extends Controller
     }
     
     protected function loadUiPage($p_serviceClass, $p_urlparams){
-        var_dump(func_get_args());
-        exit();
+        
         if(class_exists($p_serviceClass)){
-
+            
             $uiService              = new $p_serviceClass($this->getDI());
             
             $params = array();
             $params['URL']          = $p_urlparams;
-            $params['GET']          = $this->getDI()->get('swoolerequest')->get;
-            $params['POST']         = $this->getDI()->get('swoolerequest')->post;
-            $params['FILES']        = $this->getDI()->get('swoolerequest')->files;
+            $params['GET']          = $this->getDI()->get('requestManager')->getGET();
+            $params['POST']         = $this->getDI()->get('requestManager')->getPOST();
+            $params['FILES']        = $this->getDI()->get('requestManager')->getFILES();
 
             $uiPageActionName       = "mainAction";
-
+            
             if(isset($p_urlparams[3]) && method_exists($uiService, $p_urlparams[3] . "Action")){
 
                 $uiPageActionName   = $p_urlparams[3] . "Action";
             }
-
-            $this->getDI()->get('sessionManager')->start($this->getDI()->get('global')->get('sesid'));
             
-            $this->getDI()->get("responseObject")->setHtml($uiService->doPageRender($uiPageActionName, $params));
+            //$this->getDI()->get('sessionManager')->start($this->getDI()->get('global')->get('sesid'));
+            
+            $this->getDI()->get("responseManager")->setHtml($uiService->doPageRender($uiPageActionName, $params));
 
-            $this->getDI()->get('sessionManager')->end();
+            //$this->getDI()->get('sessionManager')->end();
 
-            $this->getDI()->get("responseObject")->setCookie("NBSSESSID", $this->getDI()->get('sessionManager')->getId());
+            //$this->getDI()->get("responseObject")->setCookie("NBSSESSID", $this->getDI()->get('sessionManager')->getId());
+            
         }else{
 
             //TODO: ERROR

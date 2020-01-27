@@ -1,10 +1,10 @@
 <?php
 
-namespace Nubesys\Core\Response;
+namespace Nubesys\Core\Response\ResponseAdapters;
 
-use Nubesys\Core\Response\Response;
+use Nubesys\Core\Response\ResponseAdapters;
 
-class DataResponse extends Response {
+class Data extends ResponseAdapter {
 
     private $status;
     private $info;
@@ -14,8 +14,6 @@ class DataResponse extends Response {
     public function __construct($p_di)
     {
         parent::__construct($p_di);
-
-        $this->type         = "data";
 
         $this->status       = "KO";
         $this->info         = "ERROR";
