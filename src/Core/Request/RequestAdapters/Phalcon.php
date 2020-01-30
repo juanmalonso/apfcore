@@ -36,8 +36,16 @@ class Phalcon extends Common {
     }
 
     public function getJSON(){
+        $result = NULL;
+        
+        if($this->requestObject->getRawBody() !== ""){
 
-        return json_decode($this->requestObject->getRawBody(), true);
+            if(\Nubesys\Core\Utils\Struct::isValidJson($this->requestObject->getRawBody())){
+
+                $result = json_decode($this->requestObject->getRawBody(), true);
+            }
+        }
+        return $result;
     }
 
     public function getFILES(){

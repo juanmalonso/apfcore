@@ -57,7 +57,23 @@ class UiComponent extends Common {
 
         $className      = strtolower(array_pop($pathPartes));
 
-        $this->id = implode("-", array_map(function ($e){ return \Phalcon\Text::uncamelize($e);}, $pathPartes)) . "-" . $className .  "-" . md5(time(true));
+        $this->id = implode("-", array_map(function ($e){ return \Phalcon\Text::uncamelize($e);}, $pathPartes)) . "-" . $className .  "-" . md5(microtime(true));
+    }
+
+    //MAIN LIBRARY (MODULE Ejp:Core)
+    protected function getMainLibraryName(){
+
+        $pathPartes     = explode("\\", $this->getClassPath());
+
+        return \Phalcon\Text::uncamelize($pathPartes[1]);
+    }
+
+    //URL CLASS PATH
+    protected function getUrlClassPath(){
+
+        $pathPartes     = explode("\\", $this->getClassPath());
+
+        return   "uid/" . $this->getMainLibraryName() . "/" . implode("_", array_map(function ($e){ return \Phalcon\Text::uncamelize($e);}, $pathPartes));
     }
 
     //VIEW VARS
@@ -126,7 +142,7 @@ class UiComponent extends Common {
             $this->mainAction($p_params);
         }
 
-        $this->view->loadTemplates($this->getDI()->get('config')->ui->defaulttemplates);
+        $this->view->loadTemplates($this->getDI()->get('config')->main->view->template->templates);
 
         //RENDER PAGE CSSSNIPPEDS
         $this->compileCssSnippets();
@@ -146,36 +162,36 @@ class UiComponent extends Common {
     //SERVICES (AJAX)
     protected function setServiceStatus($p_status){
 
-        $this->getDI()->get('responseObject')->setStatus($p_status);
+        $this->getDI()->get("responseManager")->setStatus($p_status);
     }
 
     public function setServiceInfo($p_info){
 
-        $this->getDI()->get('responseObject')->setInfo($p_info);
+        $this->getDI()->get("responseManager")->setInfo($p_info);
     }
 
     public function setServiceData($p_data){
 
-        $this->getDI()->get('responseObject')->setData($p_data);
+        $this->getDI()->get("responseManager")->setData($p_data);
     }
 
     public function setServiceDebug($p_debug){
 
-        $this->getDI()->get('responseObject')->setDebug($p_debug);
+        $this->getDI()->get("responseManager")->setDebug($p_debug);
     }
 
     public function setServiceError($p_message){
 
-        $this->getDI()->get('responseObject')->setError($p_message);
+        $this->getDI()->get("responseManager")->setError($p_message);
     }
 
     public function setServiceSuccess($p_data){
 
-        $this->getDI()->get('responseObject')->setSuccess($p_data);
+        $this->getDI()->get("responseManager")->setSuccess($p_data);
     }
 
     public function doService($p_uiServiceName, $p_params){
-
+        
         if(method_exists($this, $p_uiServiceName)){
 
             $this->$p_uiServiceName($p_params);
@@ -200,8 +216,8 @@ class UiComponent extends Common {
         
         $volt->setOptions(
             array(
-                "compiledPath"      => $this->getDI()->get('config')->volt->compilepath,
-                "compiledExtension" => $this->getDI()->get('config')->volt->compileext
+                "compiledPath"      => $this->getDI()->get('config')->main->view->compile->path,
+                "compiledExtension" => $this->getDI()->get('config')->main->view->compile->extension
             )
         );
 

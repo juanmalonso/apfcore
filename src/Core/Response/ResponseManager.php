@@ -39,7 +39,7 @@ class ResponseManager extends Common {
 
     public function setHeader($p_key, $p_value){
 
-        $this->$adapter->setHeader($p_key, $p_value);
+        $this->adapter->setHeader($p_key, $p_value);
     }
 
     public function getHeaders(){

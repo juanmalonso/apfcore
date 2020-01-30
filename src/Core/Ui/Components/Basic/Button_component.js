@@ -3,6 +3,10 @@ Vue.component('___tag_', {
 		data: function () {
 			return ___jsdata_
 		},
+		mounted: function (){
+
+			$('.ui.sidebar').sidebar('setting', 'transition', 'overlay').sidebar('toggle');
+		},
 		methods: {
 			doClick: function(){
 
@@ -31,7 +35,7 @@ Vue.component('___tag_', {
 				var serviceOptions = {
 					data:{"key1":"value1", "key2":"value2"},
 					emitter:$(event.target),
-					loading:true				
+					loading:false				
 				}
 
 				this.reloadData(serviceOptions);
