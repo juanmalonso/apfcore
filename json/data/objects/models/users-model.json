@@ -1,0 +1,6 @@
+{
+    "id": "users",
+    "type": "OBJECT",
+    "idStrategy": "AUTOINCREMENT",
+    "partitionMode": "NONE"
+}

@@ -1,11 +1,11 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema",
-    "type":"object",
+    "type": "object",
     "properties": {
         "id": {
             "type": "string",
             "maxLength": 50,
-            "pattern": "^[A-Z1-9]{3,20}$"
+            "pattern": "^[a-z]{3,20}$"
         },
         "type": {
             "type": "string",
@@ -15,8 +15,8 @@
                 "COLLECTION"
             ]
         },
-        "idStrategy":{
-            "type":"string",
+        "idStrategy": {
+            "type": "string",
             "enum": [
                 "UUID",
                 "SLUG",
@@ -26,8 +26,8 @@
                 "BASE36"
             ]
         },
-        "partitionMode":{
-            "type":"string",
+        "partitionMode": {
+            "type": "string",
             "enum": [
                 "NONE",
                 "Y4",

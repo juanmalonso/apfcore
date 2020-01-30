@@ -1,0 +1,11 @@
+{
+    "json.format.enable": true,
+    "json.schemas": [
+        {
+            "fileMatch": [
+                "/*-model.json"
+            ],
+            "url": "https://raw.githubusercontent.com/juanmalonso/apfcore/master/json/schemas/data/objects/model-schema.json"
+        }
+    ]
+}
