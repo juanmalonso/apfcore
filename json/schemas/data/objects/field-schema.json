@@ -1,0 +1,158 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "string",
+            "maxLength": 50,
+            "pattern": "^[a-z]{3,20}$"
+        },
+        "typeId": {
+            "type": "string",
+            "maxLength": 50,
+            "pattern": "^[a-z]{3,20}$"
+        },
+        "defaultValue": {
+            "type": "string"
+        },
+        "uiOptions":{
+            "type":"object",
+            "properties": {
+                "label":{
+                    "type":"string",
+                    "maxLength": 50
+                },
+                "info":{
+                    "type":"string"
+                },
+                "icon":{
+                    "type":"string",
+                    "default": "caret right"
+                },
+                "help":{
+                    "type":"string",
+                    "maxLength": 255
+                },
+                "hidden":{
+                    "type":"boolean",
+                    "default":false
+                },
+                "listable":{
+                    "type":"boolean",
+                    "default":true
+                },
+                "readOnly":{
+                    "type":"boolean",
+                    "default":false
+                },
+                "required":{
+                    "type":"boolean",
+                    "default":true
+                },
+                "sortable":{
+                    "type":"boolean",
+                    "default":false
+                },
+                "filterable":{
+                    "type":"boolean",
+                    "default":false
+                },
+                "searchable":{
+                    "type":"boolean",
+                    "default":false
+                }
+            },
+            "additionalProperties": false
+        },
+        "indexOptions":{
+            "type": "object",
+            "properties": {
+                "indexable": {
+                    "type": "boolean",
+                    "default": false
+                },
+                "mapping": {
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "type": "string",
+                            "enum": [
+                                "text",
+                                "keyword",
+                                "date",
+                                "long",
+                                "double",
+                                "boolean",
+                                "ip",
+                                "object",
+                                "nested",
+                                "geo_point",
+                                "geo_shape",
+                                "completion"
+                            ]
+                        }
+                    },
+                    "allOf": [
+                        {
+                            "if": {
+                                "properties": {
+                                    "type": {
+                                        "const": "object"
+                                    }
+                                }
+                            },
+                            "then": {
+                                "properties": {
+                                    "dinamic": {
+                                        "type": "boolean",
+                                        "default": true
+                                    },
+                                    "properties":{
+                                        "type":"object"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "if": {
+                                "properties": {
+                                    "type": {
+                                        "const": "date"
+                                    }
+                                }
+                            },
+                            "then": {
+                                "properties": {
+                                    "format": {
+                                        "type": "string",
+                                        "enum": ["yyyy-MM-dd", "yyyy-MM-dd HH:mm:ss", "HH:mm:ss"],
+                                        "default": "yyyy-MM-dd HH:mm:ss"
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    "required": [
+                        "type"
+                    ],
+                    "additionalProperties": true
+                }
+            },
+            "required": [
+                "indexable"
+            ]
+        },
+        "typeOptions":{
+            "type":"object",
+            "additionalProperties": true
+        },
+        "validationOptions":{
+            "type":"object",
+            "additionalProperties": true
+        },
+        "attachFileOptions":{
+            "type":"object",
+            "additionalProperties": true
+        }
+    }
+}

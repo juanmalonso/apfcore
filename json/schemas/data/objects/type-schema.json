@@ -1,0 +1,23 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "string",
+            "maxLength": 50,
+            "pattern": "^[a-z]{3,20}$"
+        },
+        "options":{
+            "type":"object",
+            "additionalProperties": true
+        },
+        "validationOptions":{
+            "type":"object",
+            "additionalProperties": true
+        },
+        "AttachFileOptions":{
+            "type":"object",
+            "additionalProperties": true
+        }
+    }
+}

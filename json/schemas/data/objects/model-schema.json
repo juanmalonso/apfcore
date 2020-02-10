@@ -35,6 +35,60 @@
                 "Y53",
                 "Y122"
             ]
+        },
+        "indexOptions":{
+            "type":"object",
+            "properties": {
+                "index":{
+                    "type":"string",
+                    "maxLength": 50,
+                    "pattern": "^[a-z]{3,20}$"
+                },
+                "indexable":{
+                    "type":"boolean",
+                    "default":true
+                },
+                "analysis":{
+                    "type":"object"
+                },
+                "basemapping":{
+                    "type":"object"
+                }
+            },
+            "additionalProperties": false
+        },
+        "uiOptions":{
+            "type":"object",
+            "properties": {
+                "name":{
+                    "type":"string",
+                    "maxLength": 50
+                },
+                "pluralName":{
+                    "type":"string",
+                    "maxLength": 50
+                },
+                "description":{
+                    "type":"string",
+                    "maxLength": 255
+                },
+                "icon":{
+                    "type":"string",
+                    "default": "caret right"
+                },
+                "help":{
+                    "type":"string",
+                    "maxLength": 255
+                },
+                "manageAs":{
+                    "type":"string",
+                    "enum": [
+                        "LIST",
+                        "GALLERY"
+                    ]
+                }
+            },
+            "additionalProperties": false
         }
     }
 }
