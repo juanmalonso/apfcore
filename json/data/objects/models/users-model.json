@@ -1,7 +1,97 @@
-{
-    "id": "users",
-    "type": "OBJECT",
-    "idStrategy": "AUTOINCREMENT",
-    "partitionMode": "NONE",
-    
+﻿{
+  "id": "users",
+  "type": "OBJECT",
+  "idStrategy": "AUTOINCREMENT",
+  "partitionMode": "NONE",
+  "indexOptions": {
+    "index": "users",
+    "indexable": true,
+    "analysis": {},
+    "basemapping": {}
+  },
+  "uiOptions": {
+    "name": "Usuario",
+    "pluralName": "Usuarios",
+    "description": "Usuarios del Sistema",
+    "icon": "caret right",
+    "help": "",
+    "manageAs": "LIST"
+  },
+  "fields": [
+    {
+      "id": "first_name",
+      "dataType": "text",
+      "defaultValue": "",
+      "order": 1,
+      "uiOptions": {
+        "label": "Nombre",
+        "info": "",
+        "icon": "caret right",
+        "help": "",
+        "hidden": false,
+        "listable": true,
+        "readOnly": false,
+        "required": true,
+        "sortable": true,
+        "filterable": false,
+        "searchable": true
+      },
+      "indexOptions": {
+        "indexable": true,
+        "mapping": {
+          "type": "text"
+        }
+      }
+    },
+    {
+      "id": "last_name",
+      "dataType": "text",
+      "defaultValue": "",
+      "order": 2,
+      "uiOptions": {
+        "label": "Apellidos",
+        "info": "",
+        "icon": "caret right",
+        "help": "",
+        "hidden": false,
+        "listable": true,
+        "readOnly": false,
+        "required": true,
+        "sortable": true,
+        "filterable": false,
+        "searchable": true
+      },
+      "indexOptions": {
+        "indexable": true,
+        "mapping": {
+          "type": "text"
+        }
+      }
+    },
+    {
+      "id": "email",
+      "dataType": "text",
+      "defaultValue": "",
+      "order": 3,
+      "uiOptions": {
+        "label": "eMmail",
+        "info": "",
+        "icon": "caret right",
+        "help": "",
+        "hidden": false,
+        "listable": true,
+        "readOnly": false,
+        "required": false,
+        "sortable": false,
+        "filterable": false,
+        "searchable": true
+      },
+      "indexOptions": {
+        "indexable": true,
+        "mapping": {
+          "type": "keyword"
+        }
+      }
+    }
+  ]
 }
