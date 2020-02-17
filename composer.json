@@ -16,7 +16,8 @@
       "psr-4": {
         "Nubesys\\Core\\": "src/Core/",
         "Nubesys\\Vue\\": "src/Vue/",
-        "Nubesys\\Data\\": "src/Data/"
+        "Nubesys\\Data\\": "src/Data/",
+        "Nubesys\\Auth\\":"src/Auth"
       }
     }
 }
