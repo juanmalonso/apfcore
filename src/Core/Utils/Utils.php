@@ -69,9 +69,9 @@ class Utils
 
         $seq = 0;
         
-        if($p_di->get('cacher')->exists('cycle', $p_sequence)){
+        if($p_di->get('cache')->has($p_sequence)){
             
-            $seq = (int)$p_di->get('cacher')->get('cycle', $p_sequence);
+            $seq = (int)$p_di->get('cache')->get($p_sequence);
         }else{
             
             $seq = 0;
@@ -79,10 +79,10 @@ class Utils
         
         if($seq < $p_max){
             
-            $p_di->get('cacher')->save('cycle', $p_sequence, $seq + 1, 3600);
+            $p_di->get('cache')->set($p_sequence, $seq + 1, 3600);
         }else{
             
-            $p_di->get('cacher')->save('cycle', $p_sequence, 0, 3600);
+            $p_di->get('cache')->set($p_sequence, 0, 3600);
         }
         
         return $seq;

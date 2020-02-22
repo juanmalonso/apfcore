@@ -1,9 +1,9 @@
 <?php
 namespace Nubesys\Core;
-//TODO Revisar common phalcon 4
-use Phalcon\Mvc\User\Plugin;
 
-class Common extends Plugin
+use Phalcon\Di\Injectable;
+
+class Common extends Injectable
 {
     
     protected $className;
