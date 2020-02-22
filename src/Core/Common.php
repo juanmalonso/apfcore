@@ -1,6 +1,6 @@
 <?php
 namespace Nubesys\Core;
-
+//TODO Revisar common phalcon 4
 use Phalcon\Mvc\User\Plugin;
 
 class Common extends Plugin
