@@ -7,38 +7,32 @@ class Redis extends CacheAdapter {
 
     protected $cacher;
 
-    public function __construct($p_di, $p_config)
+    public function __construct($p_di, $p_connection)
     {
         parent::__construct($p_di);
 
-        $lifetime       = $p_config->lifetime;
-        $prefix         = $p_config->prefix;
-
-        if(property_exists($p_config, 'connection')){
-
-            $connection = $p_config->connection;
-
-            $host           = $this->getDI()->get('config')->connections->$connection->host;
-            $port           = $this->getDI()->get('config')->connections->$connection->port;
-            $db             = $this->getDI()->get('config')->connections->$connection->db;
-
-        }else{
-
-            $host           = $p_config->host;
-            $port           = $p_config->port;
-            $db             = $p_config->db;
-        }
-
-        $frontCache     = new \Phalcon\Cache\Frontend\Data(array("lifetime" => $lifetime));
+        if(property_exists($this->getDI()->get('config')->connections, $p_connection)){
             
-        $this->cacher   = new \Phalcon\Cache\Backend\Redis($frontCache,
-            [
-            'host'          => $host,
-            'port'          => $port,
-            'persistent'    => false,
-            'prefix'        => $prefix,
-            'index'         => $db
-            ]
-        );
+            $connection     = $this->getDI()->get('config')->connections->$p_connection;
+
+            $lifetime       = $this->getDI()->get('config')->connections->$p_connection->lifetime;
+            $prefix         = $this->getDI()->get('config')->connections->$p_connection->prefix;
+            $host           = $this->getDI()->get('config')->connections->$p_connection->host;
+            $port           = $this->getDI()->get('config')->connections->$p_connection->port;
+            $db             = $this->getDI()->get('config')->connections->$p_connection->db;
+
+            $frontCache     = new \Phalcon\Cache\Frontend\Data(array("lifetime" => $lifetime));
+            
+            $this->cacher   = new \Phalcon\Cache\Backend\Redis($frontCache,
+                [
+                'host'          => $host,
+                'port'          => $port,
+                'persistent'    => false,
+                'prefix'        => $prefix,
+                'index'         => $db
+                ]
+            );
+            
+        }
     }
 }

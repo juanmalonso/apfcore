@@ -1,11 +1,11 @@
 <?php
 
-namespace Nubesys\Core\Ui\Pages;
+namespace Nubesys\Auth\Ui\Pages\Basic;
 
 use Nubesys\Vue\Services\VueUiService;
 
 //COMPONENTS
-use Nubesys\Core\Ui\Components\Basic\Button;
+use Nubesys\Auth\Ui\Components\Basic\BasicLoginForm;
 
 class Login extends VueUiService {
 
@@ -13,11 +13,10 @@ class Login extends VueUiService {
 
         $this->setTitle("Titulo de Ejemplo la Pagina");
 
-        
         $this->setJsDataVar("test","testvalue");
 
-        $button = new Button($this->getDI());
-        $this->placeComponent("content", $button, $p_params);
+        $form = new BasicLoginForm($this->getDI());
+        $this->placeComponent("content", $form, $p_params);
         
     }
 }

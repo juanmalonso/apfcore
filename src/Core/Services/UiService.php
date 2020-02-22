@@ -30,6 +30,7 @@ class UiService extends Common {
 
         //INITIALS VIEW VARS
         $this->setViewVar("id", $this->getId());
+        $this->setViewVar("splashurl", $this->getDI()->get('config')->ui->splash->url);
 
         //INITIAL JS AND CSS RESOURCES
         //CSS

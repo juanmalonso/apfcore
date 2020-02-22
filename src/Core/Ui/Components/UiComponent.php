@@ -112,7 +112,7 @@ class UiComponent extends Common {
     }
 
     protected function addCssSnippet($p_id, $p_code){
-
+        
         $this->pageService->addCssSnippet($p_id, $p_code);
     }
 

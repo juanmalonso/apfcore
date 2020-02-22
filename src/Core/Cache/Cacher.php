@@ -3,95 +3,52 @@
 namespace Nubesys\Core\Cache;
 
 use Nubesys\Core\Common;
-use Nubesys\Core\Register;
 
 class Cacher extends Common {
 
+    private $adapter;
     private $enabled;
-    private $cachers;
 
     public function __construct($p_di)
     {
         parent::__construct($p_di);
 
-        $this->cachers      = new Register();
-        $this->enabled      = $this->getDI()->get('config')->cache->enabled;
+        $this->enabled      = $this->getDI()->get('config')->main->cache->enabled;
 
-        foreach($this->getDI()->get('config')->cache->cachers as $key=>$value){
+        if($this->getDI()->get('config')->main->cache->adapter == "redis"){
 
-            
-            if(property_exists($value, "adapter")){
-
-                if($value->adapter == "redis"){
-
-                    $this->cachers->set($key, new \Nubesys\Core\Cache\CacheAdapters\Redis($p_di, $value));
-                }
-
-                if($value->adapter == "file"){
-
-                    //TOTO : agregar file adapter
-                }
-
-                if($value->adapter == "db"){
-
-                    //TODO : agregar db adapter, con tablename, lifetime etc.
-                }
-            }
+            $this->adapter  = new \Nubesys\Core\Cache\CacheAdapters\Redis($p_di, $this->getDI()->get('config')->main->cache->connection);
         }
+
+        if($this->getDI()->get('config')->main->cache->adapter == "file"){
+
+            //TOTO : agregar file adapter
+        }
+
     }
 
-    public function exists($p_cacher, $p_key){
+    public function exists($p_key){
 
-        if($this->cachers->has($p_cacher)){
-            
-            return $this->cachers->get($p_cacher)->exists($p_key);
-        }else{
-
-            //TODO : THOW cacher exceptions 
-        }
+        return $this->adapter->exists($p_key);
     }
 
     public function get($p_cacher, $p_key){
 
-        if($this->cachers->has($p_cacher)){
-            
-            return $this->cachers->get($p_cacher)->get($p_key);
-        }else{
-
-            //TODO : THOW cacher exceptions 
-        }
+        return $this->adapter->get($p_key);
     }
 
     public function save($p_cacher, $p_key, $p_data, $p_lifetime = 3600){
         
-        if($this->cachers->has($p_cacher)){
-            
-            return $this->cachers->get($p_cacher)->save($p_key, $p_data, $p_lifetime);
-        }else{
-
-            //TODO : THOW cacher exceptions 
-        }
+        return $this->adapter->save($p_key, $p_data, $p_lifetime);
     }
 
     public function delete($p_cacher, $p_key){
 
-        if($this->cachers->has($p_cacher)){
-            
-            return $this->cachers->get($p_cacher)->delete($p_key);
-        }else{
-
-            //TODO : THOW cacher exceptions 
-        }
+        return $this->adapter->delete($p_key);
     }
 
     public function flush(){
 
-        if($this->cachers->has($p_cacher)){
-            
-            return $this->cachers->get($p_cacher)->flush();
-        }else{
-
-            //TODO : THOW cacher exceptions 
-        }
+        return $this->adapter->flush();
     }
 }
