@@ -50,43 +50,43 @@ class Common extends Injectable
     }
 
     //COMMON LOG MANAGMENT
-
+    
 
     //COMMON CACHE MANAGMENT
-    protected function cacheExists($p_cacher, $p_key){
+    protected function cacheHas($p_key){
 
-        return $this->getDI()->get('cacher')->exists($p_cacher, $p_key);
+        return $this->getDI()->get('cache')->has($p_key);
     }
 
     protected function cacheGet($p_cacher, $p_key){
 
-        return $this->getDI()->get('cacher')->get($p_cacher, $p_key);
+        return $this->getDI()->get('cacher')->get($p_key);
     }
 
-    protected function cacheSave($p_cacher, $p_key, $p_data, $p_lifetime = 3600){
+    protected function cacheSet($p_key, $p_data, $p_lifetime = 3600){
 
-        return $this->getDI()->get('cacher')->save($p_cacher, $p_key, $p_data, $p_lifetime);
+        return $this->getDI()->get('cache')->set($p_key, $p_data, $p_lifetime);
     }
 
     //COMMON SESSION MANAGMENT
     protected function sessionGetId(){
 
-        return $this->getDI()->get('sessionManager')->getId();
+        return $this->getDI()->get('session')->getId();
     }
 
     protected function sessionHas($p_key){
 
-        return $this->getDI()->get('sessionManager')->has($p_key);
+        return $this->getDI()->get('session')->has($p_key);
     }
 
     protected function sessionGet($p_key){
 
-        return $this->getDI()->get('sessionManager')->get($p_key);
+        return $this->getDI()->get('session')->get($p_key);
     }
 
     protected function sessionSet($p_key, $p_value){
 
-        return $this->getDI()->get('sessionManager')->set($p_key, $p_value);
+        return $this->getDI()->get('session')->set($p_key, $p_value);
     }
 
 }
