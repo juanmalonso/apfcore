@@ -12,7 +12,7 @@ class Phalcon extends Common {
     {
         parent::__construct($p_di);
 
-        $this->requestObject = $p_requestObject;
+        $this->requestObject    = $p_requestObject;
     }
 
     public function getMethod(){
@@ -51,5 +51,15 @@ class Phalcon extends Common {
     public function getFILES(){
 
         return $this->requestObject->getUploadedFiles();
+    }
+
+    public function hasCookie($p_key){
+
+        return isset($_COOKIE[$p_key]);
+    }
+
+    public function getCookie($p_key){
+
+        return $_COOKIE[$p_key];
     }
 }

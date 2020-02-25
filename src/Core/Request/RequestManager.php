@@ -55,4 +55,14 @@ class RequestManager extends Common {
 
         return $this->adapter->getFILES();
     }
+
+    public function hasCookie($p_key){
+
+        return $this->adapter->hasCookie($p_key);
+    }
+
+    public function getCookie($p_key){
+
+        return $this->adapter->getCookie($p_key);
+    }
 }

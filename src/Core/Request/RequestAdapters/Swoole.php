@@ -44,4 +44,9 @@ class Swoole extends Common {
 
         
     }
+
+    public function hasCookie($p_key){
+
+        
+    }
 }
