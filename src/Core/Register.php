@@ -86,4 +86,19 @@ class Register implements ArrayAccess
 
         return array_keys($this->container);
     }
+
+    private function getByKeyStartAt($p_expression){
+
+        $result = array();
+
+        foreach($this->container as $key=>$value){
+
+            if(strpos($key, $p_expression)){
+
+                $result[$key] = $value;
+            }
+        }
+        
+        return $result;
+    }
 }

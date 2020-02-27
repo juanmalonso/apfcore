@@ -60,6 +60,57 @@ class UiService extends Service {
         $this->id = implode("-", array_map(function ($e){ return \Phalcon\Text::uncamelize($e);}, $pathPartes)) . "-" . $className .  "-" . md5(microtime(true));
     }
 
+    //LOCALSCOPE
+    protected function hasLocal($p_key){
+
+        $this->getDI()->get('global')->has('scope.' . $this->getId() . '.' . $p_key);
+    }
+
+    protected function getLocal($p_key){
+
+        $this->getDI()->get('global')->get('scope.' . $this->getId() . '.' . $p_key);
+    }
+
+    protected function setLocal($p_key, $p_value){
+
+        $this->getDI()->get('global')->set('scope.' . $this->getId() . '.' . $p_key, $p_value);
+    }
+
+    //PARAMS
+    protected function setParams($p_params){
+
+        foreach($p_params as $key=>$value){
+
+            switch ($key) {
+                case 'URL':
+                    $this->setParamsByGroup('url', $value);
+                    break;
+
+                case 'GET':
+                    $this->setParamsByGroup('get', $value);
+                    break;
+
+                case 'POST':
+                    $this->setParamsByGroup('post', $value);
+                    break;
+
+                case 'FILES':
+                    $this->setParamsByGroup('files', $value);
+                    break;
+                
+                case 'JSON':
+                    $this->setParamByGroup('json', $value);
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
+        var_dump($this->getDI()->get('global')->all());exit();
+        //$this->getDI()->get('global')->has('scope.' . $this->getId() . '.' . $p_key);
+    }
+
     //VIEW VARS
 
     protected function setViewVar($p_key, $p_value){
@@ -236,9 +287,8 @@ class UiService extends Service {
 
     public function doPageRender($p_action, $p_params, $p_inherited = false){
         
-        $this->setScopeData("params", $p_params);
-        var_dump($this->getScopeAll());exit();
-
+        $this->setParams($p_params);
+        exit();
         if(method_exists($this,$p_action)){
 
             $this->$p_action();

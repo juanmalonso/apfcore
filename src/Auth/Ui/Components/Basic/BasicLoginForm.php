@@ -6,7 +6,7 @@ use Nubesys\Vue\Ui\Components\VueUiComponent;
 
 class BasicLoginForm extends VueUiComponent {
 
-    public function mainAction($p_params){
+    public function mainAction(){
 
         $message    = "";
 

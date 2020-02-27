@@ -15,7 +15,8 @@ class UiComponent extends Common {
     protected $csssources;
     protected $jssources;
 
-    protected $pageService;
+    protected $serviceId;
+    protected $parentComponentId;
 
     public function __construct($p_di)
     {
@@ -34,17 +35,6 @@ class UiComponent extends Common {
         $this->setViewVar("id", $this->getId());
     }
 
-    //PAGE
-    public function getPageService(){
-
-        return $this->pageService;
-    }
-
-    public function setPageService($p_pageService){
-
-        $this->pageService = $p_pageService;
-    }
-
     //ID
     public function getId(){
 
@@ -58,6 +48,22 @@ class UiComponent extends Common {
         $className      = strtolower(array_pop($pathPartes));
 
         $this->id = implode("-", array_map(function ($e){ return \Phalcon\Text::uncamelize($e);}, $pathPartes)) . "-" . $className .  "-" . md5(microtime(true));
+    }
+
+    //LOCALSCOPE
+    protected function hasLocal($p_key){
+
+        $this->getDI()->get('global')->has('scope.' . $this->getId() . '.' . $p_key);
+    }
+
+    protected function getLocal($p_key){
+
+        $this->getDI()->get('global')->get('scope.' . $this->getId() . '.' . $p_key);
+    }
+
+    protected function setLocal($p_key, $p_value){
+
+        $this->getDI()->get('global')->set('scope.' . $this->getId() . '.' . $p_key, $p_value);
     }
 
     //MAIN LIBRARY (MODULE Ejp:Core)
@@ -136,6 +142,8 @@ class UiComponent extends Common {
     public function doComponentRender($p_params, $p_page, $p_inherited = false){
 
         $this->setPageService($p_page);
+
+        $this->setScopeData("params", $p_params);
 
         if(method_exists($this,"mainAction")){
 

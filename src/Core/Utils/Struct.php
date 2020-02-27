@@ -19,7 +19,7 @@ class Struct
         return (object)json_decode(json_encode($p_object));
     }
 
-    public static function flatten(array $arr, $prefix = '', $depth = 2, $adepth = 1)
+    public static function flatten(array $arr, $prefix = '', $depth = 1, $adepth = 1)
     {
         $out = array();
         

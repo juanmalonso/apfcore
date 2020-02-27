@@ -53,40 +53,135 @@ class Common extends Injectable
     
 
     //COMMON CACHE MANAGMENT
-    protected function cacheHas($p_key){
+    protected function hasCahce($p_key){
 
         return $this->getDI()->get('cache')->has($p_key);
     }
 
-    protected function cacheGet($p_cacher, $p_key){
+    protected function getCache($p_cacher, $p_key){
 
         return $this->getDI()->get('cacher')->get($p_key);
     }
 
-    protected function cacheSet($p_key, $p_data, $p_lifetime = 3600){
+    protected function setCache($p_key, $p_data, $p_lifetime = 3600){
 
         return $this->getDI()->get('cache')->set($p_key, $p_data, $p_lifetime);
     }
 
     //COMMON SESSION MANAGMENT
-    protected function sessionGetId(){
+    protected function getSessionId(){
 
         return $this->getDI()->get('session')->getId();
     }
 
-    protected function sessionHas($p_key){
+    protected function hasSession($p_key){
 
         return $this->getDI()->get('session')->has($p_key);
     }
 
-    protected function sessionGet($p_key){
+    protected function getSession($p_key){
 
         return $this->getDI()->get('session')->get($p_key);
     }
 
-    protected function sessionSet($p_key, $p_value){
+    protected function setSession($p_key, $p_value){
 
         return $this->getDI()->get('session')->set($p_key, $p_value);
+    }
+
+    //GLOBAL SCOPE
+    protected function hasGlobal($p_key){
+
+        $this->getDI()->get('global')->has('global.' . $p_key);
+    }
+
+    protected function getGlobal($p_key){
+
+        $this->getDI()->get('global')->get('global.' . $p_key);
+    }
+
+    protected function setGlobal($p_key, $p_value){
+
+        $this->getDI()->get('global')->set('global.' . $p_key, $p_value);
+    }
+
+    //GET PARAM SCOPE
+    protected function hasGetParam($p_key){
+
+        $this->getDI()->get('global')->has('params.get.' . $p_key);
+    }
+
+    protected function getGetParam($p_group, $p_key){
+
+        $this->getDI()->get('global')->get('params.get.' . $p_key);
+    }
+
+    //URL PARAM SCOPE
+    protected function hasUrlParam($p_key){
+
+        $this->getDI()->get('global')->has('params.url.' . $p_key);
+    }
+
+    protected function getUrlParam($p_group, $p_key){
+
+        $this->getDI()->get('global')->get('params.url.' . $p_key);
+    }
+
+    //POST PARAM SCOPE
+    protected function hasPostParam($p_key){
+
+        $this->getDI()->get('global')->has('params.post.' . $p_key);
+    }
+
+    protected function getPostParam($p_group, $p_key){
+
+        $this->getDI()->get('global')->get('params.post.' . $p_key);
+    }
+
+    //FILES PARAM SCOPE
+    protected function hasFileParam($p_key){
+
+        $this->getDI()->get('global')->has('params.files.' . $p_key);
+    }
+
+    protected function getFileParam($p_key){
+
+        $this->getDI()->get('global')->get('params.files.' . $p_key);
+    }
+
+    //JSON PARAM SCOPE
+    protected function getJsonParam(){
+
+        $this->getDI()->get('global')->get('params.json');
+    }
+
+    //TODO : VER FUNCIONES de manejo de files buscar por nombre, has por nombre etc
+
+    //SET PARAM BY GROUP
+    protected function setParamByGroup($p_group, $p_value){
+
+        $this->getDI()->get('global')->set('params.' . $p_group, $p_value);
+    }
+
+    //SET PARAMS BY GROUP
+    protected function setParamsByGroup($p_group, $p_values){
+        var_dump($p_group);
+        var_dump($p_values);
+        foreach($p_values as $key=>$value){
+
+            $this->getDI()->get('global')->set('params.' . $p_group . '.' . $key, $value);
+        }
+    }
+
+    //GET PARAMS BY GROUP
+    protected function getParams($p_group){
+
+        return $this->getDI()->get('global')->getByKeyStartAt('params.' . $p_group );
+    }
+
+    protected function getAllParams(){
+
+        return $this->getDI()->get('global')->getByKeyStartAt('params.');
     }
 
 }
