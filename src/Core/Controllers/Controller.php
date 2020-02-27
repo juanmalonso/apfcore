@@ -11,29 +11,29 @@ class Controller extends PhalconController
         
         $urlparams = \Nubesys\Core\Utils\Url::parseUrlParams($this->dispatcher->getParams());
         
-        if(isset($urlparams[0]) && isset($urlparams[1]) && isset($urlparams[2])){
+        if(isset($urlparams[0]) && isset($urlparams[1]) && isset($urlparams[2]) && isset($urlparams[3])){
 
             $serviceType                    = $urlparams[0];
             switch ($serviceType) {
 
                 case 'api':
-                    $servicePathPartes      = \array_merge(array('nubesys', $urlparams[1], "ws"), explode("_", $urlparams[2]));
+                    $servicePathPartes      = \array_merge(array($urlparams[1], $urlparams[2], "ws"), explode("_", $urlparams[3]));
                     break;
 
                 case 'uip':
-                    $servicePathPartes      = \array_merge(array('nubesys', $urlparams[1], "ui", "pages"), explode("_", $urlparams[2]));
+                    $servicePathPartes      = \array_merge(array($urlparams[1], $urlparams[2],"ui", "pages"), explode("_", $urlparams[3]));
                     break;
 
                 case 'uid':
-                    $servicePathPartes      = \explode("_", $urlparams[2]);
+                    $servicePathPartes      = \explode("_", $urlparams[3]);
                     break;
 
                 case 'bin':
-                    $servicePathPartes      = \array_merge(array('nubesys', $urlparams[1], "bin"), explode("_", $urlparams[2]));
+                    $servicePathPartes      = \array_merge(array($urlparams[1], $urlparams[2], "bin"), explode("_", $urlparams[3]));
                     break;
 
                 case 'flow':
-                    $servicePathPartes      = \array_merge(array('nubesys', $urlparams[1], "flow"), explode("_", $urlparams[2]));
+                    $servicePathPartes      = \array_merge(array($urlparams[1], $urlparams[2], "flow"), explode("_", $urlparams[3]));
                     break;
             }
 

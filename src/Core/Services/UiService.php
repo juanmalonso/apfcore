@@ -2,12 +2,12 @@
 
 namespace Nubesys\Core\Services;
 
-use Nubesys\Core\Common;
+use Nubesys\Core\Services\Service;
 use Nubesys\Core\Ui\View\View;
 use Phalcon\Mvc\View\Engine\Volt;
 use Nubesys\Core\Register;
 
-class UiService extends Common {
+class UiService extends Service {
 
     protected $id;
     protected $view;
@@ -77,9 +77,33 @@ class UiService extends Common {
         return $this->view->get($p_key);
     }
 
+    //TITLE
     protected function setTitle($p_title){
 
         $this->view->set("pagetitle", $p_title);
+    }
+
+    //ACCESS CONTROL
+    //TODO VER SI HACE FALTA LLEVAR A LA SUPERCLASE PARA APIS
+    protected function accessControl($p_enabled){
+        
+        if($p_enabled){
+
+            $loginurl = $this->getDI()->get('config')->main->url->base . "login";
+            
+            if($this->sessionHas("user_loged")){
+
+                if(!$this->sessionGet("user_loged")){
+
+                    header("Location: " . $loginurl);
+                    exit();
+                }
+            }else{
+                
+                header("Location: " . $loginurl);
+                exit();
+            }
+        }
     }
 
     //REDIRECTION
@@ -88,9 +112,9 @@ class UiService extends Common {
 
     }
 
-    protected function goToUrl(){
+    protected function goToUrl($p_url){
 
-
+        
     }
 
     //PAGE REMOTE CSS
@@ -211,12 +235,16 @@ class UiService extends Common {
     }
 
     public function doPageRender($p_action, $p_params, $p_inherited = false){
+        
+        $this->setScopeData("params", $p_params);
+        var_dump($this->getScopeAll());exit();
 
         if(method_exists($this,$p_action)){
 
-            $this->$p_action($p_params);
+            $this->$p_action();
         }
 
+        //TODO : MEJORAR LA LOGICA DE LAS TEMPLATES PARA HACER TEMPLATE GLOBAL Y CONTENT TEMPLATE
         $this->view->loadTemplates($this->getDI()->get('config')->main->view->template->templates);
 
         //COMPILE CSSSOURCES

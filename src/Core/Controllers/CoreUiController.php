@@ -36,13 +36,7 @@ class CoreUiController extends Controller
                 $uiPageActionName   = $p_urlparams[3] . "Action";
             }
             
-            //$this->getDI()->get('sessionManager')->start($this->getDI()->get('global')->get('sesid'));
-            
             $this->getDI()->get("responseManager")->setHtml($uiService->doPageRender($uiPageActionName, $params));
-
-            //$this->getDI()->get('sessionManager')->end();
-
-            //$this->getDI()->get("responseObject")->setCookie("NBSSESSID", $this->getDI()->get('sessionManager')->getId());
             
         }else{
 
