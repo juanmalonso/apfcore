@@ -55,7 +55,7 @@ class VueUiComponent extends UiComponent {
     //XTEMPLATE
     public function addVueXtemplate($p_id, $p_code){
 
-        $this->pageService->addVueXtemplate($p_id, $p_code);
+        $this->getGlobal("service")->addVueXtemplate($p_id, $p_code);
     }
 
     protected function compileVueXtemplate($p_content){
@@ -96,9 +96,9 @@ class VueUiComponent extends UiComponent {
         $this->view->loadTemplates($vueTemplates);
     }
 
-    public function doComponentRender($p_params, $p_page, $p_inherited = false){
+    public function doComponentRender($p_params, $p_parent, $p_inherited = false){
 
-        parent::doComponentRender($p_params, $p_page, true);
+        parent::doComponentRender($p_params, $p_parent, true);
 
         $this->loadVueTemplates();
 

@@ -14,7 +14,7 @@ class Button extends VueUiComponent {
         //$this->readJsonFilesTest();
     }
 
-    public function testService($p_params){
+    public function testService(){
         
         $buttonsClasses = array("orange", "red", "black", "grey", "yellow", "olive", "green", "blue", "violet", "purple", "pink", "brown");
 
@@ -26,7 +26,7 @@ class Button extends VueUiComponent {
         $this->setServiceSuccess($result);
     }
 
-    public function dataService($p_params){
+    public function dataService(){
         
         $iconClasses = array("cat", "crow", "dog", "dove", "dragon", "feather", "feather alternate", "fish", "frog", "hippo", "horse", "kiwi");
 
@@ -36,44 +36,5 @@ class Button extends VueUiComponent {
         $result->iconClass = $iconClasses[rand(0, 11)];
 
         $this->setServiceSuccess($result);
-    }
-
-    protected function readJsonFilesTest($p_sufixPath = "data/objects/models/"){
-
-        foreach($this->getDI()->get('config')->loader->apfclassespaths as $apfclasspath){
-
-            $finalPath = "";
-
-            if($this->getDI()->get('config')->main->enviroment == 'dev'){
-
-                $finalPath .= $apfclasspath->devpath . "json/" . $p_sufixPath;
-            }else{
-
-                $finalPath .= $apfclasspath->propath . "json/" . $p_sufixPath;
-            }
-
-            if(is_dir($finalPath)){
-
-                if($dh = opendir($finalPath)){
-
-                    while (($file = readdir($dh)) !== false){
-
-                        if($file != "." && $file != ".."){
-
-                            var_dump($file);
-                        }
-                    }
-                }
-            }
-            /*foreach($namespaces as $namespace=>$path){
-    
-                if(strpos($replacepath['propath'], $path) != -1){
-    
-                    $namespaces[$namespace] = str_replace($replacepath['propath'], $replacepath['devpath'],$namespaces[$namespace]);
-                }
-            }*/
-        }
-
-        exit();
     }
 }

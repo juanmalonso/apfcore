@@ -49,7 +49,7 @@ class Phalcon extends Common {
     }
 
     public function getFILES(){
-
+        
         return $this->requestObject->getUploadedFiles();
     }
 

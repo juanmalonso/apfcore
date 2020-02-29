@@ -11,7 +11,7 @@ class Controller extends PhalconController
         
         $urlparams = \Nubesys\Core\Utils\Url::parseUrlParams($this->dispatcher->getParams());
         
-        if(isset($urlparams[0]) && isset($urlparams[1]) && isset($urlparams[2]) && isset($urlparams[3])){
+        if(isset($urlparams[0]) && isset($urlparams[1]) && isset($urlparams[2])){
 
             $serviceType                    = $urlparams[0];
             switch ($serviceType) {
@@ -25,7 +25,7 @@ class Controller extends PhalconController
                     break;
 
                 case 'uid':
-                    $servicePathPartes      = \explode("_", $urlparams[3]);
+                    $servicePathPartes      = \explode("_", $urlparams[1]);
                     break;
 
                 case 'bin':
@@ -36,7 +36,7 @@ class Controller extends PhalconController
                     $servicePathPartes      = \array_merge(array($urlparams[1], $urlparams[2], "flow"), explode("_", $urlparams[3]));
                     break;
             }
-
+            
             $serviceClass                   = implode("\\",array_map(function ($e){ return \Phalcon\Text::camelize($e);}, $servicePathPartes));
             
             $serviceLoaderMethod            = $this->getLoaderMethod($urlparams[0]);

@@ -10,16 +10,12 @@ class BasicLoginForm extends VueUiComponent {
 
         $message    = "";
 
-        if(isset($p_params['POST']['login']) && isset($p_params['POST']['password'])){
-
-            $user       = $p_params['POST']['login'];
-            $pass       = $p_params['POST']['password'];
-
-            //V1 - ACCESO POR CONFIGURACION
+        if($this->hasPostParam('login') && $this->hasPostParam('password')){
+            
             $userData   = false;
             foreach($this->getDI()->get('config')->users->users->toArray() as $userDataTmp){
 
-                if($userDataTmp['login'] == $user && $userDataTmp['password'] == $pass){
+                if($userDataTmp['login'] == $this->getPostParam('login') && $userDataTmp['password'] == $this->getPostParam('password')){
 
                     $userData = $userDataTmp;
                     break;
@@ -28,23 +24,22 @@ class BasicLoginForm extends VueUiComponent {
 
             if($userData !== false){
 
-                $this->sessionSet("user_loged", true);
-                $this->sessionSet("user_login", $userData['login']);
-                $this->sessionSet("user_role", $userData['role']);
-                $this->sessionSet("user_firstname", $userData['first_name']);
-                $this->sessionSet("user_lastname", $userData['last_name']);
-                $this->sessionSet("user_avatar", $userData['avatar']);
+                $this->setSession("user_loged", true);
+                $this->setSession("user_login", $userData['login']);
+                $this->setSession("user_role", $userData['role']);
+                $this->setSession("user_firstname", $userData['first_name']);
+                $this->setSession("user_lastname", $userData['last_name']);
+                $this->setSession("user_avatar", $userData['avatar']);
 
                 //TODO : Falta majejo de privilegios
 
                 $rolestr        = $userData['role'];
                 $startpage      = $this->getDI()->get('config')->main->url->base . $this->getDI()->get('config')->users->roles->$rolestr->startpage;
 
-                $this->sessionSet("user_startpage", $startpage);
+                $this->setSession("user_startpage", $startpage);
 
                 header("Location: " . $startpage);
             }
-
         }
 
         $this->setJsDataVar("message",$message);

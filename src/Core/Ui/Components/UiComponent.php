@@ -10,13 +10,13 @@ use Nubesys\Core\Register;
 class UiComponent extends Common {
 
     protected $id;
+    protected $serviceId;
+    protected $parentComponentId;
+
     protected $view;
 
     protected $csssources;
     protected $jssources;
-
-    protected $serviceId;
-    protected $parentComponentId;
 
     public function __construct($p_di)
     {
@@ -31,6 +31,9 @@ class UiComponent extends Common {
 
         $this->generateId();
 
+        //SERVICE ID
+        $this->setServiceId($this->getGlobal("serviceId"));
+
         //INITIALS VIEW VARS
         $this->setViewVar("id", $this->getId());
     }
@@ -39,6 +42,28 @@ class UiComponent extends Common {
     public function getId(){
 
         return $this->id;
+    }
+
+    //SERVICE ID
+    public function getServiceId(){
+
+        return $this->serviceId;
+    }
+
+    public function setServiceId($p_serviceId){
+
+        $this->serviceId = $p_serviceId;
+    }
+
+    //PARENT ID
+    public function getParentId(){
+
+        return $this->parentComponentId;
+    }
+
+    public function setParentId($p_parentComponentId){
+
+        $this->parentComponentId = $p_parentComponentId;
     }
 
     private function generateId(){
@@ -50,15 +75,15 @@ class UiComponent extends Common {
         $this->id = implode("-", array_map(function ($e){ return \Phalcon\Text::uncamelize($e);}, $pathPartes)) . "-" . $className .  "-" . md5(microtime(true));
     }
 
-    //LOCALSCOPE
+    //LOCAL SCOPE
     protected function hasLocal($p_key){
 
-        $this->getDI()->get('global')->has('scope.' . $this->getId() . '.' . $p_key);
+        return $this->getDI()->get('global')->has('scope.' . $this->getId() . '.' . $p_key);
     }
 
     protected function getLocal($p_key){
 
-        $this->getDI()->get('global')->get('scope.' . $this->getId() . '.' . $p_key);
+        return $this->getDI()->get('global')->get('scope.' . $this->getId() . '.' . $p_key);
     }
 
     protected function setLocal($p_key, $p_value){
@@ -66,12 +91,49 @@ class UiComponent extends Common {
         $this->getDI()->get('global')->set('scope.' . $this->getId() . '.' . $p_key, $p_value);
     }
 
-    //MAIN LIBRARY (MODULE Ejp:Core)
-    protected function getMainLibraryName(){
+    protected function getAllLocals(){
 
-        $pathPartes     = explode("\\", $this->getClassPath());
+        return $this->getDI()->get('global')->getByKeyPrefix('scope.' . $this->getId() . '.');
+    }
 
-        return \Phalcon\Text::uncamelize($pathPartes[1]);
+    protected function setAllLocals($p_values){
+        
+        foreach($p_values as $key=>$value){
+            
+            $this->getDI()->get('global')->set('scope.' . $this->getId() . '.' . $key, $value);
+        }
+    }
+
+    //PARENT SCOPE
+    protected function hasParent($p_key){
+
+        return $this->getDI()->get('global')->has('scope.' . $this->getParentId() . '.' . $p_key);
+    }
+
+    protected function getParent($p_key){
+
+        return $this->getDI()->get('global')->get('scope.' . $this->getParentId() . '.' . $p_key);
+    }
+
+    protected function getAllParents($p_key, $p_value){
+
+        return $this->getDI()->get('global')->getByKeyPrefix('scope.' . $this->getParentId() . '.');
+    }
+
+    //SERVICE SCOPE
+    protected function hasService($p_key){
+
+        return $this->getDI()->get('global')->has('scope.' . $this->getServiceId() . '.' . $p_key);
+    }
+
+    protected function getService($p_key){
+
+        return $this->getDI()->get('global')->get('scope.' . $this->getServiceId() . '.' . $p_key);
+    }
+
+    protected function getAllService($p_key, $p_value){
+
+        return $this->getDI()->get('global')->getByKeyPrefix('scope.' . $this->getServiceId() . '.');
     }
 
     //URL CLASS PATH
@@ -79,7 +141,39 @@ class UiComponent extends Common {
 
         $pathPartes     = explode("\\", $this->getClassPath());
 
-        return   "uid/" . $this->getMainLibraryName() . "/" . implode("_", array_map(function ($e){ return \Phalcon\Text::uncamelize($e);}, $pathPartes));
+        return   "uid/" . implode("_", array_map(function ($e){ return \Phalcon\Text::uncamelize($e);}, $pathPartes));
+    }
+
+    //PARAMS
+    protected function setParams($p_params){
+
+        foreach($p_params as $key=>$value){
+
+            switch ($key) {
+                case 'URL':
+                    $this->setParamsByGroup('url', $value);
+                    break;
+
+                case 'GET':
+                    $this->setParamsByGroup('get', $value);
+                    break;
+
+                case 'POST':
+                    $this->setParamsByGroup('post', $value);
+                    break;
+
+                case 'FILES':
+                    $this->setParamsByGroup('files', $value);
+                    break;
+                
+                case 'JSON':
+                    $this->setJsonParam($value);
+                    break;
+
+                default:
+                    break;
+            }
+        }
     }
 
     //VIEW VARS
@@ -102,13 +196,13 @@ class UiComponent extends Common {
     //PAGE REMOTE CSS
     public function addCssSource($p_value){
 
-        $this->pageService->addCssSource($p_value);
+        $this->getGlobal("service")->addCssSource($p_value);
     }
 
     //PAGE REMOTE JS
     public function addJsSource($p_value){
 
-        $this->pageService->addJsSource($p_value);
+        $this->getGlobal("service")->addJsSource($p_value);
     }
 
     //SNIPPETS
@@ -119,7 +213,7 @@ class UiComponent extends Common {
 
     protected function addCssSnippet($p_id, $p_code){
         
-        $this->pageService->addCssSnippet($p_id, $p_code);
+        $this->getGlobal("service")->addCssSnippet($p_id, $p_code);
     }
 
     protected function compileJsSnippets(){
@@ -129,21 +223,26 @@ class UiComponent extends Common {
 
     protected function addJsSnippet($p_id, $p_code){
    
-        $this->pageService->addJsSnippet($p_id, $p_code);
+        $this->getGlobal("service")->addJsSnippet($p_id, $p_code);
     }
 
     //COMPONENT
     public function addJsComponent($p_id, $p_code){
 
-        $this->pageService->addJsComponent($p_id, $p_code);
+        $this->getGlobal("service")->addJsComponent($p_id, $p_code);
+    }
+
+    protected function placeComponent($p_place, $p_instance, $p_params = array()){
+
+        $this->setViewVar($p_place, $p_instance->doComponentRender($p_params, $this->getId()));
     }
 
     //RENDER
-    public function doComponentRender($p_params, $p_page, $p_inherited = false){
+    public function doComponentRender($p_params, $p_parent, $p_inherited = false){
 
-        $this->setPageService($p_page);
-
-        $this->setScopeData("params", $p_params);
+        $this->setParentId($p_parent);
+        
+        $this->setAllLocals($p_params);
 
         if(method_exists($this,"mainAction")){
 
@@ -200,9 +299,11 @@ class UiComponent extends Common {
 
     public function doService($p_uiServiceName, $p_params){
         
+        $this->setParams($p_params);
+        
         if(method_exists($this, $p_uiServiceName)){
 
-            $this->$p_uiServiceName($p_params);
+            $this->$p_uiServiceName();
         }
 
         return 0;

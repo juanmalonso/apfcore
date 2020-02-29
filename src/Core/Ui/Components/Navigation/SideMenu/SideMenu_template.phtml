@@ -1,0 +1,7 @@
+<div class="ui visible left vertical inverted sidebar labeled icon menu" style="min-width:75px;">
+    <a v-for="(item, index) in items" :key="index" class="item"
+        style="padding-right: 8px; padding-left: 8px; min-width:100%;" v-bind:href="item.url">
+        <i v-bind:class="item.icon"></i>
+        ${ item.label }
+    </a>
+</div>

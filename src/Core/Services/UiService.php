@@ -28,6 +28,10 @@ class UiService extends Service {
 
         $this->generateId();
 
+        //GLOBAL SERVICE ID
+        $this->setGlobal("serviceId", $this->getId());
+        $this->setGlobal("service", $this);
+
         //INITIALS VIEW VARS
         $this->setViewVar("id", $this->getId());
         $this->setViewVar("splashurl", $this->getDI()->get('config')->ui->splash->url);
@@ -63,17 +67,30 @@ class UiService extends Service {
     //LOCALSCOPE
     protected function hasLocal($p_key){
 
-        $this->getDI()->get('global')->has('scope.' . $this->getId() . '.' . $p_key);
+        return $this->getDI()->get('global')->has('scope.' . $this->getId() . '.' . $p_key);
     }
 
     protected function getLocal($p_key){
 
-        $this->getDI()->get('global')->get('scope.' . $this->getId() . '.' . $p_key);
+        return $this->getDI()->get('global')->get('scope.' . $this->getId() . '.' . $p_key);
     }
 
     protected function setLocal($p_key, $p_value){
 
         $this->getDI()->get('global')->set('scope.' . $this->getId() . '.' . $p_key, $p_value);
+    }
+
+    protected function getAllLocals(){
+
+        return $this->getDI()->get('global')->getByKeyPrefix('scope.' . $this->getId() . '.');
+    }
+
+    protected function setAllLocals($p_values){
+        
+        foreach($p_values as $key=>$value){
+
+            $this->getDI()->get('global')->set('scope.' . $this->getId() . '.' . $p_key, $value);
+        }
     }
 
     //PARAMS
@@ -99,16 +116,13 @@ class UiService extends Service {
                     break;
                 
                 case 'JSON':
-                    $this->setParamByGroup('json', $value);
+                    $this->setJsonParam($value);
                     break;
 
                 default:
                     break;
             }
         }
-
-        var_dump($this->getDI()->get('global')->all());exit();
-        //$this->getDI()->get('global')->has('scope.' . $this->getId() . '.' . $p_key);
     }
 
     //VIEW VARS
@@ -135,16 +149,16 @@ class UiService extends Service {
     }
 
     //ACCESS CONTROL
-    //TODO VER SI HACE FALTA LLEVAR A LA SUPERCLASE PARA APIS
+    //TODO VER SI HACE FALTA LLEVAR A LA SUPERCLASE PARA LAS APIS
     protected function accessControl($p_enabled){
         
         if($p_enabled){
 
             $loginurl = $this->getDI()->get('config')->main->url->base . "login";
             
-            if($this->sessionHas("user_loged")){
+            if($this->hasSession("user_loged")){
 
-                if(!$this->sessionGet("user_loged")){
+                if(!$this->getSession("user_loged")){
 
                     header("Location: " . $loginurl);
                     exit();
@@ -280,15 +294,15 @@ class UiService extends Service {
         $this->addSnippet("jscomponents", $p_id, "js", $p_code);
     }
 
-    protected function placeComponent($p_place, $p_instance, $p_params){
-
-        $this->setViewVar($p_place, $p_instance->doComponentRender($p_params, $this));
+    protected function placeComponent($p_place, $p_instance, $p_params = array()){
+        
+        $this->setViewVar($p_place, $p_instance->doComponentRender($p_params, $this->getId()));
     }
 
     public function doPageRender($p_action, $p_params, $p_inherited = false){
         
         $this->setParams($p_params);
-        exit();
+        
         if(method_exists($this,$p_action)){
 
             $this->$p_action();
@@ -296,7 +310,7 @@ class UiService extends Service {
 
         //TODO : MEJORAR LA LOGICA DE LAS TEMPLATES PARA HACER TEMPLATE GLOBAL Y CONTENT TEMPLATE
         $this->view->loadTemplates($this->getDI()->get('config')->main->view->template->templates);
-
+        
         //COMPILE CSSSOURCES
         $this->compileCssSources();
 

@@ -53,7 +53,7 @@ class CoreUiController extends Controller
             $params = array();
             $params['URL']          = $p_urlparams;
             $params['GET']          = $this->getDI()->get('requestManager')->getGET();
-            $params['JSON']         = $this->getDI()->get('requestManager')->getPOST();
+            $params['JSON']         = $this->getDI()->get('requestManager')->getJSON();
             $params['FILES']        = $this->getDI()->get('requestManager')->getFILES();
 
             $uiServiceName          = "dataService";
@@ -65,11 +65,8 @@ class CoreUiController extends Controller
 
             $this->getDI()->get("responseManager")->setHeader("Content-Type", "application/json");
 
-            //$this->getDI()->get('sessionManager')->start($this->getDI()->get('global')->get('sesid'));
-            
             $uiService->doService($uiServiceName, $params);
 
-            //$this->getDI()->get('sessionManager')->end();
         }else{
 
             //TODO: ERROR

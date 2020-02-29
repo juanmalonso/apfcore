@@ -92,12 +92,17 @@ class Common extends Injectable
     //GLOBAL SCOPE
     protected function hasGlobal($p_key){
 
-        $this->getDI()->get('global')->has('global.' . $p_key);
+        return $this->getDI()->get('global')->has('global.' . $p_key);
     }
 
     protected function getGlobal($p_key){
 
-        $this->getDI()->get('global')->get('global.' . $p_key);
+        return $this->getDI()->get('global')->get('global.' . $p_key);
+    }
+
+    protected function getAllGlobal($p_key){
+
+        return $this->getDI()->get('global')->getByKeyStartAt('global.');
     }
 
     protected function setGlobal($p_key, $p_value){
@@ -108,65 +113,94 @@ class Common extends Injectable
     //GET PARAM SCOPE
     protected function hasGetParam($p_key){
 
-        $this->getDI()->get('global')->has('params.get.' . $p_key);
+        return $this->getDI()->get('global')->has('params.get.' . $p_key);
     }
 
-    protected function getGetParam($p_group, $p_key){
+    protected function getGetParam($p_key){
 
-        $this->getDI()->get('global')->get('params.get.' . $p_key);
+        return $this->getDI()->get('global')->get('params.get.' . $p_key);
+    }
+
+    protected function getAllGetParams(){
+
+        return $this->getParams("get");
     }
 
     //URL PARAM SCOPE
     protected function hasUrlParam($p_key){
 
-        $this->getDI()->get('global')->has('params.url.' . $p_key);
+        return $this->getDI()->get('global')->has('params.url.' . $p_key);
     }
 
-    protected function getUrlParam($p_group, $p_key){
+    protected function getUrlParam($p_key){
 
-        $this->getDI()->get('global')->get('params.url.' . $p_key);
+        return $this->getDI()->get('global')->get('params.url.' . $p_key);
+    }
+
+    protected function getAllUrlParams(){
+
+        return $this->getParams("url");
     }
 
     //POST PARAM SCOPE
     protected function hasPostParam($p_key){
 
-        $this->getDI()->get('global')->has('params.post.' . $p_key);
+        return $this->getDI()->get('global')->has('params.post.' . $p_key);
     }
 
-    protected function getPostParam($p_group, $p_key){
+    protected function getPostParam($p_key){
 
-        $this->getDI()->get('global')->get('params.post.' . $p_key);
+        return $this->getDI()->get('global')->get('params.post.' . $p_key);
+    }
+
+    protected function getAllPostParams(){
+
+        return $this->getParams("post");
     }
 
     //FILES PARAM SCOPE
     protected function hasFileParam($p_key){
 
-        $this->getDI()->get('global')->has('params.files.' . $p_key);
+        return $this->getDI()->get('global')->has('params.files.' . $p_key);
     }
 
     protected function getFileParam($p_key){
 
-        $this->getDI()->get('global')->get('params.files.' . $p_key);
+        return $this->getDI()->get('global')->get('params.files.' . $p_key);
+    }
+
+    protected function getAllFileParams(){
+
+        return $this->getParams("files");
     }
 
     //JSON PARAM SCOPE
+    protected function hasJsonParam(){
+
+        return $this->getDI()->get('global')->get('params.json');
+    }
+
     protected function getJsonParam(){
 
-        $this->getDI()->get('global')->get('params.json');
+        return $this->getDI()->get('global')->get('params.json');
+    }
+
+    protected function setJsonParam($p_value){
+
+        $this->getDI()->get('global')->set('params.json', $p_value);
     }
 
     //TODO : VER FUNCIONES de manejo de files buscar por nombre, has por nombre etc
 
     //SET PARAM BY GROUP
-    protected function setParamByGroup($p_group, $p_value){
+    protected function setParamByGroup($p_group, $p_key, $p_value){
 
-        $this->getDI()->get('global')->set('params.' . $p_group, $p_value);
+        $this->getDI()->get('global')->set('params.' . $p_group . '.' . $p_key, $p_value);
     }
 
     //SET PARAMS BY GROUP
     protected function setParamsByGroup($p_group, $p_values){
-        var_dump($p_group);
-        var_dump($p_values);
+        
         foreach($p_values as $key=>$value){
 
             $this->getDI()->get('global')->set('params.' . $p_group . '.' . $key, $value);
@@ -176,12 +210,12 @@ class Common extends Injectable
     //GET PARAMS BY GROUP
     protected function getParams($p_group){
 
-        return $this->getDI()->get('global')->getByKeyStartAt('params.' . $p_group );
+        return $this->getDI()->get('global')->getByKeyPrefix('params.' . $p_group . '.');
     }
 
     protected function getAllParams(){
 
-        return $this->getDI()->get('global')->getByKeyStartAt('params.');
+        return $this->getDI()->get('global')->getByKeyPrefix('params.');
     }
 
 }
