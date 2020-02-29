@@ -83,7 +83,7 @@ class UiComponent extends Common {
 
     protected function getLocal($p_key){
 
-        return $this->getDI()->get('global')->get('scope.' . $this->getId() . '.' . $p_key);
+        return $this->replaceValues($this->getDI()->get('global')->get('scope.' . $this->getId() . '.' . $p_key));
     }
 
     protected function setLocal($p_key, $p_value){
@@ -93,14 +93,25 @@ class UiComponent extends Common {
 
     protected function getAllLocals(){
 
-        return $this->getDI()->get('global')->getByKeyPrefix('scope.' . $this->getId() . '.');
+        $prefix     = 'scope.' . $this->getId() . '.';
+
+        $result     = array();
+
+        foreach($this->getDI()->get('global')->getByKeyStartAt($prefix) as $key=>$value){
+            
+            $result[str_replace($prefix, "", $key)] = $this->replaceValues($value);
+        }
+
+        return $result;
     }
 
     protected function setAllLocals($p_values){
         
+        $prefix     = 'scope.' . $this->getId() . '.';
+
         foreach($p_values as $key=>$value){
             
-            $this->getDI()->get('global')->set('scope.' . $this->getId() . '.' . $key, $value);
+            $this->getDI()->get('global')->set($prefix . $key, $value);
         }
     }
 
@@ -112,12 +123,21 @@ class UiComponent extends Common {
 
     protected function getParent($p_key){
 
-        return $this->getDI()->get('global')->get('scope.' . $this->getParentId() . '.' . $p_key);
+        return $this->replaceValues($this->getDI()->get('global')->get('scope.' . $this->getParentId() . '.' . $p_key));
     }
 
-    protected function getAllParents($p_key, $p_value){
+    protected function getAllParents(){
 
-        return $this->getDI()->get('global')->getByKeyPrefix('scope.' . $this->getParentId() . '.');
+        $prefix     = 'scope.' . $this->getParentId() . '.';
+
+        $result     = array();
+
+        foreach($this->getDI()->get('global')->getByKeyStartAt($prefix) as $key=>$value){
+            
+            $result[str_replace($prefix, "", $key)] = $this->replaceValues($value);
+        }
+
+        return $result;
     }
 
     //SERVICE SCOPE
@@ -128,12 +148,21 @@ class UiComponent extends Common {
 
     protected function getService($p_key){
 
-        return $this->getDI()->get('global')->get('scope.' . $this->getServiceId() . '.' . $p_key);
+        return $this->replaceValues($this->getDI()->get('global')->get('scope.' . $this->getServiceId() . '.' . $p_key));
     }
 
-    protected function getAllService($p_key, $p_value){
+    protected function getAllService(){
 
-        return $this->getDI()->get('global')->getByKeyPrefix('scope.' . $this->getServiceId() . '.');
+        $prefix     = 'scope.' . $this->getServiceId() . '.';
+
+        $result     = array();
+
+        foreach($this->getDI()->get('global')->getByKeyStartAt($prefix) as $key=>$value){
+            
+            $result[str_replace($prefix, "", $key)] = $this->replaceValues($value);
+        }
+
+        return $result;
     }
 
     //URL CLASS PATH
@@ -196,13 +225,13 @@ class UiComponent extends Common {
     //PAGE REMOTE CSS
     public function addCssSource($p_value){
 
-        $this->getGlobal("service")->addCssSource($p_value);
+        $this->getDI()->get('global')->get('service')->addCssSource($p_value);
     }
 
     //PAGE REMOTE JS
     public function addJsSource($p_value){
 
-        $this->getGlobal("service")->addJsSource($p_value);
+        $this->getDI()->get('global')->get('service')->addJsSource($p_value);
     }
 
     //SNIPPETS
@@ -213,7 +242,7 @@ class UiComponent extends Common {
 
     protected function addCssSnippet($p_id, $p_code){
         
-        $this->getGlobal("service")->addCssSnippet($p_id, $p_code);
+        $this->getDI()->get('global')->get('service')->addCssSnippet($p_id, $p_code);
     }
 
     protected function compileJsSnippets(){
@@ -223,13 +252,13 @@ class UiComponent extends Common {
 
     protected function addJsSnippet($p_id, $p_code){
    
-        $this->getGlobal("service")->addJsSnippet($p_id, $p_code);
+        $this->getDI()->get('global')->get('service')->addJsSnippet($p_id, $p_code);
     }
 
     //COMPONENT
     public function addJsComponent($p_id, $p_code){
 
-        $this->getGlobal("service")->addJsComponent($p_id, $p_code);
+        $this->getDI()->get('global')->get('service')->addJsComponent($p_id, $p_code);
     }
 
     protected function placeComponent($p_place, $p_instance, $p_params = array()){
@@ -240,6 +269,8 @@ class UiComponent extends Common {
     //RENDER
     public function doComponentRender($p_params, $p_parent, $p_inherited = false){
 
+        $this->loadJsonTree();
+        
         $this->setParentId($p_parent);
         
         $this->setAllLocals($p_params);
@@ -299,6 +330,8 @@ class UiComponent extends Common {
 
     public function doService($p_uiServiceName, $p_params){
         
+        $this->loadJsonTree();
+
         $this->setParams($p_params);
         
         if(method_exists($this, $p_uiServiceName)){

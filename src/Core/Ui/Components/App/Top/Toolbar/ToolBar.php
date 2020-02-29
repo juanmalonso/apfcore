@@ -23,4 +23,9 @@ class SideMenu extends VueUiComponent {
             $this->setJsDataVar("user",false);
         }
     }
+
+    private function getItemAbsoluteUrl($p_path){
+
+        return $this->getDI()->getConfig('main')->url->base . $p_path;
+    }
 }

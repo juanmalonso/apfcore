@@ -23,13 +23,13 @@ class BasicLoginForm extends VueUiComponent {
             }
 
             if($userData !== false){
-
+                
                 $this->setSession("user_loged", true);
                 $this->setSession("user_login", $userData['login']);
                 $this->setSession("user_role", $userData['role']);
                 $this->setSession("user_firstname", $userData['first_name']);
                 $this->setSession("user_lastname", $userData['last_name']);
-                $this->setSession("user_avatar", $userData['avatar']);
+                $this->setSession("user_avatar", $userData['avatar']['url']);
 
                 //TODO : Falta majejo de privilegios
 

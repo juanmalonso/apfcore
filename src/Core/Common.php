@@ -81,7 +81,7 @@ class Common extends Injectable
 
     protected function getSession($p_key){
 
-        return $this->getDI()->get('session')->get($p_key);
+        return $this->replaceValues($this->getDI()->get('session')->get($p_key));
     }
 
     protected function setSession($p_key, $p_value){
@@ -97,12 +97,21 @@ class Common extends Injectable
 
     protected function getGlobal($p_key){
 
-        return $this->getDI()->get('global')->get('global.' . $p_key);
+        return $this->replaceValues($this->getDI()->get('global')->get('global.' . $p_key));
     }
 
-    protected function getAllGlobal($p_key){
+    protected function getAllGlobal(){
 
-        return $this->getDI()->get('global')->getByKeyStartAt('global.');
+        $prefix     = 'global.';
+
+        $result     = array();
+
+        foreach($this->getDI()->get('global')->getByKeyStartAt($prefix) as $key=>$value){
+            
+            $result[str_replace($prefix, "", $key)] = $this->replaceValues($value);
+        }
+
+        return $result;
     }
 
     protected function setGlobal($p_key, $p_value){
@@ -210,12 +219,94 @@ class Common extends Injectable
     //GET PARAMS BY GROUP
     protected function getParams($p_group){
 
-        return $this->getDI()->get('global')->getByKeyPrefix('params.' . $p_group . '.');
+        $prefix     = 'params.' . $p_group . '.';
+    
+        $result     = array();
+
+        foreach($this->getDI()->get('global')->getByKeyStartAt($prefix) as $key=>$value){
+            
+            $result[str_replace($prefix, "", $key)] = $value;
+        }
+
+        return $result;
     }
 
     protected function getAllParams(){
 
-        return $this->getDI()->get('global')->getByKeyPrefix('params.');
+        $prefix     = 'params.';
+    
+        $result     = array();
+
+        foreach($this->getDI()->get('global')->getByKeyStartAt($prefix) as $key=>$value){
+            
+            $result[str_replace($prefix, "", $key)] = $value;
+        }
+
+        return $result;
+    }
+
+    //JSON TREE
+    protected function loadJsonTree($p_extraVars = array()){
+        //TODO : Hacer cacheable los datos del JSON
+        $path   = $this->classDir . "/" . $this->className . "_service.json";
+        
+        if(file_exists($path)){
+
+            $rawServiceMainData             = json_decode(file_get_contents($path), true);
+
+            $serviceMainData                = \Nubesys\Core\Utils\Struct::flatten($rawServiceMainData,"",2);
+            
+            $this->setAllLocals($serviceMainData);
+        }
+    }
+
+    protected function replaceValues($p_value){
+        $result = $p_value;
+
+        if(\is_string($p_value)){
+            
+            $matches = array();
+
+            if(\preg_match('/^(v|f)\{(.*):(.*)\}$/', $p_value, $matches)){
+
+                if($matches[1] == "v"){
+
+                    switch ($matches[2]) {
+                        case 'session':
+                            $result = $this->getSession($matches[3]);
+                            break;
+                        case 'global':
+                            $result = $this->getGlobal($matches[3]);
+                            break;
+                        case 'service':
+                            $result = $this->getService($matches[3]);
+                            break;
+                        case 'local':
+                            $result = $this->getLocal($matches[3]);
+                            break;
+                        
+                        default:
+                            # code...
+                            break;
+                    }
+                }else if($matches[1] == "f"){
+
+                    $method     = $matches[2];
+                    $params     = \explode(",", $matches[3]);
+
+                    $result     = $this->$method($param);
+                }
+            }
+        }else if(\is_array($p_value)){
+
+            $result = array();
+            foreach($p_value as $key=>$value){
+
+                $result[$key] = $this->replaceValues($value);
+            }
+        }
+
+        return $result;
     }
 
 }

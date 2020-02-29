@@ -19,7 +19,7 @@ class Struct
         return (object)json_decode(json_encode($p_object));
     }
 
-    public static function flatten(array $arr, $prefix = '', $depth = 1, $adepth = 1)
+    public static function flatten(array $arr, $prefix = '', $depth = 0, $adepth = 0)
     {
         $out = array();
         
@@ -27,6 +27,8 @@ class Struct
             $arr = (array)$arr;
         }
         
+        $adepth++;
+
         foreach ($arr as $k => $v) {
 
             $key = (!strlen($prefix)) ? $k : "{$prefix}.{$k}";
@@ -34,9 +36,9 @@ class Struct
             if($adepth < $depth){
                 
                 if (is_array($v)) {
-                    $out += self::flatten($v, $key, $depth, $adepth++);
+                    $out += self::flatten($v, $key, $depth, $adepth);
                 } elseif(is_object($v)){
-                    $out += self::flatten((array)$v,$key, $depth, $adepth++);
+                    $out += self::flatten((array)$v,$key, $depth, $adepth);
                 } else {
                     $out[$key] = $v;
                 }

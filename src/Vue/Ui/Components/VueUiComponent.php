@@ -55,7 +55,7 @@ class VueUiComponent extends UiComponent {
     //XTEMPLATE
     public function addVueXtemplate($p_id, $p_code){
 
-        $this->getGlobal("service")->addVueXtemplate($p_id, $p_code);
+        $this->getDI()->get('global')->get('service')->addVueXtemplate($p_id, $p_code);
     }
 
     protected function compileVueXtemplate($p_content){

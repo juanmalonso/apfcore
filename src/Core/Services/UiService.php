@@ -30,7 +30,7 @@ class UiService extends Service {
 
         //GLOBAL SERVICE ID
         $this->setGlobal("serviceId", $this->getId());
-        $this->setGlobal("service", $this);
+        $this->getDI()->get('global')->set('service', $this);
 
         //INITIALS VIEW VARS
         $this->setViewVar("id", $this->getId());
@@ -72,7 +72,7 @@ class UiService extends Service {
 
     protected function getLocal($p_key){
 
-        return $this->getDI()->get('global')->get('scope.' . $this->getId() . '.' . $p_key);
+        return $this->replaceValues($this->getDI()->get('global')->get('scope.' . $this->getId() . '.' . $p_key));
     }
 
     protected function setLocal($p_key, $p_value){
@@ -82,14 +82,25 @@ class UiService extends Service {
 
     protected function getAllLocals(){
 
-        return $this->getDI()->get('global')->getByKeyPrefix('scope.' . $this->getId() . '.');
+        $prefix     = 'scope.' . $this->getId() . '.';
+
+        $result     = array();
+
+        foreach($this->getDI()->get('global')->getByKeyStartAt($prefix) as $key=>$value){
+            
+            $result[str_replace($prefix, "", $key)] = $this->replaceValues($value);
+        }
+
+        return $result;
     }
 
     protected function setAllLocals($p_values){
         
-        foreach($p_values as $key=>$value){
+        $prefix     = 'scope.' . $this->getId() . '.';
 
-            $this->getDI()->get('global')->set('scope.' . $this->getId() . '.' . $p_key, $value);
+        foreach($p_values as $key=>$value){
+            
+            $this->getDI()->get('global')->set($prefix . $key, $value);
         }
     }
 
@@ -146,29 +157,6 @@ class UiService extends Service {
     protected function setTitle($p_title){
 
         $this->view->set("pagetitle", $p_title);
-    }
-
-    //ACCESS CONTROL
-    //TODO VER SI HACE FALTA LLEVAR A LA SUPERCLASE PARA LAS APIS
-    protected function accessControl($p_enabled){
-        
-        if($p_enabled){
-
-            $loginurl = $this->getDI()->get('config')->main->url->base . "login";
-            
-            if($this->hasSession("user_loged")){
-
-                if(!$this->getSession("user_loged")){
-
-                    header("Location: " . $loginurl);
-                    exit();
-                }
-            }else{
-                
-                header("Location: " . $loginurl);
-                exit();
-            }
-        }
     }
 
     //REDIRECTION
@@ -301,6 +289,8 @@ class UiService extends Service {
 
     public function doPageRender($p_action, $p_params, $p_inherited = false){
         
+        $this->loadJsonTree();
+
         $this->setParams($p_params);
         
         if(method_exists($this,$p_action)){
