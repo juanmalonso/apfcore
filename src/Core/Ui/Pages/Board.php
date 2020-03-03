@@ -8,6 +8,9 @@ use Nubesys\Vue\Services\VueUiService;
 use Nubesys\Core\Ui\Components\Navigation\SideMenu\SideMenu;
 use Nubesys\Core\Ui\Components\App\Top\TopBar\TopBar;
 
+//NUBESYS DATA ENGINE
+use Nubesys\Data\Objects\DataEngine;
+
 class Board extends VueUiService {
 
     public function mainAction(){
@@ -15,6 +18,8 @@ class Board extends VueUiService {
         $this->accessControl();
 
         $this->setTitle($this->getLocal("title"));
+
+        $dataEngine = new DataEngine($this->getDI());
 
         $this->setViewVar("content", "Panel Principal de Prueba");
         

@@ -1,18 +1,18 @@
 {
-    "accessControl":true,
-    "title": "Board",
-    "navigation": {
-        "user": {
-            "label":"v{session:user_login}",
-            "url":"http://localhost/profile",
-            "avatar":"f{getSession:user_avatar}"
-        },
-        "items":[
-            {
-                "label":"Inicio",
-                "url":"http://localhost/board/",
-                "icon":"home icon"
-            }
-        ]
-    }
+  "accessControl": true,
+  "title": "Board",
+  "navigation": {
+    "user": {
+      "label": "v{session:user_login}",
+      "url": "http://localhost/profile",
+      "avatar": "f{getSession:user_avatar}"
+    },
+    "items": [
+      {
+        "label": "Inicio",
+        "url": "http://localhost/board/",
+        "icon": "home icon"
+      }
+    ]
+  }
 }

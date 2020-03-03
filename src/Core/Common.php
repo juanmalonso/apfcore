@@ -68,6 +68,11 @@ class Common extends Injectable
         return $this->getDI()->get('cache')->set($p_key, $p_data, $p_lifetime);
     }
 
+    protected function deleteCache($p_key){
+
+        return $this->getDI()->get('cache')->delete($p_key);
+    }
+
     //COMMON SESSION MANAGMENT
     protected function getSessionId(){
 
@@ -262,7 +267,7 @@ class Common extends Injectable
 
     protected function replaceValues($p_value){
         $result = $p_value;
-
+        
         if(\is_string($p_value)){
             
             $matches = array();
@@ -293,8 +298,8 @@ class Common extends Injectable
 
                     $method     = $matches[2];
                     $params     = \explode(",", $matches[3]);
-
-                    $result     = $this->$method($param);
+                    
+                    $result     = call_user_func_array(array($this, $method),$params);
                 }
             }
         }else if(\is_array($p_value)){
