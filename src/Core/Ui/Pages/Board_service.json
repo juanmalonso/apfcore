@@ -14,5 +14,9 @@
         "icon": "home icon"
       }
     ]
+  },
+  "application":{
+    "model":"f{getUrlParam:5}",
+    "manager":"tablelist"
   }
 }

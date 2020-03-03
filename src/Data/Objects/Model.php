@@ -76,7 +76,7 @@ class Model extends Common
 
                     foreach ($model as $field => $value) {
 
-                        $modelTemp[$field] = \Nubesys\Platform\Util\Parse::decodeJsonField($field, $value, $jsonFields);
+                        $modelTemp[$field] = \Nubesys\Core\Utils\Struct::decodeJsonField($field, $value, $jsonFields);
                     }
 
                     $result[] = $modelTemp;
@@ -102,7 +102,7 @@ class Model extends Common
 
                 foreach ($resultSet as $field => $value) {
 
-                    $result[$field] = \Nubesys\Platform\Util\Parse::decodeJsonField($field, $value, $jsonFields);
+                    $result[$field] = \Nubesys\Core\Utils\Struct::decodeJsonField($field, $value, $jsonFields);
                 }
 
                 $this->setCache($cacheKey, $result, $cacheLifetime);

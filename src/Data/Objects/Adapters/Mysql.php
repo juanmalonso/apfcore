@@ -14,19 +14,19 @@ class Mysql extends Common
 {
     public function isTableExist($p_table){
 
-        return $this->getDI()->get('db')->tableExists($p_table);
+        return $this->getDI()->get('datadb')->tableExists($p_table);
     }
 
     public function query($p_query){
 
-        $result = $this->getDI()->get('db')->fetchAll($p_query, \Phalcon\Db::FETCH_ASSOC, array());
+        $result = $this->getDI()->get('datadb')->fetchAll($p_query, \Pdo::FETCH_ASSOC, array());
 
         return $result;
     }
 
     public function execute($p_statement){
 
-        $result = $this->getDI()->get('db')->execute($p_statement);
+        $result = $this->getDI()->get('datadb')->execute($p_statement);
 
         return $result;
     }
@@ -101,7 +101,7 @@ class Mysql extends Common
 
             /*if(is_string($value)){
 
-                $params[$key] = $this->getDI()->get('db')->escapeString($value);
+                $params[$key] = $this->getDI()->get('datadb')->escapeString($value);
             }else{
 
                 $params[$key] = $value;
@@ -115,7 +115,7 @@ class Mysql extends Common
 
         $query = "SELECT " . $fields . " FROM " . $p_table . "" . $conditions ."" . $order . "" . $rows . "" . $offset . ";";
 
-        $resultSet = $this->getDI()->get('db')->fetchAll($query, \Phalcon\Db::FETCH_ASSOC, $params);
+        $resultSet = $this->getDI()->get('datadb')->fetchAll($query, \Pdo::FETCH_ASSOC, $params);
 
         if(is_array($resultSet)){
 
@@ -212,7 +212,7 @@ class Mysql extends Common
 
         $query = "SELECT " . $fields . " FROM " . $p_table . "" . $conditions ."" . $order . "" . $rows . "" . $offset . ";";
 
-        $resultSet = $this->getDI()->get('db')->fetchOne($query, \Phalcon\Db::FETCH_ASSOC, $params);
+        $resultSet = $this->getDI()->get('datadb')->fetchOne($query, \Pdo::FETCH_ASSOC, $params);
 
         if(is_array($resultSet)){
 
@@ -256,7 +256,7 @@ class Mysql extends Common
 
         $query = "SELECT " . $field . " FROM " . $p_table . "" . $conditions .";";
 
-        $resultSet = $this->getDI()->get('db')->fetchOne($query, \Phalcon\Db::FETCH_ASSOC, $params);
+        $resultSet = $this->getDI()->get('datadb')->fetchOne($query, \Pdo::FETCH_ASSOC, $params);
 
         if(is_array($resultSet)){
 
@@ -272,7 +272,7 @@ class Mysql extends Common
 
         if(is_array($p_data)){
 
-            $result = $this->getDI()->get('db')->insertAsDict($p_table, $p_data);
+            $result = $this->getDI()->get('datadb')->insertAsDict($p_table, $p_data);
         }
 
         //TODO : Retornar LastInserId
@@ -286,7 +286,7 @@ class Mysql extends Common
 
         /*if(is_array($p_data)){
 
-            $result = $this->getDI()->get('db')->insertAsDict($p_table, $p_data);
+            $result = $this->getDI()->get('datadb')->insertAsDict($p_table, $p_data);
         }
 
         //TODO : Retornar LastInserId
@@ -315,7 +315,7 @@ class Mysql extends Common
 
         if(is_array($p_data) && strlen($p_conditions) > 0){
 
-            $result = $this->getDI()->get('db')->updateAsDict($p_table, $p_data, $p_conditions);
+            $result = $this->getDI()->get('datadb')->updateAsDict($p_table, $p_data, $p_conditions);
         }
 
         return $result;
@@ -327,7 +327,7 @@ class Mysql extends Common
 
         if(strlen($p_conditions) > 0){
 
-            $result = $this->getDI()->get('db')->delete($p_table, $p_conditions);
+            $result = $this->getDI()->get('datadb')->delete($p_table, $p_conditions);
         }
 
         return $result;

@@ -51,36 +51,137 @@ class Struct
         return $out;
     }
 
-    public static function normalizeDataExpresion($p_data, $p_expression){
-        
-        $result = array();
-        foreach($p_expression as $expart){
-            
-            if(is_array($expart)){
+    public static function extendFieldValues($p_valueA, $p_valueB, $p_asString = false){
 
-                $result[] = self::normalizeDataExpresion($p_data, $expart);
-            } else {
+        $result = false;
 
-                $matches = array();
-                preg_match('/^\$\{(.*)\}$/', $expart ,$matches);
-                
-                if(isset($matches[1])){
+        if($p_asString){
 
-                    $result[] = $p_data[$matches[1]];
-                }else{
+            if(is_null($p_valueA) || strlen($p_valueA) == 0){
 
-                    $result[] = $expart;
-                }
+                $result = $p_valueB;
+            }else{
+
+                $result = $p_valueA;
             }
+        }else {
+
+            if (is_string($p_valueA) && self::isValidJson($p_valueA)) {
+
+                $objA = self::toArray(json_decode($p_valueA));
+            }else{
+
+                $objA = self::toArray($p_valueA);
+            }
+
+            if (is_string($p_valueB) && self::isValidJson($p_valueB)) {
+
+                $objB = self::toArray(json_decode($p_valueB));
+            }else{
+
+                $objB = self::toArray($p_valueB);
+            }
+
+            $result = self::extendArray($objA, $objB);
+
+            $result = self::toObject($result);
         }
 
         return $result;
     }
 
-    public static function evaluateDataExpression($p_data, $p_expression){
-        
-        $expression = self::normalizeDataExpresion(self::flatten($p_data), $p_expression);
-        
-        return \Nubesys\Core\Library\Utils\ExpressionParser::evaluate($expression);
+    public static function extendArray(){
+
+        $arrays = func_get_args();
+        $base = array_shift($arrays);
+        foreach ($arrays as $array) {
+            reset($base);
+            while (list($key, $value) = @each($array)) {
+
+                if (is_array($value) && @is_array($base[$key])) {
+
+                    $base[$key] = self::extendArray($base[$key], $value);
+                } else {
+
+                    $base[$key] = $value;
+                }
+            }
+        }
+
+        return $base;
+    }
+
+    public static function decodeUtf8($p_data){
+
+        if(is_array($p_data)){
+
+            foreach($p_data as $key => $value){
+
+                if(is_string($value)){
+
+                    $p_data[$key] = utf8_decode($value);
+                }elseif(is_array($value) || is_object($value)){
+
+                    $p_data[$key] = self::decodeUtf8($value);
+                }
+            }
+        }elseif(is_object($p_data)){
+
+            foreach($p_data as $key => $value){
+
+                if(is_string($value)){
+
+                    $p_data->$key = utf8_decode($value);
+                }elseif(is_array($value) || is_object($value)){
+
+                    $p_data->$key = self::decodeUtf8($value);
+                }
+            }
+        }
+
+        return $p_data;
+    }
+
+    public static function encodeUtf8($p_data){
+
+        if(is_array($p_data)){
+
+            foreach($p_data as $key => $value){
+
+                if(is_string($value)){
+
+                    $p_data[$key] = utf8_encode($value);
+                }elseif(is_array($value) || is_object($value)){
+
+                    $p_data[$key] = self::encodeUtf8($value);
+                }
+            }
+        }elseif(is_object($p_data)){
+
+            foreach($p_data as $key => $value){
+
+                if(is_string($value)){
+
+                    $p_data->$key = utf8_encode($value);
+                }elseif(is_array($value) || is_object($value)){
+
+                    $p_data->$key = self::encodeUtf8($value);
+                }
+            }
+        }
+
+        return $p_data;
+    }
+
+    public static function decodeJsonField($p_field, $p_value, $p_filter){
+
+        $result = $p_value;
+
+        if(in_array($p_field, $p_filter)){
+
+            $result = json_decode(utf8_encode($p_value));
+        }
+
+        return $result;
     }
 }

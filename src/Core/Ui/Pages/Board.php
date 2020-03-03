@@ -20,34 +20,16 @@ class Board extends VueUiService {
         $this->setTitle($this->getLocal("title"));
 
         $dataEngine = new DataEngine($this->getDI());
+        
+        //var_dump($this->getUrlParam(5));
+        //var_dump($dataEngine->getModel($this->getUrlParam(5)));
+        var_dump($dataEngine->getModel($this->getLocal("application.model")));
+        exit();
 
         $this->setViewVar("content", "Panel Principal de Prueba");
         
         $this->generateSideMenu();
         $this->generateTopBar();
-    }
-
-    //ACCESS CONTROL
-    //TODO VER SI HACE FALTA LLEVAR A LA SUPERCLASE PARA LAS APIS
-    protected function accessControl(){
-        
-        if($this->getLocal("accessControl")){
-
-            $loginurl = $this->getDI()->get('config')->main->url->base . "login";
-            
-            if($this->hasSession("user_loged")){
-
-                if(!$this->getSession("user_loged")){
-
-                    header("Location: " . $loginurl);
-                    exit();
-                }
-            }else{
-                
-                header("Location: " . $loginurl);
-                exit();
-            }
-        }
     }
 
     //ROLE SIDE MENU
@@ -94,5 +76,28 @@ class Board extends VueUiService {
     protected function generateFooter(){
 
         //TODO : 
+    }
+
+    //ACCESS CONTROL
+    //TODO VER SI HACE FALTA LLEVAR A LA SUPERCLASE PARA LAS APIS
+    protected function accessControl(){
+        
+        if($this->getLocal("accessControl")){
+
+            $loginurl = $this->getDI()->get('config')->main->url->base . "login";
+            
+            if($this->hasSession("user_loged")){
+
+                if(!$this->getSession("user_loged")){
+
+                    header("Location: " . $loginurl);
+                    exit();
+                }
+            }else{
+                
+                header("Location: " . $loginurl);
+                exit();
+            }
+        }
     }
 }
