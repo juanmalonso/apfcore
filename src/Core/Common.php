@@ -272,7 +272,7 @@ class Common extends Injectable
             
             $matches = array();
 
-            if(\preg_match('/^(v|f)\{(.*):(.*)\}$/', $p_value, $matches)){
+            if(\preg_match('/^(v|f)\{(.*)\((.*)\)\}$/', $p_value, $matches)){
 
                 if($matches[1] == "v"){
 

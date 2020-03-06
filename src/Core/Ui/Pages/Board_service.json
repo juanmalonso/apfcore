@@ -3,9 +3,9 @@
   "title": "Board",
   "navigation": {
     "user": {
-      "label": "v{session:user_login}",
+      "label": "v{session(user_login)}",
       "url": "http://localhost/profile",
-      "avatar": "f{getSession:user_avatar}"
+      "avatar": "f{getSession(user_avatar)}"
     },
     "items": [
       {
@@ -15,8 +15,17 @@
       }
     ]
   },
-  "application":{
-    "model":"f{getUrlParam:5}",
-    "manager":"tablelist"
+  "application": {
+    "type": "dataobjectscrud",
+    "modelId": "f{getModelId()}",
+    "modelData": "f{getModelData()}",
+    "modelDefinitions": "f{getModelDefinitions()}",
+    "selector": {
+      "type": "tablelist",
+      "fields": "f{getSelectorFields()}",
+      "actions": "f{getSelectorActions()}",
+      "links": "f{getSelectorLinks()}",
+      "data": "f{getSelectorData()}"
+    }
   }
 }

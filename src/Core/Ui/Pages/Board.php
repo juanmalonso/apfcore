@@ -7,11 +7,24 @@ use Nubesys\Vue\Services\VueUiService;
 //COMPONENTS
 use Nubesys\Core\Ui\Components\Navigation\SideMenu\SideMenu;
 use Nubesys\Core\Ui\Components\App\Top\TopBar\TopBar;
+use Nubesys\Core\Ui\Components\App\Selectors\TableList\TableList;
 
 //NUBESYS DATA ENGINE
 use Nubesys\Data\Objects\DataEngine;
 
 class Board extends VueUiService {
+
+    //OBJECTS APP VARS
+    protected $dataEngine;
+    protected $model                        = false;
+    protected $modelId                      = null;
+    protected $modelData                    = null;
+    protected $modelDefinitions             = null;
+    protected $modelObjectsData             = null;
+    protected $modelSelectedObjectId        = null;
+    protected $modelSelectedObjectData      = null;
+
+    protected $action                       = null;
 
     public function mainAction(){
 
@@ -19,22 +32,384 @@ class Board extends VueUiService {
 
         $this->setTitle($this->getLocal("title"));
 
-        $dataEngine = new DataEngine($this->getDI());
+        $this->dataEngine                   = new DataEngine($this->getDI());
         
-        //var_dump($this->getUrlParam(5));
-        //var_dump($dataEngine->getModel($this->getUrlParam(5)));
-        var_dump($dataEngine->getModel($this->getLocal("application.model")));
-        exit();
+        //TODO : VER OPCIONES DE TIPO DE APPLICACION
 
         $this->setViewVar("content", "Panel Principal de Prueba");
+
+        $this->setModel();
         
         $this->generateSideMenu();
         $this->generateTopBar();
+
+        //DEFINIR LOGICA DE ACCIONES EN EL JSON
+        $this->generateSelector();
+    }
+
+    //OBJECTS SELECTOR
+    protected function generateSelector(){
+        
+        //PONER LOGICA SEGUN TIPO DE SELECTOR
+        //TABLELIST SELECTOR
+        $objectSelectorParams                   = array();
+        
+        $objectSelectorParams['fields']         = ($this->getLocal("application.selector"))["fields"];
+        //$objectSelectorParams['data']         = $this->getLocal("application.selector.selectorData");;
+
+        $objectSelector             = new TableList($this->getDI());
+        $this->placeComponent("main", $objectSelector, $objectSelectorParams);
+        
+    }
+
+    protected function getSelectorFields(){
+
+        //TODO : VER SI HACE FALTA LOGICA DISTINTA SEGUN TIPO DE SELECTOR
+        $result         = array();
+
+        //TODO: FALTAN LOS CAMPOS BASE
+        
+        foreach($this->getModelDefinitions() as $field=>$definition){
+
+            $fieldTemp                  = array();
+            $fieldTemp["id"]            = $definition["id"];
+            $fieldTemp["label"]         = $definition["uiOptions"]->label;
+            $fieldTemp["icon"]          = $definition["uiOptions"]->icon;
+            $fieldTemp["order"]         = $definition["order"];
+            $fieldTemp["type"]          = $definition["type"];
+            $fieldTemp["render"]        = new \stdClass();
+
+            $fieldTemp["render"]->type  = null;
+
+            if($definition["isName"]){
+
+                $fieldTemp["render"]->type  = "link";
+                $fieldTemp["render"]->url   = "#";
+            }
+
+            if($definition["isImage"]){
+
+                $fieldTemp["render"]->type  = "image";
+                
+                //TODO : IMG URL??
+            }
+
+            if(is_null($fieldTemp["render"]->type) && $definition["uiOptions"]->hidden){
+
+                $fieldTemp["render"]->type  = "hidden";
+            }
+
+            if(is_null($fieldTemp["render"]->type) && !$definition["uiOptions"]->listable){
+
+                $fieldTemp["render"]->type  = "none";
+            }
+
+            //TODO : FALTA LOS RENDERS DE TAGS, OBJECT REFERENCE, COLLECTIONS, ETC 
+
+            if(is_null($fieldTemp["render"]->type)){
+
+                $fieldTemp["render"]->type  = "value";
+            }
+
+            $result[] = $fieldTemp;
+
+        }
+
+        return $result;
+    }
+
+    protected function getSelectorData(){
+
+        $result     = array();
+
+        
+
+        return $result;
+    }
+
+    protected function getSelectorActions(){
+
+        $result     = array();
+
+        $result[]   = array(
+            "icon" => "edit green",
+            'url' => "#"
+        );
+
+        $result[]   = array(
+            "icon" => "remove green",
+            'url' => "#"
+        );
+
+        return $result;
+    }
+
+    protected function getSelectorLinks(){
+
+        $result     = array();
+
+        $result[]   = array(
+            "label"         => "Link A",
+            "url"           => "#",
+            "style"         => "teal",
+            "conditions"    => array()
+        );
+
+        $result[]   = array(
+            "label"         => "Link B",
+            "url"           => "#",
+            "style"         => "basic",
+            "conditions"    => array()
+        );
+
+        return $result;
+    }
+
+    //OBJECTS APPS METHODS
+    //MODEL
+    protected function setModel(){
+
+        if(!$this->model){
+
+            $this->modelId                  = $this->getLocal("application.modelId");
+
+            $this->modelData                = $this->getLocal("application.modelData");
+            $this->modelDefinitions         = $this->getLocal("application.modelDefinitions");
+
+            $this->modelObjectsData         = $this->getLocal("application.modelObjectsData");
+
+            $this->model                    = true;
+        }
+    }
+
+    protected function getModelId(){
+
+        return "affiliates";
+    }
+
+    //MODEL DATA
+    protected function getModelData(){
+
+        if(is_null($this->modelData)){
+
+            //TODO ACA SE PONE LA LOGICA DE RECUPERAR DESDE LA BASES DE DATOS
+            $result                     = array();
+            $result['id']               = "affiliates";
+            $result['parent']           = "root";
+            $result["type"]             = "OBJECT";
+            $result["idStrategy"]       = "AUTOINCREMENT";
+            $result["partitionMode"]    = "NONE";
+
+            $result["uiOptions"]                            = new \stdClass();
+            $result["uiOptions"]->help                      = "Texto de ayuda del Modelo";
+            $result["uiOptions"]->icon                      = "users";
+            $result["uiOptions"]->name                      = "Afiliado";
+            $result["uiOptions"]->pluralName                = "Afiliados";
+            $result["uiOptions"]->manageAs                  = "LIST";
+            $result["uiOptions"]->description               = "Texto de Descripcion";
+
+            $result["indexOptions"]                         = new \stdClass();
+            $result["indexOptions"]->indexable              = true;
+            $result["indexOptions"]->index                  = "affiliates";
+            $result["indexOptions"]->analysis               = new \stdClass();
+            $result["indexOptions"]->basemapping            = new \stdClass();
+
+            $result["cacheOptions"]                         = new \stdClass();
+            $result["cacheOptions"]->cacheable              = true;
+            $result["cacheOptions"]->adapter                = "MEMORY";
+            $result["cacheOptions"]->cacheLife              = 3600;
+
+            $result["versionsOptions"]                      = new \stdClass();
+            $result["statesOptions"]                        = new \stdClass();
+            
+        }else{
+
+            $result = $this->modelData;
+        }
+
+        return $result;
+    }
+
+
+    //MODEL DEFINITIONS
+    protected function getModelDefinitions(){
+
+        if(is_null($this->modelDefinitions)){
+
+            $definitions            = array();
+
+            $definitionsRow                         = array();
+            $definitionsRow["id"]                   = "name";
+            $definitionsRow["type"]                 = "text";
+            $definitionsRow["group"]                = "data";
+            $definitionsRow["defaultValue"]         = "";
+            $definitionsRow["order"]                = 1;
+            $definitionsRow["isName"]               = 1;
+            $definitionsRow["isImage"]              = 0;
+
+            $definitionsRow["uiOptions"]                        = new \stdClass();
+            $definitionsRow["uiOptions"]->help                  = "Texto de Ayuda del campo Nombre";
+            $definitionsRow["uiOptions"]->icon                  = "caret right";
+            $definitionsRow["uiOptions"]->label                 = "Nombre";
+            $definitionsRow["uiOptions"]->hidden                = false;
+            $definitionsRow["uiOptions"]->listable              = true;
+            $definitionsRow["uiOptions"]->readOnly              = true;
+            $definitionsRow["uiOptions"]->required              = true;
+            $definitionsRow["uiOptions"]->sortable              = true;
+            $definitionsRow["uiOptions"]->filterable            = true;
+            $definitionsRow["uiOptions"]->searchable            = true;
+
+            $definitionsRow["indexOptions"]                     = new \stdClass();
+            $definitionsRow["indexOptions"]->indexable          = true;
+            $definitionsRow["indexOptions"]->mapping            = new \stdClass();
+
+            $definitionsRow['typeOptions']                      = new \stdClass();
+            $definitionsRow['validationOptions']                = new \stdClass();
+            $definitionsRow['attachFileOptions']                = new \stdClass();
+
+            $definitions[$definitionsRow["id"]]                 = $definitionsRow;
+
+            $definitionsRow                         = array();
+            $definitionsRow["id"]                   = "description";
+            $definitionsRow["type"]                 = "text";
+            $definitionsRow["group"]                = "data";
+            $definitionsRow["defaultValue"]         = "";
+            $definitionsRow["order"]                = 1;
+            $definitionsRow["isName"]               = 0;
+            $definitionsRow["isImage"]              = 0;
+            $definitionsRow["isImage"]              = 0;
+
+            $definitionsRow["uiOptions"]                        = new \stdClass();
+            $definitionsRow["uiOptions"]->help                  = "Texto de Ayuda del campo Descripción";
+            $definitionsRow["uiOptions"]->icon                  = "caret right";
+            $definitionsRow["uiOptions"]->label                 = "Descripcion";
+            $definitionsRow["uiOptions"]->hidden                = false;
+            $definitionsRow["uiOptions"]->listable              = true;
+            $definitionsRow["uiOptions"]->readOnly              = true;
+            $definitionsRow["uiOptions"]->required              = true;
+            $definitionsRow["uiOptions"]->sortable              = true;
+            $definitionsRow["uiOptions"]->filterable            = true;
+            $definitionsRow["uiOptions"]->searchable            = true;
+
+            $definitionsRow["indexOptions"]                     = new \stdClass();
+            $definitionsRow["indexOptions"]->indexable          = true;
+            $definitionsRow["indexOptions"]->mapping            = new \stdClass();
+
+            $definitionsRow['typeOptions']                      = new \stdClass();
+            $definitionsRow['validationOptions']                = new \stdClass();
+            $definitionsRow['attachFileOptions']                = new \stdClass();
+
+            $definitions[$definitionsRow["id"]]                 = $definitionsRow;
+        
+        }else{
+
+            $definitions = $this->modelDefinitions;
+        }
+
+        return $definitions;
+    }
+
+    //MODEL OBJECTS
+    protected function getModelObjectsData(){
+
+        $objects                                    = array();
+
+        if(is_null($this->modelObjectsData)){
+
+            $objectTmp                              = array();
+            $objectTmp["_id"]                       = "10";
+            $objectTmp["objTIme"]                   = 15785800000000;
+            $objectTmp["objOrder"]                  = 1;
+            $objectTmp["objActive"]                 = 1;
+
+            $objectTmp["objData"]                   = new \stdClass();
+            $objectTmp["objData"]->name                 = "Affiliado1";
+            $objectTmp["objData"]->description          = "Affiliado1 Desc";
+
+            $objectTmp["objDateAdd"]                = "2020-01-09 14:12:43";
+            $objectTmp["objUserAdd"]                = NULL;
+            $objectTmp["objDateUpdated"]            = "2020-01-09 14:12:43";
+            $objectTmp["objUserUpdated"]            = NULL;
+            $objectTmp["objDateErased"]             = "2020-01-09 14:12:43";
+            $objectTmp["objUserErased"]             = NULL;
+            $objectTmp["objErased"]                 = 0;
+            $objectTmp["objDateErased"]             = "2020-01-09 14:12:43";
+            $objectTmp["objUserErased"]             = NULL;
+            $objectTmp["objDateIndexed"]            = "2020-01-09 14:12:43";
+            $objectTmp["objPartitionIndex"]         = 1;
+            $objectTmp["objPage1000"]               = 1;
+            $objectTmp["objPage10000"]              = 1;
+            $objectTmp["objPage10000"]              = 1;
+
+            $objects[] = $objectTmp;
+
+            $objectTmp                              = array();
+            $objectTmp["_id"]                       = "11";
+            $objectTmp["objTIme"]                   = 15785800000000;
+            $objectTmp["objOrder"]                  = 1;
+            $objectTmp["objActive"]                 = 1;
+
+            $objectTmp["objData"]                   = new \stdClass();
+            $objectTmp["objData"]->name                 = "Affiliado2";
+            $objectTmp["objData"]->description          = "Affiliado2 Desc";
+
+            $objectTmp["objDateAdd"]                = "2020-01-09 14:12:43";
+            $objectTmp["objUserAdd"]                = NULL;
+            $objectTmp["objDateUpdated"]            = "2020-01-09 14:12:43";
+            $objectTmp["objUserUpdated"]            = NULL;
+            $objectTmp["objDateErased"]             = "2020-01-09 14:12:43";
+            $objectTmp["objUserErased"]             = NULL;
+            $objectTmp["objErased"]                 = 0;
+            $objectTmp["objDateErased"]             = "2020-01-09 14:12:43";
+            $objectTmp["objUserErased"]             = NULL;
+            $objectTmp["objDateIndexed"]            = "2020-01-09 14:12:43";
+            $objectTmp["objPartitionIndex"]         = 1;
+            $objectTmp["objPage1000"]               = 1;
+            $objectTmp["objPage10000"]              = 1;
+            $objectTmp["objPage10000"]              = 1;
+
+            $objects[] = $objectTmp;
+
+            $objectTmp                              = array();
+            $objectTmp["_id"]                       = "12";
+            $objectTmp["objTIme"]                   = 15785800000000;
+            $objectTmp["objOrder"]                  = 1;
+            $objectTmp["objActive"]                 = 1;
+
+            $objectTmp["objData"]                   = new \stdClass();
+            $objectTmp["objData"]->name                 = "Affiliado3";
+            $objectTmp["objData"]->description          = "Affiliado3 Desc";
+
+            $objectTmp["objDateAdd"]                = "2020-01-09 14:12:43";
+            $objectTmp["objUserAdd"]                = NULL;
+            $objectTmp["objDateUpdated"]            = "2020-01-09 14:12:43";
+            $objectTmp["objUserUpdated"]            = NULL;
+            $objectTmp["objDateErased"]             = "2020-01-09 14:12:43";
+            $objectTmp["objUserErased"]             = NULL;
+            $objectTmp["objErased"]                 = 0;
+            $objectTmp["objDateErased"]             = "2020-01-09 14:12:43";
+            $objectTmp["objUserErased"]             = NULL;
+            $objectTmp["objDateIndexed"]            = "2020-01-09 14:12:43";
+            $objectTmp["objPartitionIndex"]         = 1;
+            $objectTmp["objPage1000"]               = 1;
+            $objectTmp["objPage10000"]              = 1;
+            $objectTmp["objPage10000"]              = 1;
+
+            $objects[] = $objectTmp;
+        
+        }else{
+
+            $objects = $this->modelObjectsData;
+        }
+
+        return $objects;
     }
 
     //ROLE SIDE MENU
     protected function generateSideMenu(){
         
+        //TODO REEMPLAZAR POR LOS ITEMS DE MENU DE ROL
+
         $user                   = $this->getLocal("navigation.user");
 
         $items                  = $this->getLocal("navigation.items");

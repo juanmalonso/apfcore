@@ -68,21 +68,30 @@ class Model extends Common
 
                 $resultSet = $this->database->select('data_models', $modelDataOptions);
 
-                $result = array();
+                if(is_array($resultSet)){
 
-                foreach ($resultSet as $model) {
+                    $result = array();
 
-                    $modelTemp = array();
+                    foreach ($resultSet as $model) {
 
-                    foreach ($model as $field => $value) {
+                        $modelTemp = array();
 
-                        $modelTemp[$field] = \Nubesys\Core\Utils\Struct::decodeJsonField($field, $value, $jsonFields);
+                        foreach ($model as $field => $value) {
+
+                            $modelTemp[$field] = \Nubesys\Core\Utils\Struct::decodeJsonField($field, $value, $jsonFields);
+                        }
+
+                        $result[] = $modelTemp;
                     }
 
-                    $result[] = $modelTemp;
-                }
+                    if(is_array($result) && count($result) > 0){
 
-                $this->setCache($cacheKey, $result, $cacheLifetime);
+                        $this->setCache($cacheKey, $result, $cacheLifetime);
+                    }
+                }else{
+
+                    //TODO : NO
+                }
             }
         }else{
             
@@ -90,22 +99,25 @@ class Model extends Common
             $cacheLifetime  = 3600;
             
             if($this->hasCache($cacheKey)){
-
+                
                 $result = $this->getCache($cacheKey);
             }else {
-
+                
                 $modelDataOptions['conditions'] = "modId = '" . $p_modId . "'";
 
                 $resultSet = $this->database->selectOne('data_models', $modelDataOptions);
+                
+                if(is_array($resultSet) && count($resultSet) > 0){
+                
+                    $result = array();
 
-                $result = array();
+                    foreach ($resultSet as $field => $value) {
 
-                foreach ($resultSet as $field => $value) {
-
-                    $result[$field] = \Nubesys\Core\Utils\Struct::decodeJsonField($field, $value, $jsonFields);
+                        $result[$field] = \Nubesys\Core\Utils\Struct::decodeJsonField($field, $value, $jsonFields);
+                    }
+                    
+                    $this->setCache($cacheKey, $result, $cacheLifetime);
                 }
-
-                $this->setCache($cacheKey, $result, $cacheLifetime);
             }
         }
 
