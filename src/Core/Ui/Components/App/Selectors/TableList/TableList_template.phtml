@@ -5,7 +5,12 @@
                 <thead>
                     <tr>
                         <th>&nbsp;</th>
-                        <th>ID</th>
+                        <!-- fields -->
+                        <th v-for="(item, index) in selectorFields" :key="index">
+                            ${item.label}
+                        </th>
+                        <!-- links -->
+                        <th>&nbsp;</th>
                         <th>&nbsp;</th>
                     </tr>
                 </thead>

@@ -305,6 +305,7 @@ class Common extends Injectable
         }else if(\is_array($p_value)){
 
             $result = array();
+            
             foreach($p_value as $key=>$value){
 
                 $result[$key] = $this->replaceValues($value);

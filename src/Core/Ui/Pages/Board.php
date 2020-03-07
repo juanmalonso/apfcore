@@ -24,6 +24,12 @@ class Board extends VueUiService {
     protected $modelSelectedObjectId        = null;
     protected $modelSelectedObjectData      = null;
 
+    //APP DATA SELECTOR VARS
+    protected $selectorFields               = null;
+    protected $selectorActions              = null;
+    protected $selectorLinks                = null;
+    protected $selectorData                 = null;
+
     protected $action                       = null;
 
     public function mainAction(){
@@ -52,69 +58,173 @@ class Board extends VueUiService {
         
         //PONER LOGICA SEGUN TIPO DE SELECTOR
         //TABLELIST SELECTOR
+        $this->selectorFields                   = ($this->getLocal("application.selector"))["fields"];
+        $this->selectorActions                  = ($this->getLocal("application.selector"))["actions"];
+        $this->selectorLinks                    = ($this->getLocal("application.selector"))["links"];
+
         $objectSelectorParams                   = array();
         
-        $objectSelectorParams['fields']         = ($this->getLocal("application.selector"))["fields"];
+        $objectSelectorParams['fields']         = $this->selectorFields;
         //$objectSelectorParams['data']         = $this->getLocal("application.selector.selectorData");;
 
-        $objectSelector             = new TableList($this->getDI());
+        $objectSelector                         = new TableList($this->getDI());
         $this->placeComponent("main", $objectSelector, $objectSelectorParams);
         
     }
 
     protected function getSelectorFields(){
 
-        //TODO : VER SI HACE FALTA LOGICA DISTINTA SEGUN TIPO DE SELECTOR
-        $result         = array();
+        if(\is_null($this->selectorFields)){
 
-        //TODO: FALTAN LOS CAMPOS BASE
-        
-        foreach($this->getModelDefinitions() as $field=>$definition){
+            //TODO : VER SI HACE FALTA LOGICA DISTINTA SEGUN TIPO DE SELECTOR
+            $result         = array();
 
-            $fieldTemp                  = array();
-            $fieldTemp["id"]            = $definition["id"];
-            $fieldTemp["label"]         = $definition["uiOptions"]->label;
-            $fieldTemp["icon"]          = $definition["uiOptions"]->icon;
-            $fieldTemp["order"]         = $definition["order"];
-            $fieldTemp["type"]          = $definition["type"];
-            $fieldTemp["render"]        = new \stdClass();
+            //TODO: FALTA EL CAMPO NUMERO DE FILA
+            
+            //TODO: FALTAN LOS CAMPOS BASE, ID
+            
+            foreach($this->getModelDefinitions() as $field=>$definition){
 
-            $fieldTemp["render"]->type  = null;
+                $fieldTemp                  = array();
+                $fieldTemp["id"]            = $definition["id"];
+                $fieldTemp["label"]         = $definition["uiOptions"]->label;
+                $fieldTemp["icon"]          = $definition["uiOptions"]->icon;
+                $fieldTemp["order"]         = $definition["order"];
+                $fieldTemp["type"]          = $definition["type"];
+                $fieldTemp["render"]        = new \stdClass();
 
-            if($definition["isName"]){
+                $fieldTemp["render"]->type  = null;
 
-                $fieldTemp["render"]->type  = "link";
-                $fieldTemp["render"]->url   = "#";
+                if($definition["isName"]){
+
+                    $fieldTemp["render"]->type  = "link";
+                    $fieldTemp["render"]->url   = "#";
+                }
+
+                if($definition["isImage"]){
+
+                    $fieldTemp["render"]->type  = "image";
+                    
+                    //TODO : IMG URL??
+                }
+
+                if(is_null($fieldTemp["render"]->type) && $definition["uiOptions"]->hidden){
+
+                    $fieldTemp["render"]->type  = "hidden";
+                }
+
+                if(is_null($fieldTemp["render"]->type) && !$definition["uiOptions"]->listable){
+
+                    $fieldTemp["render"]->type  = "none";
+                }
+
+                //TODO : FALTA LOS RENDERS DE TAGS, OBJECT REFERENCE, COLLECTIONS, ETC 
+
+                if(is_null($fieldTemp["render"]->type)){
+
+                    $fieldTemp["render"]->type  = "value";
+                }
+
+                $result[$fieldTemp["id"]] = $fieldTemp;
+
             }
 
-            if($definition["isImage"]){
+            $links              = $this->getSelectorLinks();
+            $linkIndex          = 0;
+            
+            foreach($links as $link){
 
-                $fieldTemp["render"]->type  = "image";
-                
-                //TODO : IMG URL??
+                $fieldTemp                  = array();
+                $fieldTemp["label"]         = $link["label"];
+                $fieldTemp["render"]        = new \stdClass();
+
+                $fieldTemp["render"]->type      = "buttonlink";
+                $fieldTemp["render"]->url       = $link["url"];
+                $fieldTemp["render"]->style     = $link["style"];
+
+                $result["link" . $linkIndex] = $fieldTemp;
+                $linkIndex++;
+            }
+            
+            
+            $actions            = $this->getSelectorActions();
+            $actionIndex        = 0;
+
+            foreach($actions as $action){
+
+                $fieldTemp                  = array();
+                $fieldTemp["render"]        = new \stdClass();
+
+                $fieldTemp["render"]->type      = "buttonaction";
+                $fieldTemp["render"]->url       = $link["url"];
+                $fieldTemp["render"]->style     = $link["style"];
+
+                $result["action" . $actionIndex] = $fieldTemp;
+                $actionIndex++;
             }
 
-            if(is_null($fieldTemp["render"]->type) && $definition["uiOptions"]->hidden){
+        }else{
 
-                $fieldTemp["render"]->type  = "hidden";
-            }
-
-            if(is_null($fieldTemp["render"]->type) && !$definition["uiOptions"]->listable){
-
-                $fieldTemp["render"]->type  = "none";
-            }
-
-            //TODO : FALTA LOS RENDERS DE TAGS, OBJECT REFERENCE, COLLECTIONS, ETC 
-
-            if(is_null($fieldTemp["render"]->type)){
-
-                $fieldTemp["render"]->type  = "value";
-            }
-
-            $result[] = $fieldTemp;
-
+            $result = $this->selectorFields;
         }
 
+        return $result;
+    }
+
+    protected function getSelectorActions(){
+
+        if(\is_null($this->selectorActions)){
+            
+            $result     = array();
+
+            //TODO : DEFINIR CONDICIONANTES
+
+            $result[]   = array(
+                "style" => "edit green",
+                'url' => "#"
+            );
+
+            $result[]   = array(
+                "style" => "remove green",
+                'url' => "#"
+            );
+
+            //TODO : VER LOGICA DE ACCIONES ADICIONALES
+
+        }else{
+
+            $result = $this->selectorActions;
+        }
+
+        return $result;
+    }
+
+    protected function getSelectorLinks(){
+
+        if(\is_null($this->selectorLinks)){
+            
+            $result     = array();
+
+            //TODO : DEFINIR CONDICIONANTES
+
+            $result[]   = array(
+                "label"         => "Link A",
+                "url"           => "#",
+                "style"         => "teal",
+            );
+
+            $result[]   = array(
+                "label"         => "Link B",
+                "url"           => "#",
+                "style"         => "basic",
+            );
+
+        }else{
+
+            $result = $this->selectorLinks;
+        }
+
+        //TODO : VER LOGICA DE LINKS ADICIONALES
         return $result;
     }
 
@@ -123,44 +233,6 @@ class Board extends VueUiService {
         $result     = array();
 
         
-
-        return $result;
-    }
-
-    protected function getSelectorActions(){
-
-        $result     = array();
-
-        $result[]   = array(
-            "icon" => "edit green",
-            'url' => "#"
-        );
-
-        $result[]   = array(
-            "icon" => "remove green",
-            'url' => "#"
-        );
-
-        return $result;
-    }
-
-    protected function getSelectorLinks(){
-
-        $result     = array();
-
-        $result[]   = array(
-            "label"         => "Link A",
-            "url"           => "#",
-            "style"         => "teal",
-            "conditions"    => array()
-        );
-
-        $result[]   = array(
-            "label"         => "Link B",
-            "url"           => "#",
-            "style"         => "basic",
-            "conditions"    => array()
-        );
 
         return $result;
     }
