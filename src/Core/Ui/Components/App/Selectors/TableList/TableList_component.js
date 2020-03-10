@@ -6,14 +6,52 @@ Vue.component("___tag_", {
   mounted: function() {
     var _self = this;
 
-    console.log(this.selectorFields);
-    console.log(this.selectorLinks);
-    console.log(this.selectorActions);
+    console.log(this.selectorLinks,this.selectorLinks.length);
   },
-  methods: {},
+  methods: {
+    getLinkMappedUrl:function (fieldId, rowData){
+
+      //TODO : MAPPING URL
+      return this.fields[fieldId].render.url;
+    },
+    isRenderTypeField:function (renderType,fieldId){
+      
+      var result = false;
+
+      if(this.fields[fieldId] != undefined){
+
+        if(this.fields[fieldId].render != undefined){
+
+          if(this.fields[fieldId].render.type == renderType){
+  
+            result = true;
+          }
+        }
+      }
+      console.log(renderType, fieldId, result);
+      return result;
+    },
+    isListableField:function (fieldId){
+      
+      var result = false;
+
+      if(this.fields[fieldId] != undefined){
+
+        if(this.fields[fieldId].render != undefined){
+
+          if(this.fields[fieldId].render.type == "value" || this.fields[fieldId].render.type == "link"){
+  
+            result = true;
+          }
+        }
+      }
+
+      return result;
+    }
+  },
   computed: {
     selectorFields : function(){
-      var result = {};
+      var result = [];
 
       _.each(this.fields, function (element, index, list){
         
@@ -24,8 +62,9 @@ Vue.component("___tag_", {
 
       return result;
     },
+
     selectorLinks : function(){
-      var result = {};
+      var result = [];
 
       _.each(this.fields, function (element, index, list){
         
@@ -36,8 +75,9 @@ Vue.component("___tag_", {
 
       return result;
     },
+
     selectorActions : function(){
-      var result = {};
+      var result = [];
 
       _.each(this.fields, function (element, index, list){
         

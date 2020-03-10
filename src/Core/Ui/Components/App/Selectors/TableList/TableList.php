@@ -8,6 +8,6 @@ class TableList extends VueUiComponent {
     public function mainAction(){
         
         $this->setJsDataVar("fields", $this->getLocal("fields"));
-        //$this->setJsDataVar("data", $this->getLocal("data"));
+        $this->setJsDataVar("data", $this->getLocal("data"));
     }
 }

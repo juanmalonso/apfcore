@@ -250,6 +250,23 @@ class Common extends Injectable
         return $result;
     }
 
+    //DATA SOURCES
+    //POST PARAM SCOPE
+    protected function hasDataSource($p_key){
+
+        return $this->getDI()->get('global')->has('ds.' . $p_key);
+    }
+
+    protected function getDataSource($p_key){
+
+        return $this->getDI()->get('global')->get('ds.' . $p_key);
+    }
+
+    protected function setDataSource($p_key, $p_value){
+
+        return $this->getDI()->get('global')->set('ds.' . $p_key, $p_value);
+    }
+
     //JSON TREE
     protected function loadJsonTree($p_extraVars = array()){
         //TODO : Hacer cacheable los datos del JSON

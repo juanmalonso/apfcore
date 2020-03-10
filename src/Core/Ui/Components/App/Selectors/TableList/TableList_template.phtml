@@ -4,10 +4,10 @@
             <table class="ui celled striped table">
                 <thead>
                     <tr>
-                        <th>&nbsp;</th>
+                        <th style="width:36px;">#</th>
                         <!-- fields -->
-                        <th v-for="(item, index) in selectorFields" :key="index">
-                            ${item.label}
+                        <th v-if="isListableField(fieldIndex)" v-for="(field, fieldIndex) in fields" :key="fieldIndex">
+                            ${field.label}
                         </th>
                         <!-- links -->
                         <th>&nbsp;</th>
@@ -15,15 +15,25 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>
-                            FIELD
+                    <tr v-for="(dataRow, rowIndex) in data.objects" :key="rowIndex">
+                        <td>&nbsp;</td>
+                        <td v-if="isListableField(fieldIndex)" v-for="(rowField, fieldIndex) in dataRow" :key="fieldIndex">
+                            <template v-if="isRenderTypeField('link',fieldIndex)">
+                                <a v-bind:href="getLinkMappedUrl(fieldIndex, dataRow)">${rowField}</a>
+                            </template>
+                            <template v-else>
+                                ${rowField}
+                            </template>
                         </td>
-                        <td>
-                            FIELD
+                        <td v-if="selectorLinks.length > 0">
+                            <template v-if="isRenderTypeField('buttonlink',linkIndex)" v-for="(rowLink, linkIndex) in fields">
+                                <a v-bind:class="'ui ' + rowLink.render.style + ' button'" v-bind:href="rowLink.render.url">${rowLink.label}</a>
+                            </template>
                         </td>
-                        <td>
-                            FIELD
+                        <td v-if="selectorActions.length > 0">
+                            <template v-if="isRenderTypeField('actionlink',linkIndex)" v-for="(rowLink, linkIndex) in fields">
+                                <a v-bind:class="'ui ' + rowLink.render.style + ' button'" v-bind:href="rowLink.render.url">${rowLink.label}</a>
+                            </template>
                         </td>
                     </tr>
                 </tbody>

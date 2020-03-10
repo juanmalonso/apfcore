@@ -1,6 +1,6 @@
 {
   "accessControl": true,
-  "title": "Board",
+  "title": "Tablero Principal",
   "navigation": {
     "user": {
       "label": "v{session(user_login)}",
@@ -17,15 +17,17 @@
   },
   "application": {
     "type": "dataobjectscrud",
-    "modelId": "f{getModelId()}",
-    "modelData": "f{getModelData()}",
-    "modelDefinitions": "f{getModelDefinitions()}",
+    "dataSources": {
+      "objects":{
+        "adapter":"objects",
+        "options":{
+          "model":"affiliates"
+        }
+      }
+    },
     "selector": {
       "type": "tablelist",
-      "fields": "f{getSelectorFields()}",
-      "actions": "f{getSelectorActions()}",
-      "links": "f{getSelectorLinks()}",
-      "data": "f{getSelectorData()}"
+      "dataSource":"objects"
     }
   }
 }
