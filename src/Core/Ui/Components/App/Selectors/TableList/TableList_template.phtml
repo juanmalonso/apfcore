@@ -4,36 +4,40 @@
             <table class="ui celled striped table">
                 <thead>
                     <tr>
+                        <!-- rownum -->
                         <th style="width:36px;">#</th>
                         <!-- fields -->
-                        <th v-if="isListableField(fieldIndex)" v-for="(field, fieldIndex) in fields" :key="fieldIndex">
+                        <th v-for="(field, fieldIndex) in tableFields" :key="fieldIndex">
                             ${field.label}
                         </th>
                         <!-- links -->
-                        <th>&nbsp;</th>
-                        <th>&nbsp;</th>
+                        <th v-if="_.size(linksFields) > 0">&nbsp;</th>
+                        <!-- actions -->
+                        <th v-if="_.size(actionsFields) > 0">&nbsp;</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr v-for="(dataRow, rowIndex) in data.objects" :key="rowIndex">
                         <td>&nbsp;</td>
-                        <td v-if="isListableField(fieldIndex)" v-for="(rowField, fieldIndex) in dataRow" :key="fieldIndex">
-                            <template v-if="isRenderTypeField('link',fieldIndex)">
-                                <a v-bind:href="getLinkMappedUrl(fieldIndex, dataRow)">${rowField}</a>
+                        <td v-for="(rowField, fieldIndex) in tableFields" :key="fieldIndex">
+                            <template v-if="rowField.renderType == 'LINK'">
+                                <a href="#">${dataRow[fieldIndex]}</a>
                             </template>
                             <template v-else>
-                                ${rowField}
+                                ${dataRow[fieldIndex]}
                             </template>
                         </td>
-                        <td v-if="selectorLinks.length > 0">
-                            <template v-if="isRenderTypeField('buttonlink',linkIndex)" v-for="(rowLink, linkIndex) in fields">
-                                <a v-bind:class="'ui ' + rowLink.render.style + ' button'" v-bind:href="rowLink.render.url">${rowLink.label}</a>
+                        <td v-if="_.size(linksFields) > 0">
+                            <template v-for="(rowLink, linkIndex) in linksFields">
+                                <a v-bind:class="'ui ' + rowLink.style + ' button'" v-bind:href="rowLink.urlMap">${rowLink.label}</a>
                             </template>
                         </td>
-                        <td v-if="selectorActions.length > 0">
-                            <template v-if="isRenderTypeField('actionlink',linkIndex)" v-for="(rowLink, linkIndex) in fields">
-                                <a v-bind:class="'ui ' + rowLink.render.style + ' button'" v-bind:href="rowLink.render.url">${rowLink.label}</a>
+                        <td v-if="_.size(actionsFields) > 0" class="right aligned" style="padding-right: 4px;">
+                            <div class="ui basic buttons">
+                            <template v-for="(rowAction, linkIndex) in actionsFields">
+                                <a class="ui icon button" v-bind:href="rowAction.urlMap"><i v-bind:class=" rowAction.style + ' icon'"></i></a>
                             </template>
+                            </div>
                         </td>
                     </tr>
                 </tbody>

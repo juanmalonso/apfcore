@@ -41,7 +41,7 @@ class Board extends VueUiService {
 
         $this->setDataSources();
 
-        //TODO : VER OPCIONES DE TIPO DE APPLICACION
+        //TODO : VER LOGICA Y OPCIONES DE TIPO DE APPLICACION
 
         $this->setViewVar("content", "Panel Principal de Prueba");
 
@@ -89,67 +89,64 @@ class Board extends VueUiService {
         //TODO : VER SI HACE FALTA LOGICA DISTINTA SEGUN TIPO DE SELECTOR
         $result         = array();
 
-        //TODO: FALTA EL CAMPO NUMERO DE FILA
+        //FALTAN CARACTERISTICAS SEGUN MODEL (SHOW ID, SHOW NUM ROWS, SHOW DATEADD, SHOW DATE MODIFF, SHOW USER, ACTIVATABLE, DROPABLE,ETC)
 
         //ID
-        $fieldId                    = array();
-        $fieldId["id"]              = "_id";
-        $fieldId["label"]           = "ID";
-        $fieldId["order"]           = 0;
-        $fieldId["type"]            = "text";
-        $fieldId["render"]          = new \stdClass();
-        $fieldId["render"]->type    = "hidden";
-        $result[$fieldId["id"]]     = $fieldId;
+        $field                      = array();
+        $field["renderType"]        = "HIDDEN";
+        $result["_id"]              = $field;
 
-
+        //ROW NUM
+        $field                      = array();
+        $field["renderType"]        = "HIDDEN";
+        $result["rownum"]           = $field;
         
         //TODO: FALTAN LOS CAMPOS BASE
+        //TODO: FALTAN LOS CAMPOS RELACION
+        //TODO: FALTAN LOS CAMPOS TAGS
+        //TODO: FALTAN LOS CAMPOS OBJECTSR
+        //TODO: FALTAN LOS CAMPOS OBJECTR
         
         foreach($p_dataSource->getDataDefinitions() as $field=>$definition){
 
             $fieldTemp                  = array();
-            $fieldTemp["id"]            = $definition["id"];
-            $fieldTemp["label"]         = $definition["uiOptions"]->label;
-            $fieldTemp["icon"]          = $definition["uiOptions"]->icon;
-            $fieldTemp["order"]         = $definition["order"];
-            $fieldTemp["type"]          = $definition["type"];
-            $fieldTemp["render"]        = new \stdClass();
+            $fieldTemp['renderType']    = "VALUE";
+            
+            if($definition["uiOptions"]->listable){
 
-            $fieldTemp["render"]->type  = null;
+                if($definition["uiOptions"]->hidden){
 
-            if($definition["isName"]){
+                    $fieldTemp["renderType"]            = "HIDDEN";
+                }else{
 
-                $fieldTemp["render"]->type  = "link";
-                $fieldTemp["render"]->url   = "#";
+                    if($definition["isName"]){
+
+                        $fieldTemp["renderType"]        = "LINK";
+                        $fieldTemp["urlMap"]            = "#";
+
+                    }
+
+                    if($definition["isImage"]){
+
+                        $fieldTemp["renderType"]        = "IMAGE";
+                        $fieldTemp["imgSrcMap"]         = "#";
+
+                    }
+
+                    $fieldTemp["label"]                 = $definition["uiOptions"]->label;
+                    $fieldTemp["icon"]                  = $definition["uiOptions"]->icon;
+                    $fieldTemp["order"]                 = $definition["order"];
+                }
+            }else{
+
+                $fieldTemp['renderType']    = "HIDDEN";
             }
 
-            if($definition["isImage"]){
-
-                $fieldTemp["render"]->type  = "image";
-                
-                //TODO : IMG URL??
-            }
-
-            if(is_null($fieldTemp["render"]->type) && $definition["uiOptions"]->hidden){
-
-                $fieldTemp["render"]->type  = "hidden";
-            }
-
-            if(is_null($fieldTemp["render"]->type) && !$definition["uiOptions"]->listable){
-
-                $fieldTemp["render"]->type  = "none";
-            }
-
-            //TODO : FALTA LOS RENDERS DE TAGS, OBJECT REFERENCE, COLLECTIONS, ETC 
-
-            if(is_null($fieldTemp["render"]->type)){
-
-                $fieldTemp["render"]->type  = "value";
-            }
-
-            $result[$fieldTemp["id"]] = $fieldTemp;
+            $result[$definition["id"]] = $fieldTemp;
 
         }
+
+        //TODO: FALTA LOGICA DE COMO MOSTRAR LAS ACCIONES Y LOS LINKS SEGUN MODELO (SELECT MENU, CONTEXTUAL MENU, ITEMS)
 
         $links              = $this->getSelectorLinks();
         $linkIndex          = 0;
@@ -157,12 +154,12 @@ class Board extends VueUiService {
         foreach($links as $link){
 
             $fieldTemp                  = array();
+            $fieldTemp["renderType"]    = "LINKBUTTON";
             $fieldTemp["label"]         = $link["label"];
-            $fieldTemp["render"]        = new \stdClass();
+            $fieldTemp["urlMap"]        = $link["urlMap"];
+            $fieldTemp["style"]         = $link["style"];
 
-            $fieldTemp["render"]->type      = "buttonlink";
-            $fieldTemp["render"]->url       = $link["url"];
-            $fieldTemp["render"]->style     = $link["style"];
+            //TODO: FALTA LA LOGICA DE ACTIONS JS (PARA SERVICE y PARA LOCAL)
 
             $result["link" . $linkIndex] = $fieldTemp;
             $linkIndex++;
@@ -175,11 +172,12 @@ class Board extends VueUiService {
         foreach($actions as $action){
 
             $fieldTemp                  = array();
-            $fieldTemp["render"]        = new \stdClass();
+            $fieldTemp["renderType"]    = "ACTIONBUTTON";
+            $fieldTemp["label"]         = $action["label"];
+            $fieldTemp["urlMap"]        = $action["urlMap"];
+            $fieldTemp["style"]         = $action["style"];
 
-            $fieldTemp["render"]->type      = "buttonaction";
-            $fieldTemp["render"]->url       = $link["url"];
-            $fieldTemp["render"]->style     = $link["style"];
+            //TODO: FALTA LA LOGICA DE ACTIONS JS (PARA SERVICE y PARA LOCAL)
 
             $result["action" . $actionIndex] = $fieldTemp;
             $actionIndex++;
@@ -195,15 +193,18 @@ class Board extends VueUiService {
         //TODO : DEFINIR CONDICIONANTES
 
         $result[]   = array(
-            "style" => "edit green",
-            'url' => "#"
+            "label"         => "editar",
+            "style"         => "edit green",
+            "urlMap"        => "#"
         );
 
         $result[]   = array(
-            "style" => "remove green",
-            'url' => "#"
+            "label"         => "borrar",
+            "style"         => "edit red",
+            "urlMap"        => "#"
         );
 
+        //TODO : VER LOGICA DE ACCIONES ADICIONALES
         return $result;
     }
 
@@ -215,13 +216,13 @@ class Board extends VueUiService {
 
         $result[]   = array(
             "label"         => "Link A",
-            "url"           => "#",
+            "urlMap"        => "#",
             "style"         => "teal",
         );
 
         $result[]   = array(
             "label"         => "Link B",
-            "url"           => "#",
+            "urlMap"        => "#",
             "style"         => "basic",
         );
 

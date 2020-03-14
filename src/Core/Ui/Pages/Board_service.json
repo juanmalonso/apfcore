@@ -28,6 +28,11 @@
     "selector": {
       "type": "tablelist",
       "dataSource":"objects"
+    },
+    "urlmaps":{
+      "LIST":"{GLOBAL:basemapping}/board/list",
+      "EDIT":"{GLOBAL:basemapping}/board/edit/{_id}",
+      "DELETE":"{GLOBAL:basemapping}/board/delete/{_id}"
     }
   }
 }

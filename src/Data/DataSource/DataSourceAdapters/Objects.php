@@ -45,9 +45,14 @@ class Objects extends DataSourceAdapter {
         //TODO : PREPARAR EL QUERY Y LOS FILTROS (engine get Search)
         $this->setModelDataObjects();
 
+        //INICIO ROW NUM
+        $rownum = ($result['page'] * $result['rows']) - ($result['rows'] - 1);
+
         foreach($this->modelDataObjects as $row){
 
             $rowTmp                     = array();
+
+            $rowTmp['num']              = $rownum++;
             
             foreach($row as $key=>$value){
 
