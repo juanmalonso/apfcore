@@ -286,10 +286,12 @@ class Common extends Injectable
         $result = $p_value;
         
         if(\is_string($p_value)){
+
+            $pattern = '/^.*(v|f)\{(.*)\((.*)\)\}.*$/';
             
             $matches = array();
 
-            if(\preg_match('/^(v|f)\{(.*)\((.*)\)\}$/', $p_value, $matches)){
+            if(\preg_match($pattern, $p_value, $matches)){
 
                 if($matches[1] == "v"){
 
@@ -297,12 +299,15 @@ class Common extends Injectable
                         case 'session':
                             $result = $this->getSession($matches[3]);
                             break;
+
                         case 'global':
                             $result = $this->getGlobal($matches[3]);
                             break;
+
                         case 'service':
                             $result = $this->getService($matches[3]);
                             break;
+
                         case 'local':
                             $result = $this->getLocal($matches[3]);
                             break;
@@ -319,6 +324,9 @@ class Common extends Injectable
                     $result     = call_user_func_array(array($this, $method),$params);
                 }
             }
+
+            //RECURSIVE
+            
         }else if(\is_array($p_value)){
 
             $result = array();

@@ -6,7 +6,8 @@ use Nubesys\Vue\Ui\Components\VueUiComponent;
 class TopBar extends VueUiComponent {
 
     public function mainAction(){
-        
-        
+
+        $this->setJsDataVar("title", $this->getLocal("title"));
+        $this->setJsDataVar("actions", $this->getLocal("actions"));
     }
 }

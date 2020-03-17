@@ -17,6 +17,10 @@
   },
   "application": {
     "type": "dataobjectscrud",
+    "serviceActions":{
+      "default":"list",
+      "paramNum":5
+    },
     "dataSources": {
       "objects":{
         "adapter":"objects",
@@ -25,14 +29,28 @@
         }
       }
     },
+    "topbar":{
+      "list":{
+        "title":{
+          "text":"MAIN BOARD"
+        },
+        "actions":[
+          {
+            "label":"nuevo",
+            "urlMap":"#",
+            "icon":"plus green icon"
+          }
+        ]
+      }
+    },
     "selector": {
       "type": "tablelist",
       "dataSource":"objects"
     },
-    "urlmaps":{
-      "LIST":"{GLOBAL:basemapping}/board/list",
-      "EDIT":"{GLOBAL:basemapping}/board/edit/{_id}",
-      "DELETE":"{GLOBAL:basemapping}/board/delete/{_id}"
+    "urlMaps":{
+      "LIST":"v{service('baseurl')}/board/list",
+      "EDIT":"v{service('baseurl')}/board/edit/{ROW:_id}",
+      "DELETE":"v{service('baseurl')}/board/delete/{ROW:_id}"
     }
   }
 }

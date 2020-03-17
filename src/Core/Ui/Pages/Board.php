@@ -15,16 +15,6 @@ use Nubesys\Data\DataSource\DataSourceAdapters\Objects as ObjectsDataSource;
 
 class Board extends VueUiService {
 
-    //OBJECTS APP VARS
-    
-    protected $model                        = false;
-    protected $modelId                      = null;
-    protected $modelData                    = null;
-    protected $modelDefinitions             = null;
-    protected $modelObjectsData             = null;
-    protected $modelSelectedObjectId        = null;
-    protected $modelSelectedObjectData      = null;
-
     //APP DATA SELECTOR VARS
     protected $selectorFields               = null;
     protected $selectorActions              = null;
@@ -32,6 +22,7 @@ class Board extends VueUiService {
     protected $selectorData                 = null;
 
     protected $action                       = null;
+    protected $baseUrlMaps                  = null;
 
     public function mainAction(){
 
@@ -40,18 +31,52 @@ class Board extends VueUiService {
         $this->setTitle($this->getLocal("title"));
 
         $this->setDataSources();
+        $this->setUrlBaseMaps();
 
         //TODO : VER LOGICA Y OPCIONES DE TIPO DE APPLICACION
+        $this->generateSideMenu();
+
+        $this->callServiceAction();
+    }
+
+    //CALL SERVICE ACTION
+    protected function callServiceAction(){
+
+        $action             = ($this->getLocal("application.serviceActions"))['default'];
+        $paramNum           = ($this->getLocal("application.serviceActions"))['paramNum'];
+
+        if(!strstr(":", $this->getUrlParam($paramNum))){
+
+            $action         = $this->getUrlParam($paramNum);
+        }
+
+        $methodName         = $action . "Action";
+
+        if(method_exists($this, $methodName)){
+
+            $this->action   = $action;
+            $this->$methodName();
+        }else{
+
+            exit("Method " . $methodName . " Not Found");
+        }
+    }
+
+    //LIST ACTION
+    protected function listAction(){
 
         $this->setViewVar("content", "Panel Principal de Prueba");
 
-        //$this->setModel();
-        
-        $this->generateSideMenu();
         $this->generateTopBar();
 
         //DEFINIR LOGICA DE ACCIONES EN EL JSON
         $this->generateSelector();
+    }
+
+    //URL BASE MAPS
+    protected function setUrlBaseMaps(){
+
+        //var_dump($this->getLocal("application.urlMaps"));exit();
     }
 
     //DATA SOURCES
@@ -257,23 +282,8 @@ class Board extends VueUiService {
     //TOP BAR
     protected function generateTopBar(){
 
-        $actions                = array();
-
-        //TODO : ITEMS SEGUN MODULO
-
-        $action                 = new \stdClass();
-        $action->label          = "nuevo";
-        $action->url            = "";
-        $action->icon           = "plus green icon";
-
-        $actions[]              = $action;
-
-        $topBarParams               = array();
-        $topBarParams['title']      = "Board";
-        $topBarParams['actions']    = $actions;
-
         $topBar                     = new TopBar($this->getDI());
-        $this->placeComponent("top", $topBar, $topBarParams);
+        $this->placeComponent("top", $topBar, ($this->getLocal("application.topbar"))[$this->action]);
         
     }
 

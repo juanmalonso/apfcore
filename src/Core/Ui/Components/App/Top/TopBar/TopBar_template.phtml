@@ -8,6 +8,7 @@
             </div>
         </div>
         <div class="right menu">
+            <!-- SEARCH -->
             <div class="item">
                 <div class="ui action input">
                     <input type="text" id="search" name="search" placeholder="Search...">
@@ -16,12 +17,15 @@
                     </button>
                 </div>
             </div>
+
+            <!-- FILTERS -->
             <a id="filter-button" class="ui item blue filters button">
                 <i class="filter icon"></i> Filtros
             </a>
-            
-            <button class="ui item basic button">
-                <i class="plus green icon"></i> nuevo
+
+            <!-- ACTIONS -->            
+            <button v-for="(item, index) in actions" :key="index" class="ui item basic button" >
+                <i v-bind:class="item.icon"></i> ${item.label}
             </button>
         </div>
     </div>
