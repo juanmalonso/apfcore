@@ -67,40 +67,45 @@ class UiService extends Service {
     //LOCALSCOPE
     protected function hasLocal($p_key){
 
-        return $this->getDI()->get('global')->has('scope.' . $this->getId() . '.' . $p_key);
+        $globalScopeKey     = "local." . $this->getId() . ".scope";
+
+        $this->initScope($globalScopeKey);
+
+        return $this->getScope($globalScopeKey)->has($p_key);
     }
 
     protected function getLocal($p_key){
 
-        return $this->replaceValues($this->getDI()->get('global')->get('scope.' . $this->getId() . '.' . $p_key));
+        $globalScopeKey     = "local." . $this->getId() . ".scope";
+
+        $this->initScope($globalScopeKey);
+
+        return $this->getScope($globalScopeKey)->get($p_key);
+    }
+
+    protected function allLocal($p_key){
+
+        $globalScopeKey     = "local." . $this->getId() . ".scope";
+
+        $this->initScope($globalScopeKey);
+
+        return $this->getScope($globalScopeKey)->all($p_key);
     }
 
     protected function setLocal($p_key, $p_value){
 
-        $this->getDI()->get('global')->set('scope.' . $this->getId() . '.' . $p_key, $p_value);
-    }
+        $globalScopeKey     = "local." . $this->getId() . ".scope";
 
-    protected function getAllLocals(){
+        $this->initScope($globalScopeKey);
 
-        $prefix     = 'scope.' . $this->getId() . '.';
-
-        $result     = array();
-
-        foreach($this->getDI()->get('global')->getByKeyStartAt($prefix) as $key=>$value){
-            
-            $result[str_replace($prefix, "", $key)] = $this->replaceValues($value);
-        }
-
-        return $result;
+        $this->getScope($globalScopeKey)->set($p_key, $p_value);
     }
 
     protected function setAllLocals($p_values){
         
-        $prefix     = 'scope.' . $this->getId() . '.';
-
         foreach($p_values as $key=>$value){
             
-            $this->getDI()->get('global')->set($prefix . $key, $value);
+            $this->setLocal($key, $value);
         }
     }
 
@@ -111,19 +116,19 @@ class UiService extends Service {
 
             switch ($key) {
                 case 'URL':
-                    $this->setParamsByGroup('url', $value);
+                    $this->setAllUrlParams($value);
                     break;
 
                 case 'GET':
-                    $this->setParamsByGroup('get', $value);
+                    $this->setAllGetParams($value);
                     break;
 
                 case 'POST':
-                    $this->setParamsByGroup('post', $value);
+                    $this->setAllPostParams($value);
                     break;
 
                 case 'FILES':
-                    $this->setParamsByGroup('files', $value);
+                    $this->setAllFilesParams($value);
                     break;
                 
                 case 'JSON':

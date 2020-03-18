@@ -2,6 +2,7 @@
 namespace Nubesys\Core;
 
 use Phalcon\Di\Injectable;
+use Nubesys\Core\Register;
 
 class Common extends Injectable
 {
@@ -93,178 +94,295 @@ class Common extends Injectable
 
         return $this->getDI()->get('session')->set($p_key, $p_value);
     }
+    //SCOPES
+    protected function hasScope($p_key){
+
+        return $this->getDI()->get('global')->has($p_key);
+    }
+
+    protected function getScope($p_key){
+
+        return $this->getDI()->get('global')->get($p_key);
+    }
+
+    protected function setScope($p_key, $p_value){
+
+        $this->getDI()->get('global')->set($p_key, $p_value);
+    }
+
+    protected function initScope($p_key){
+
+        if(!$this->hasScope($p_key)){
+
+            $this->setScope($p_key, new Register());
+        }
+    }
 
     //GLOBAL SCOPE
+    
     protected function hasGlobal($p_key){
 
-        return $this->getDI()->get('global')->has('global.' . $p_key);
+        $globalScopeKey     = "global.scope";
+
+        $this->initScope($globalScopeKey);
+
+        return $this->getScope($globalScopeKey)->has($p_key);
     }
 
     protected function getGlobal($p_key){
 
-        return $this->replaceValues($this->getDI()->get('global')->get('global.' . $p_key));
+        $globalScopeKey     = "global.scope";
+
+        $this->initScope($globalScopeKey);
+
+        return $this->getScope($globalScopeKey)->get($p_key);
     }
 
-    protected function getAllGlobal(){
+    protected function allGlobal(){
 
-        $prefix     = 'global.';
+        $globalScopeKey     = "global.scope";
 
-        $result     = array();
+        $this->initScope($globalScopeKey);
 
-        foreach($this->getDI()->get('global')->getByKeyStartAt($prefix) as $key=>$value){
-            
-            $result[str_replace($prefix, "", $key)] = $this->replaceValues($value);
-        }
-
-        return $result;
+        return $this->getScope($globalScopeKey)->all();
     }
 
     protected function setGlobal($p_key, $p_value){
 
-        $this->getDI()->get('global')->set('global.' . $p_key, $p_value);
+        $globalScopeKey     = "global.scope";
+
+        $this->initScope($globalScopeKey);
+
+        $this->getScope($globalScopeKey)->set($p_key, $p_value);
     }
 
     //GET PARAM SCOPE
     protected function hasGetParam($p_key){
+        
+        $globalScopeKey     = "get.scope";
 
-        return $this->getDI()->get('global')->has('params.get.' . $p_key);
+        $this->initScope($globalScopeKey);
+
+        return $this->getScope($globalScopeKey)->has($p_key);
     }
 
     protected function getGetParam($p_key){
 
-        return $this->getDI()->get('global')->get('params.get.' . $p_key);
+        $globalScopeKey     = "get.scope";
+
+        $this->initScope($globalScopeKey);
+
+        return $this->getScope($globalScopeKey)->get($p_key);
     }
 
-    protected function getAllGetParams(){
+    protected function allGetParams(){
 
-        return $this->getParams("get");
+        $globalScopeKey     = "get.scope";
+
+        $this->initScope($globalScopeKey);
+
+        return $this->getScope($globalScopeKey)->all($p_key);
+    }
+
+    protected function setGetParam($p_key, $p_value){
+
+        $globalScopeKey     = "get.scope";
+
+        $this->initScope($globalScopeKey);
+
+        $this->getScope($globalScopeKey)->set($p_key, $p_value);
+    }
+
+    protected function setAllGetParams($p_values){
+        
+        foreach($p_values as $key=>$value){
+            
+            $this->setGetParam($key, $value);
+        }
     }
 
     //URL PARAM SCOPE
     protected function hasUrlParam($p_key){
+        
+        $globalScopeKey     = "url.scope";
 
-        return $this->getDI()->get('global')->has('params.url.' . $p_key);
+        $this->initScope($globalScopeKey);
+
+        return $this->getScope($globalScopeKey)->has($p_key);
     }
 
     protected function getUrlParam($p_key){
 
-        return $this->getDI()->get('global')->get('params.url.' . $p_key);
+        $globalScopeKey     = "url.scope";
+
+        $this->initScope($globalScopeKey);
+
+        return $this->getScope($globalScopeKey)->get($p_key);
     }
 
-    protected function getAllUrlParams(){
+    protected function allUrlParams(){
 
-        return $this->getParams("url");
+        $globalScopeKey     = "url.scope";
+
+        $this->initScope($globalScopeKey);
+
+        return $this->getScope($globalScopeKey)->all($p_key);
+    }
+
+    protected function setUrlParam($p_key, $p_value){
+
+        $globalScopeKey     = "url.scope";
+
+        $this->initScope($globalScopeKey);
+
+        $this->getScope($globalScopeKey)->set($p_key, $p_value);
+    }
+
+    protected function setAllUrlParams($p_values){
+        
+        foreach($p_values as $key=>$value){
+            
+            $this->setUrlParam($key, $value);
+        }
     }
 
     //POST PARAM SCOPE
     protected function hasPostParam($p_key){
+        
+        $globalScopeKey     = "post.scope";
 
-        return $this->getDI()->get('global')->has('params.post.' . $p_key);
+        $this->initScope($globalScopeKey);
+
+        return $this->getScope($globalScopeKey)->has($p_key);
     }
 
     protected function getPostParam($p_key){
 
-        return $this->getDI()->get('global')->get('params.post.' . $p_key);
+        $globalScopeKey     = "post.scope";
+
+        $this->initScope($globalScopeKey);
+
+        return $this->getScope($globalScopeKey)->get($p_key);
     }
 
-    protected function getAllPostParams(){
+    protected function allPostParams(){
 
-        return $this->getParams("post");
+        $globalScopeKey     = "post.scope";
+
+        $this->initScope($globalScopeKey);
+
+        return $this->getScope($globalScopeKey)->all($p_key);
+    }
+
+    protected function setPostParam($p_key, $p_value){
+
+        $globalScopeKey     = "post.scope";
+
+        $this->initScope($globalScopeKey);
+
+        $this->getScope($globalScopeKey)->set($p_key, $p_value);
+    }
+
+    protected function setAllPostParams($p_values){
+        
+        foreach($p_values as $key=>$value){
+            
+            $this->setPostParam($key, $value);
+        }
     }
 
     //FILES PARAM SCOPE
-    protected function hasFileParam($p_key){
+    protected function hasFilesParam($p_key){
+        
+        $globalScopeKey     = "files.scope";
 
-        return $this->getDI()->get('global')->has('params.files.' . $p_key);
+        $this->initScope($globalScopeKey);
+
+        return $this->getScope($globalScopeKey)->has($p_key);
     }
 
-    protected function getFileParam($p_key){
+    protected function getFilesParam($p_key){
 
-        return $this->getDI()->get('global')->get('params.files.' . $p_key);
+        $globalScopeKey     = "files.scope";
+
+        $this->initScope($globalScopeKey);
+
+        return $this->getScope($globalScopeKey)->get($p_key);
     }
 
-    protected function getAllFileParams(){
+    protected function allFilesParams(){
 
-        return $this->getParams("files");
+        $globalScopeKey     = "files.scope";
+
+        $this->initScope($globalScopeKey);
+
+        return $this->getScope($globalScopeKey)->all($p_key);
+    }
+
+    protected function setFilesParam($p_key, $p_value){
+
+        $globalScopeKey     = "files.scope";
+
+        $this->initScope($globalScopeKey);
+
+        $this->getScope($globalScopeKey)->set($p_key, $p_value);
+    }
+
+    protected function setAllFilesParams($p_values){
+        
+        foreach($p_values as $key=>$value){
+            
+            $this->setFilesParam($key, $value);
+        }
     }
 
     //JSON PARAM SCOPE
     protected function hasJsonParam(){
 
-        return $this->getDI()->get('global')->get('params.json');
+        $globalScopeKey     = "json.scope";
+
+        return $this->getDI()->get('global')->hs($globalScopeKey);
     }
 
     protected function getJsonParam(){
 
-        return $this->getDI()->get('global')->get('params.json');
+        $globalScopeKey     = "json.scope";
+
+        return $this->getDI()->get('global')->get($globalScopeKey);
     }
 
     protected function setJsonParam($p_value){
 
-        $this->getDI()->get('global')->set('params.json', $p_value);
-    }
+        $globalScopeKey     = "json.scope";
 
-    //TODO : VER FUNCIONES de manejo de files buscar por nombre, has por nombre etc
-
-    //SET PARAM BY GROUP
-    protected function setParamByGroup($p_group, $p_key, $p_value){
-
-        $this->getDI()->get('global')->set('params.' . $p_group . '.' . $p_key, $p_value);
-    }
-
-    //SET PARAMS BY GROUP
-    protected function setParamsByGroup($p_group, $p_values){
-        
-        foreach($p_values as $key=>$value){
-
-            $this->getDI()->get('global')->set('params.' . $p_group . '.' . $key, $value);
-        }
-    }
-
-    //GET PARAMS BY GROUP
-    protected function getParams($p_group){
-
-        $prefix     = 'params.' . $p_group . '.';
-    
-        $result     = array();
-
-        foreach($this->getDI()->get('global')->getByKeyStartAt($prefix) as $key=>$value){
-            
-            $result[str_replace($prefix, "", $key)] = $value;
-        }
-
-        return $result;
-    }
-
-    protected function getAllParams(){
-
-        $prefix     = 'params.';
-    
-        $result     = array();
-
-        foreach($this->getDI()->get('global')->getByKeyStartAt($prefix) as $key=>$value){
-            
-            $result[str_replace($prefix, "", $key)] = $value;
-        }
-
-        return $result;
+        $this->getDI()->get('global')->set($globalScopeKey, $p_value);
     }
 
     //DATA SOURCES
-    //POST PARAM SCOPE
     protected function hasDataSource($p_key){
+        $globalScopeKey     = "ds.scope";
 
-        return $this->getDI()->get('global')->has('ds.' . $p_key);
+        $this->initScope($globalScopeKey);
+
+        return $this->getScope($globalScopeKey)->has($p_key);
     }
 
     protected function getDataSource($p_key){
 
-        return $this->getDI()->get('global')->get('ds.' . $p_key);
+        $globalScopeKey     = "ds.scope";
+
+        $this->initScope($globalScopeKey);
+
+        return $this->getScope($globalScopeKey)->get($p_key);
     }
 
     protected function setDataSource($p_key, $p_value){
 
-        return $this->getDI()->get('global')->set('ds.' . $p_key, $p_value);
+        $globalScopeKey     = "ds.scope";
+
+        $this->initScope($globalScopeKey);
+
+        $this->getScope($globalScopeKey)->set($p_key, $p_value);
     }
 
     //JSON TREE
@@ -274,10 +392,10 @@ class Common extends Injectable
         
         if(file_exists($path)){
 
-            $rawServiceMainData             = json_decode(file_get_contents($path), true);
-
-            $serviceMainData                = \Nubesys\Core\Utils\Struct::flatten($rawServiceMainData,"",2);
+            $serviceMainData             = json_decode(file_get_contents($path), true);
             
+            //TODO : REPLACE VARS AQUI
+
             $this->setAllLocals($serviceMainData);
         }
     }
@@ -339,7 +457,7 @@ class Common extends Injectable
 
         return $result;
     }
-
+    
 }
 
 ?>

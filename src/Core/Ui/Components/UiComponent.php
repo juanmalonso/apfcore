@@ -78,99 +78,102 @@ class UiComponent extends Common {
     //LOCAL SCOPE
     protected function hasLocal($p_key){
 
-        return $this->getDI()->get('global')->has('scope.' . $this->getId() . '.' . $p_key);
+        $globalScopeKey     = "local." . $this->getId() . ".scope";
+
+        $this->initScope($globalScopeKey);
+
+        return $this->getScope($globalScopeKey)->has($p_key);
     }
 
     protected function getLocal($p_key){
 
-        return $this->replaceValues($this->getDI()->get('global')->get('scope.' . $this->getId() . '.' . $p_key));
+        $globalScopeKey     = "local." . $this->getId() . ".scope";
+
+        $this->initScope($globalScopeKey);
+
+        return $this->getScope($globalScopeKey)->get($p_key);
+    }
+
+    protected function allLocal($p_key){
+
+        $globalScopeKey     = "local." . $this->getId() . ".scope";
+
+        $this->initScope($globalScopeKey);
+
+        return $this->getScope($globalScopeKey)->all($p_key);
     }
 
     protected function setLocal($p_key, $p_value){
 
-        $this->getDI()->get('global')->set('scope.' . $this->getId() . '.' . $p_key, $p_value);
-    }
+        $globalScopeKey     = "local." . $this->getId() . ".scope";
 
-    protected function getAllLocals(){
+        $this->initScope($globalScopeKey);
 
-        $prefix     = 'scope.' . $this->getId() . '.';
-
-        $result     = array();
-
-        foreach($this->getDI()->get('global')->getByKeyStartAt($prefix) as $key=>$value){
-            
-            $result[str_replace($prefix, "", $key)] = $this->replaceValues($value);
-        }
-
-        return $result;
+        $this->getScope($globalScopeKey)->set($p_key, $p_value);
     }
 
     protected function setAllLocals($p_values){
         
-        $prefix     = 'scope.' . $this->getId() . '.';
-
         foreach($p_values as $key=>$value){
             
-            $this->getDI()->get('global')->set($prefix . $key, $value);
+            $this->setLocal($key, $value);
         }
     }
 
     //PARENT SCOPE
     protected function hasParent($p_key){
 
-        return $this->getDI()->get('global')->has('scope.' . $this->getParentId() . '.' . $p_key);
+        $globalScopeKey     = "local." . $this->getParentId() . ".scope";
+
+        $this->initScope($globalScopeKey);
+
+        return $this->getScope($globalScopeKey)->has($p_key);
     }
 
     protected function getParent($p_key){
 
-        return $this->replaceValues($this->getDI()->get('global')->get('scope.' . $this->getParentId() . '.' . $p_key));
+        $globalScopeKey     = "local." . $this->getParentId() . ".scope";
+
+        $this->initScope($globalScopeKey);
+
+        return $this->getScope($globalScopeKey)->get($p_key);
     }
 
-    protected function getAllParents(){
+    protected function allParent($p_key){
 
-        $prefix     = 'scope.' . $this->getParentId() . '.';
+        $globalScopeKey     = "local." . $this->getParentId() . ".scope";
 
-        $result     = array();
+        $this->initScope($globalScopeKey);
 
-        foreach($this->getDI()->get('global')->getByKeyStartAt($prefix) as $key=>$value){
-            
-            $result[str_replace($prefix, "", $key)] = $this->replaceValues($value);
-        }
-
-        return $result;
+        return $this->getScope($globalScopeKey)->all($p_key);
     }
 
     //SERVICE SCOPE
     protected function hasService($p_key){
+        
+        $globalScopeKey     = "local." . $this->getServiceId() . ".scope";
 
-        return $this->getDI()->get('global')->has('scope.' . $this->getServiceId() . '.' . $p_key);
+        $this->initScope($globalScopeKey);
+
+        return $this->getScope($globalScopeKey)->has($p_key);
     }
 
     protected function getService($p_key){
 
-        return $this->replaceValues($this->getDI()->get('global')->get('scope.' . $this->getServiceId() . '.' . $p_key));
+        $globalScopeKey     = "local." . $this->getServiceId() . ".scope";
+
+        $this->initScope($globalScopeKey);
+
+        return $this->getScope($globalScopeKey)->get($p_key);
     }
 
-    protected function getAllService(){
+    protected function allService($p_key){
 
-        $prefix     = 'scope.' . $this->getServiceId() . '.';
+        $globalScopeKey     = "local." . $this->getServiceId() . ".scope";
 
-        $result     = array();
+        $this->initScope($globalScopeKey);
 
-        foreach($this->getDI()->get('global')->getByKeyStartAt($prefix) as $key=>$value){
-            
-            $result[str_replace($prefix, "", $key)] = $this->replaceValues($value);
-        }
-
-        return $result;
-    }
-
-    //URL CLASS PATH
-    protected function getUrlClassPath(){
-
-        $pathPartes     = explode("\\", $this->getClassPath());
-
-        return   "uid/" . implode("_", array_map(function ($e){ return \Phalcon\Text::uncamelize($e);}, $pathPartes));
+        return $this->getScope($globalScopeKey)->all($p_key);
     }
 
     //PARAMS
@@ -180,19 +183,19 @@ class UiComponent extends Common {
 
             switch ($key) {
                 case 'URL':
-                    $this->setParamsByGroup('url', $value);
+                    $this->setAllUrlParams($value);
                     break;
 
                 case 'GET':
-                    $this->setParamsByGroup('get', $value);
+                    $this->setAllGetParams($value);
                     break;
 
                 case 'POST':
-                    $this->setParamsByGroup('post', $value);
+                    $this->setAllPostParams($value);
                     break;
 
                 case 'FILES':
-                    $this->setParamsByGroup('files', $value);
+                    $this->setAllFilesParams($value);
                     break;
                 
                 case 'JSON':
@@ -205,8 +208,15 @@ class UiComponent extends Common {
         }
     }
 
-    //VIEW VARS
+    //URL CLASS PATH
+    protected function getUrlClassPath(){
 
+        $pathPartes     = explode("\\", $this->getClassPath());
+
+        return "uid/" . implode("_", array_map(function ($e){ return \Phalcon\Text::uncamelize($e);}, $pathPartes));
+    }
+
+    //VIEW VARS
     protected function setViewVar($p_key, $p_value){
 
         $this->view->set($p_key, $p_value);
@@ -269,11 +279,11 @@ class UiComponent extends Common {
     //RENDER
     public function doComponentRender($p_params, $p_parent, $p_inherited = false){
 
-        $this->loadJsonTree();
-        
         $this->setParentId($p_parent);
-        
+
         $this->setAllLocals($p_params);
+
+        $this->loadJsonTree();
 
         if(method_exists($this,"mainAction")){
 
@@ -330,9 +340,9 @@ class UiComponent extends Common {
 
     public function doService($p_uiServiceName, $p_params){
         
-        $this->loadJsonTree();
-
         $this->setParams($p_params);
+
+        $this->loadJsonTree();
         
         if(method_exists($this, $p_uiServiceName)){
 
