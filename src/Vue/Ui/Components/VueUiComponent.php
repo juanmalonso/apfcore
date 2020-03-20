@@ -15,6 +15,7 @@ class VueUiComponent extends UiComponent {
         $this->setJsDataVar("id", $this->getId());
         $this->setJsDataVar("tag", $this->getId());
         $this->setJsDataVar("basepath", $this->getDI()->get('config')->main->url->base);
+        $this->setJsDataVar("serviceId", $this->serviceId);
         
         $this->setJsDataVar("path", $this->getUrlClassPath());
         //var_dump();
@@ -99,6 +100,8 @@ class VueUiComponent extends UiComponent {
     public function doComponentRender($p_params, $p_parent, $p_inherited = false){
 
         parent::doComponentRender($p_params, $p_parent, true);
+
+        $this->setJsDataVar("parentId", $this->parentComponentId);
 
         $this->loadVueTemplates();
 

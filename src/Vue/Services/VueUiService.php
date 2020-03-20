@@ -25,6 +25,16 @@ class VueUiService extends UiService {
         $this->addJsSource("https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js");
     }
 
+    //JSDATA REFERENCESNAMES
+    protected function setJsReferencesNamesDataVar(){
+
+        $globalScopeKey     = "references.scope";
+
+        $this->initScope($globalScopeKey);
+
+        $this->setJsDataVar("nameReferences", $this->getScope($globalScopeKey)->all());
+    }
+
     //VUEJSDATA
     function setJsDataVar($p_key, $p_value){
 
@@ -101,6 +111,8 @@ class VueUiService extends UiService {
     public function doPageRender($p_action, $p_params, $p_inherited = false){
 
         parent::doPageRender($p_action, $p_params, true);
+
+        $this->setJsReferencesNamesDataVar();
 
         $this->loadVueTemplates();
 

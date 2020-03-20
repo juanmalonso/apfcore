@@ -3,9 +3,9 @@
   "title": "Tablero Principal",
   "navigation": {
     "user": {
-      "label": "v{session(user_login)}",
+      "label": "var(session:user_login)",
       "url": "http://localhost/profile",
-      "avatar": "f{getSession(user_avatar)}"
+      "avatar": "fun(getSession:user_avatar)"
     },
     "items": [
       {
@@ -29,16 +29,61 @@
         }
       }
     },
-    "topbar":{
+    "urlMaps":{
+      "LIST":"{var(global:urlbase)}board/list",
+      "ADD":"{var(global:urlbase)}board/edit/",
+      "EDIT":"{var(global:urlbase)}board/edit/%(data:_id)%",
+      "DELETE":"{var(global:urlbase)}board/delete/%(data:_id)%",
+      "SUBPAGE":"{var(global:urlbase)}board/subpage/%(data:_id)%/%(component:id)%",
+      "DETALLE":"{var(global:urlbase)}board/detalle/%(data:_id)%"
+    },
+    "topBar":{
       "list":{
         "title":{
           "text":"MAIN BOARD"
         },
         "actions":[
           {
+            "type":"link",
             "label":"nuevo",
-            "urlMap":"#",
+            "urlMap":"var(local:application.urlMaps.ADD)",
             "icon":"plus green icon"
+          },
+          {
+            "type":"actions",
+            "label":"nuevo",
+            "actions":[
+              {
+                "scope":"_local",
+                "name":"doLocalTest",
+                "params":{
+                  "p1":"A",
+                  "p2":2
+                }
+              },
+              {
+                "scope":"_service",
+                "name":"doServiceTest",
+                "params":{
+                  "p1":"A"
+                }
+              },
+              {
+                "scope":"_parent",
+                "name":"doParentTest",
+                "params":{
+                  "p1":"G"
+                }
+              },
+              {
+                "scope":"topbar",
+                "name":"doRefereceTest",
+                "params":{
+                  "p1":"G"
+                }
+              }
+            ],
+            "icon":"caret left icon"
           }
         ]
       }
@@ -46,11 +91,6 @@
     "selector": {
       "type": "tablelist",
       "dataSource":"objects"
-    },
-    "urlMaps":{
-      "LIST":"v{service('baseurl')}/board/list",
-      "EDIT":"v{service('baseurl')}/board/edit/{ROW:_id}",
-      "DELETE":"v{service('baseurl')}/board/delete/{ROW:_id}"
     }
   }
 }

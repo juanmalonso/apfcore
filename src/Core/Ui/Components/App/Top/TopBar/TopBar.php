@@ -7,6 +7,8 @@ class TopBar extends VueUiComponent {
 
     public function mainAction(){
 
+        $this->registerReference("topbar");
+
         $this->setJsDataVar("title", $this->getLocal("title"));
         $this->setJsDataVar("actions", $this->getLocal("actions"));
     }

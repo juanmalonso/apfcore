@@ -75,6 +75,16 @@ class UiComponent extends Common {
         $this->id = implode("-", array_map(function ($e){ return \Phalcon\Text::uncamelize($e);}, $pathPartes)) . "-" . $className .  "-" . md5(microtime(true));
     }
 
+    //COMPONENTS REFERENCE NAMES
+    protected function registerReference($p_name){
+
+        $globalScopeKey     = "references.scope";
+
+        $this->initScope($globalScopeKey);
+
+        $this->getScope($globalScopeKey)->set($p_name, $this->getId());
+    }
+
     //LOCAL SCOPE
     protected function hasLocal($p_key){
 
@@ -82,7 +92,13 @@ class UiComponent extends Common {
 
         $this->initScope($globalScopeKey);
 
-        return $this->getScope($globalScopeKey)->has($p_key);
+        if(!strpos($p_key, '.')){
+
+            return $this->getScope($globalScopeKey)->has($p_key);
+        }else{
+
+            return $this->getScope($globalScopeKey)->hasDot($p_key);
+        }
     }
 
     protected function getLocal($p_key){
@@ -91,16 +107,24 @@ class UiComponent extends Common {
 
         $this->initScope($globalScopeKey);
 
-        return $this->getScope($globalScopeKey)->get($p_key);
+        if(!strpos($p_key, '.')){
+
+            return $this->getScope($globalScopeKey)->get($p_key);
+        }else{
+
+            return $this->getScope($globalScopeKey)->getDot($p_key);
+        }
+
+        
     }
 
-    protected function allLocal($p_key){
+    protected function allLocal(){
 
         $globalScopeKey     = "local." . $this->getId() . ".scope";
 
         $this->initScope($globalScopeKey);
 
-        return $this->getScope($globalScopeKey)->all($p_key);
+        return $this->getScope($globalScopeKey)->all();
     }
 
     protected function setLocal($p_key, $p_value){
@@ -109,7 +133,13 @@ class UiComponent extends Common {
 
         $this->initScope($globalScopeKey);
 
-        $this->getScope($globalScopeKey)->set($p_key, $p_value);
+        if(!strpos($p_key, '.')){
+
+            return $this->getScope($globalScopeKey)->set($p_key, $p_value);
+        }else{
+
+            return $this->getScope($globalScopeKey)->setDot($p_key, $p_value);
+        }
     }
 
     protected function setAllLocals($p_values){
@@ -139,13 +169,13 @@ class UiComponent extends Common {
         return $this->getScope($globalScopeKey)->get($p_key);
     }
 
-    protected function allParent($p_key){
+    protected function allParent(){
 
         $globalScopeKey     = "local." . $this->getParentId() . ".scope";
 
         $this->initScope($globalScopeKey);
 
-        return $this->getScope($globalScopeKey)->all($p_key);
+        return $this->getScope($globalScopeKey)->all();
     }
 
     //SERVICE SCOPE
@@ -167,13 +197,13 @@ class UiComponent extends Common {
         return $this->getScope($globalScopeKey)->get($p_key);
     }
 
-    protected function allService($p_key){
+    protected function allService(){
 
         $globalScopeKey     = "local." . $this->getServiceId() . ".scope";
 
         $this->initScope($globalScopeKey);
 
-        return $this->getScope($globalScopeKey)->all($p_key);
+        return $this->getScope($globalScopeKey)->all();
     }
 
     //PARAMS
@@ -280,7 +310,7 @@ class UiComponent extends Common {
     public function doComponentRender($p_params, $p_parent, $p_inherited = false){
 
         $this->setParentId($p_parent);
-
+        
         $this->setAllLocals($p_params);
 
         $this->loadJsonTree();

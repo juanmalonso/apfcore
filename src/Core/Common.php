@@ -87,7 +87,7 @@ class Common extends Injectable
 
     protected function getSession($p_key){
 
-        return $this->replaceValues($this->getDI()->get('session')->get($p_key));
+        return $this->getDI()->get('session')->get($p_key);
     }
 
     protected function setSession($p_key, $p_value){
@@ -126,7 +126,13 @@ class Common extends Injectable
 
         $this->initScope($globalScopeKey);
 
-        return $this->getScope($globalScopeKey)->has($p_key);
+        if(!strpos($p_key, '.')){
+
+            return $this->getScope($globalScopeKey)->has($p_key);
+        }else{
+
+            return $this->getScope($globalScopeKey)->hasDot($p_key);
+        }
     }
 
     protected function getGlobal($p_key){
@@ -135,7 +141,13 @@ class Common extends Injectable
 
         $this->initScope($globalScopeKey);
 
-        return $this->getScope($globalScopeKey)->get($p_key);
+        if(!strpos($p_key, '.')){
+
+            return $this->getScope($globalScopeKey)->get($p_key);
+        }else{
+
+            return $this->getScope($globalScopeKey)->getDot($p_key);
+        }
     }
 
     protected function allGlobal(){
@@ -153,7 +165,13 @@ class Common extends Injectable
 
         $this->initScope($globalScopeKey);
 
-        $this->getScope($globalScopeKey)->set($p_key, $p_value);
+        if(!strpos($p_key, '.')){
+
+            $this->getScope($globalScopeKey)->set($p_key, $p_value);
+        }else{
+
+            $this->getScope($globalScopeKey)->setDot($p_key, $p_value);
+        }
     }
 
     //GET PARAM SCOPE
@@ -163,7 +181,13 @@ class Common extends Injectable
 
         $this->initScope($globalScopeKey);
 
-        return $this->getScope($globalScopeKey)->has($p_key);
+        if(!strpos($p_key, '.')){
+
+            return $this->getScope($globalScopeKey)->has($p_key);
+        }else{
+
+            return $this->getScope($globalScopeKey)->hasDot($p_key);
+        }
     }
 
     protected function getGetParam($p_key){
@@ -172,7 +196,13 @@ class Common extends Injectable
 
         $this->initScope($globalScopeKey);
 
-        return $this->getScope($globalScopeKey)->get($p_key);
+        if(!strpos($p_key, '.')){
+
+            return $this->getScope($globalScopeKey)->get($p_key);
+        }else{
+
+            return $this->getScope($globalScopeKey)->getDot($p_key);
+        }
     }
 
     protected function allGetParams(){
@@ -190,7 +220,13 @@ class Common extends Injectable
 
         $this->initScope($globalScopeKey);
 
-        $this->getScope($globalScopeKey)->set($p_key, $p_value);
+        if(!strpos($p_key, '.')){
+
+            $this->getScope($globalScopeKey)->set($p_key, $p_value);
+        }else{
+
+            $this->getScope($globalScopeKey)->setDot($p_key, $p_value);
+        }
     }
 
     protected function setAllGetParams($p_values){
@@ -208,7 +244,13 @@ class Common extends Injectable
 
         $this->initScope($globalScopeKey);
 
-        return $this->getScope($globalScopeKey)->has($p_key);
+        if(!strpos($p_key, '.')){
+
+            return $this->getScope($globalScopeKey)->has($p_key);
+        }else{
+
+            return $this->getScope($globalScopeKey)->hasDot($p_key);
+        }
     }
 
     protected function getUrlParam($p_key){
@@ -217,7 +259,13 @@ class Common extends Injectable
 
         $this->initScope($globalScopeKey);
 
-        return $this->getScope($globalScopeKey)->get($p_key);
+        if(!strpos($p_key, '.')){
+
+            return $this->getScope($globalScopeKey)->get($p_key);
+        }else{
+
+            return $this->getScope($globalScopeKey)->getDot($p_key);
+        }
     }
 
     protected function allUrlParams(){
@@ -226,7 +274,7 @@ class Common extends Injectable
 
         $this->initScope($globalScopeKey);
 
-        return $this->getScope($globalScopeKey)->all($p_key);
+        return $this->getScope($globalScopeKey)->all();
     }
 
     protected function setUrlParam($p_key, $p_value){
@@ -235,7 +283,13 @@ class Common extends Injectable
 
         $this->initScope($globalScopeKey);
 
-        $this->getScope($globalScopeKey)->set($p_key, $p_value);
+        if(!strpos($p_key, '.')){
+
+            $this->getScope($globalScopeKey)->set($p_key, $p_value);
+        }else{
+
+            $this->getScope($globalScopeKey)->setDot($p_key, $p_value);
+        }
     }
 
     protected function setAllUrlParams($p_values){
@@ -253,7 +307,13 @@ class Common extends Injectable
 
         $this->initScope($globalScopeKey);
 
-        return $this->getScope($globalScopeKey)->has($p_key);
+        if(!strpos($p_key, '.')){
+
+            return $this->getScope($globalScopeKey)->has($p_key);
+        }else{
+
+            return $this->getScope($globalScopeKey)->hasDot($p_key);
+        }
     }
 
     protected function getPostParam($p_key){
@@ -262,7 +322,13 @@ class Common extends Injectable
 
         $this->initScope($globalScopeKey);
 
-        return $this->getScope($globalScopeKey)->get($p_key);
+        if(!strpos($p_key, '.')){
+
+            return $this->getScope($globalScopeKey)->get($p_key);
+        }else{
+
+            return $this->getScope($globalScopeKey)->getDot($p_key);
+        }
     }
 
     protected function allPostParams(){
@@ -280,7 +346,13 @@ class Common extends Injectable
 
         $this->initScope($globalScopeKey);
 
-        $this->getScope($globalScopeKey)->set($p_key, $p_value);
+        if(!strpos($p_key, '.')){
+
+            $this->getScope($globalScopeKey)->set($p_key, $p_value);
+        }else{
+
+            $this->getScope($globalScopeKey)->setDot($p_key, $p_value);
+        }
     }
 
     protected function setAllPostParams($p_values){
@@ -298,7 +370,13 @@ class Common extends Injectable
 
         $this->initScope($globalScopeKey);
 
-        return $this->getScope($globalScopeKey)->has($p_key);
+        if(!strpos($p_key, '.')){
+
+            return $this->getScope($globalScopeKey)->has($p_key);
+        }else{
+
+            return $this->getScope($globalScopeKey)->hasDot($p_key);
+        }
     }
 
     protected function getFilesParam($p_key){
@@ -307,7 +385,13 @@ class Common extends Injectable
 
         $this->initScope($globalScopeKey);
 
-        return $this->getScope($globalScopeKey)->get($p_key);
+        if(!strpos($p_key, '.')){
+
+            return $this->getScope($globalScopeKey)->get($p_key);
+        }else{
+
+            return $this->getScope($globalScopeKey)->getDot($p_key);
+        }
     }
 
     protected function allFilesParams(){
@@ -325,7 +409,13 @@ class Common extends Injectable
 
         $this->initScope($globalScopeKey);
 
-        $this->getScope($globalScopeKey)->set($p_key, $p_value);
+        if(!strpos($p_key, '.')){
+
+            $this->getScope($globalScopeKey)->set($p_key, $p_value);
+        }else{
+
+            $this->getScope($globalScopeKey)->setDot($p_key, $p_value);
+        }
     }
 
     protected function setAllFilesParams($p_values){
@@ -395,12 +485,144 @@ class Common extends Injectable
             $serviceMainData             = json_decode(file_get_contents($path), true);
             
             //TODO : REPLACE VARS AQUI
+            //var_dump($serviceMainData);
 
-            $this->setAllLocals($serviceMainData);
+            $dot = new \Adbar\Dot($serviceMainData);
+
+            foreach($dot->flatten() as $key=>$value){
+
+                $this->setLocal($key, $this->parseBlocks($value));
+            }
         }
     }
 
-    protected function replaceValues($p_value){
+    protected function parseExpression($p_input){
+    
+        return "_expressionResult_";
+    }
+    
+    protected function parseVariable($p_group, $p_name){
+
+        switch ($p_group) {
+                
+            case 'global':
+                $result = $this->getGlobal($p_name);
+                break;
+            
+            case 'service':
+                $result = $this->getService($p_name);
+                break;
+    
+            case 'local':
+                $result = $this->getLocal($p_name);
+                break;
+    
+            case 'session':
+                $result = $this->getSession($p_name);
+                break;
+    
+            default:
+                $result = null;
+                break;
+        }
+        
+        return $result;
+    }
+    
+    protected function parseFunction($p_name, $p_params){
+        
+        
+        $params     = \explode(",", $p_params);
+                    
+        return      call_user_func_array(array($this, $p_name),$params);
+    }
+    
+    protected function parseBlockValue($p_input, $p_forceTo = "any"){
+        
+        $result = $p_input;
+        
+        $blockValuePattern   = '/^(fun|var|exp)\((.*):(.*)\)$/';
+        
+        if(preg_match($blockValuePattern, $result, $matches)){
+            
+            switch ($matches[1]) {
+                
+                case 'var':
+                    $result = $this->parseVariable($matches[2], $matches[3]);
+                    break;
+                
+                case 'fun':
+                    $result = $this->parseFunction($matches[2], $matches[3]);
+                    break;
+                
+                case 'exp':
+                    $result = $this->parseExpression($matches[3]);
+                    break;
+                
+                default:
+                    $result = null;
+                    break;
+            }
+        }
+        
+        if($p_forceTo == "string"){
+            
+            if(is_array($result)){
+                
+                $result = "_array_";
+            }
+            
+            if(is_object($result)){
+                
+                $result = "_object_";
+            }
+            
+            if(is_null($result)){
+                
+                $result = "_null_";
+            }
+        }
+        
+        return $result;
+    }
+    
+    protected function parseBlocks($p_input){
+        
+        $result = $p_input;
+
+        if(is_string($p_input)){
+        
+            $result = $p_input;
+        
+            $blockPattern     = '/^.*\{(.*)\}.*$/';
+        
+            while(preg_match($blockPattern, $result, $matches)){
+            
+                if("{" . $matches[1] . "}" == $matches[0]){
+                
+                    $result = $this->parseBlockValue($matches[1]);
+                }else{
+                
+                    $result = str_replace("{" . $matches[1] . "}", $this->parseBlockValue($matches[1], "string"), $matches[0]);   
+                }
+            }
+        
+            $result = $this->parseBlockValue($result);
+            
+        } else if(is_array($p_input)){
+        
+            $result = array();
+            
+            foreach($p_input as $key=>$value){
+                
+                $result[$key] = $this->parseBlocks($value);
+            }
+        }
+        
+        return $result;
+    }
+
+    protected function replaceValuesOLD($p_value){
         $result = $p_value;
         
         if(\is_string($p_value)){

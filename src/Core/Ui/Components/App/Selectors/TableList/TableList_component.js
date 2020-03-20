@@ -5,10 +5,9 @@ Vue.component("___tag_", {
   },
   mounted: function() {
     var _self = this;
-
-    console.log(_.size(this.linksFields), this.linksFields);
   },
-  methods: {},
+  methods: {
+  },
   computed: {
     colsNum: function() {
       var result = 1; //numrows column

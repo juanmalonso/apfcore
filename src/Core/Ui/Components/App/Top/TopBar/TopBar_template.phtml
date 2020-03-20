@@ -9,6 +9,7 @@
         </div>
         <div class="right menu">
             <!-- SEARCH -->
+            <!-- 
             <div class="item">
                 <div class="ui action input">
                     <input type="text" id="search" name="search" placeholder="Search...">
@@ -17,16 +18,22 @@
                     </button>
                 </div>
             </div>
-
+            -->
             <!-- FILTERS -->
+            <!--
             <a id="filter-button" class="ui item blue filters button">
                 <i class="filter icon"></i> Filtros
             </a>
-
-            <!-- ACTIONS -->            
-            <button v-for="(item, index) in actions" :key="index" class="ui item basic button" >
-                <i v-bind:class="item.icon"></i> ${item.label}
-            </button>
+            -->
+            <!-- ACTIONS -->
+            <template v-for="(item, index) in actions">
+                <a v-if="item.type == 'link'" class="ui item basic button" v-bind:href="parseBlocks(item.urlMap, {})">
+                    <i v-bind:class="item.icon"></i> ${item.label}
+                </a>
+                <button v-if="item.type == 'actions'" class="ui item basic button" v-on:click.once="doComponentAction(item.actions, $event)">
+                    <i v-bind:class="item.icon"></i> ${item.label}
+                </button>
+            </template>
         </div>
     </div>
 </div>

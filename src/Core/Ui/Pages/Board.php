@@ -31,23 +31,25 @@ class Board extends VueUiService {
         $this->setTitle($this->getLocal("title"));
 
         $this->setDataSources();
-        $this->setUrlBaseMaps();
 
         //TODO : VER LOGICA Y OPCIONES DE TIPO DE APPLICACION
         $this->generateSideMenu();
-
+        
         $this->callServiceAction();
     }
 
     //CALL SERVICE ACTION
     protected function callServiceAction(){
 
-        $action             = ($this->getLocal("application.serviceActions"))['default'];
-        $paramNum           = ($this->getLocal("application.serviceActions"))['paramNum'];
+        $action             = ($this->getLocal("application"))['serviceActions']['default'];
+        $paramNum           = ($this->getLocal("application"))['serviceActions']['paramNum'];
+        
+        if($this->hasUrlParam($paramNum)){
 
-        if(!strstr(":", $this->getUrlParam($paramNum))){
+            if(!strstr(":", $this->getUrlParam($paramNum))){
 
-            $action         = $this->getUrlParam($paramNum);
+                $action     = $this->getUrlParam($paramNum);
+            }
         }
 
         $methodName         = $action . "Action";
@@ -73,23 +75,18 @@ class Board extends VueUiService {
         $this->generateSelector();
     }
 
-    //URL BASE MAPS
-    protected function setUrlBaseMaps(){
-
-        //var_dump($this->getLocal("application.urlMaps"));exit();
-    }
-
     //DATA SOURCES
     protected function setDataSources(){
-
+        
         $this->dataSources = array();
-
+        
         foreach($this->getLocal("application.dataSources") as $dataSoyrceName=>$dataSource){
 
             //TODO VER DE MODIFICAR EL DATASOURCE ADAPTER DINAMICAMENTE SEGUN OPCIONES                        
 
             $this->setDataSource("objects", new DataSource($this->getDI(), new ObjectsDataSource($this->getDI(), $dataSource["options"])));
         }
+        
     }
 
     //OBJECTS SELECTOR
@@ -98,7 +95,7 @@ class Board extends VueUiService {
         //PONER LOGICA SEGUN TIPO DE SELECTOR
         
         //TABLELIST SELECTOR
-        $objectsSelectorDataSource              = $this->getDataSource(($this->getLocal("application.selector"))["dataSource"]);
+        $objectsSelectorDataSource              = $this->getDataSource($this->getLocal("application.selector.dataSource"));
 
         $objectsSelectorParams                  = array();
         $objectsSelectorParams['fields']        = $this->getSelectorFields($objectsSelectorDataSource);
@@ -110,7 +107,7 @@ class Board extends VueUiService {
     }
 
     protected function getSelectorFields($p_dataSource){
-
+        
         //TODO : VER SI HACE FALTA LOGICA DISTINTA SEGUN TIPO DE SELECTOR
         $result         = array();
 
@@ -220,13 +217,13 @@ class Board extends VueUiService {
         $result[]   = array(
             "label"         => "editar",
             "style"         => "edit green",
-            "urlMap"        => "#"
+            "urlMap"        => $this->getLocal("application.urlMaps.EDIT")
         );
 
         $result[]   = array(
             "label"         => "borrar",
             "style"         => "edit red",
-            "urlMap"        => "#"
+            "urlMap"        => $this->getLocal("application.urlMaps.DELETE")
         );
 
         //TODO : VER LOGICA DE ACCIONES ADICIONALES
@@ -234,20 +231,20 @@ class Board extends VueUiService {
     }
 
     protected function getSelectorLinks(){
-
+        
         $result     = array();
 
         //TODO : DEFINIR CONDICIONANTES
 
         $result[]   = array(
             "label"         => "Link A",
-            "urlMap"        => "#",
+            "urlMap"        => $this->getLocal("application.urlMaps.SUBPAGE"),
             "style"         => "teal",
         );
 
         $result[]   = array(
             "label"         => "Link B",
-            "urlMap"        => "#",
+            "urlMap"        => $this->getLocal("application.urlMaps.DETALLE"),
             "style"         => "basic",
         );
 
@@ -283,8 +280,7 @@ class Board extends VueUiService {
     protected function generateTopBar(){
 
         $topBar                     = new TopBar($this->getDI());
-        $this->placeComponent("top", $topBar, ($this->getLocal("application.topbar"))[$this->action]);
-        
+        $this->placeComponent("top", $topBar, $this->getLocal("application.topBar.{$this->action}"));
     }
 
     //FOOTER

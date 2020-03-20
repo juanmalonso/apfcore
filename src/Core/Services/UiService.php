@@ -28,9 +28,12 @@ class UiService extends Service {
 
         $this->generateId();
 
-        //GLOBAL SERVICE ID
-        $this->setGlobal("serviceId", $this->getId());
+        //GLOBAL SERVICE INSTANCE
         $this->getDI()->get('global')->set('service', $this);
+
+        //INITIAL GLOBAL VARS
+        $this->setGlobal("serviceId", $this->getId());
+        $this->setGlobal("urlbase", $this->getDI()->get('config')->main->url->base);
 
         //INITIALS VIEW VARS
         $this->setViewVar("id", $this->getId());
@@ -71,7 +74,13 @@ class UiService extends Service {
 
         $this->initScope($globalScopeKey);
 
-        return $this->getScope($globalScopeKey)->has($p_key);
+        if(!strpos($p_key, '.')){
+
+            return $this->getScope($globalScopeKey)->has($p_key);
+        }else{
+
+            return $this->getScope($globalScopeKey)->hasDot($p_key);
+        }
     }
 
     protected function getLocal($p_key){
@@ -80,16 +89,22 @@ class UiService extends Service {
 
         $this->initScope($globalScopeKey);
 
-        return $this->getScope($globalScopeKey)->get($p_key);
+        if(!strpos($p_key, '.')){
+
+            return $this->getScope($globalScopeKey)->get($p_key);
+        }else{
+
+            return $this->getScope($globalScopeKey)->getDot($p_key);
+        }
     }
 
-    protected function allLocal($p_key){
+    protected function allLocal(){
 
         $globalScopeKey     = "local." . $this->getId() . ".scope";
 
         $this->initScope($globalScopeKey);
 
-        return $this->getScope($globalScopeKey)->all($p_key);
+        return $this->getScope($globalScopeKey)->all();
     }
 
     protected function setLocal($p_key, $p_value){
@@ -98,7 +113,13 @@ class UiService extends Service {
 
         $this->initScope($globalScopeKey);
 
-        $this->getScope($globalScopeKey)->set($p_key, $p_value);
+        if(!strpos($p_key, '.')){
+
+            return $this->getScope($globalScopeKey)->set($p_key, $p_value);
+        }else{
+
+            return $this->getScope($globalScopeKey)->setDot($p_key, $p_value);
+        }
     }
 
     protected function setAllLocals($p_values){

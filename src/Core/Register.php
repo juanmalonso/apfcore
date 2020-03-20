@@ -36,9 +36,23 @@ class Register implements ArrayAccess
         return isset($this->container[$key]) ? $this->container[$key] : null;
     }
 
+    public function getDot($keyDot){
+
+        $dot = new \Adbar\Dot($this->container);
+
+        return $dot->get($keyDot);
+    }
+
     public function has($key){
 
         return isset($this->container[$key]) ? true : false;
+    }
+
+    public function hasDot($keyDot){
+
+        $dot = new \Adbar\Dot($this->container);
+
+        return $dot->has($keyDot);
     }
 
     public function remove($p_key){
@@ -56,6 +70,15 @@ class Register implements ArrayAccess
         } else {
             $this->container[$key] = $value;
         }
+    }
+
+    public function setDot($keyDot, $value){
+
+        $dot = new \Adbar\Dot($this->container);
+
+        $dot->set($keyDot, $value);
+
+        $this->setAll($dot->all());
     }
 
     public function setAll($value){
@@ -85,43 +108,5 @@ class Register implements ArrayAccess
     public function keys(){
 
         return array_keys($this->container);
-    }
-
-    public function getByKeyStartAt($p_expression){
-        
-        $result = array();
-
-        foreach($this->container as $key=>$value){
-            
-            if(strpos($key, $p_expression) === 0){
-
-                $result[$key] = $value;
-            }
-        }
-        
-        return $result;
-    }
-
-    public function getByKeyPrefix($p_prefix){
-        
-        $data = array();
-        foreach($this->getByKeyStartAt($p_prefix) as $key=>$value){
-
-            $data[str_replace($p_prefix, "", $key)] = $value;
-        }
-
-        $output = array();
-        foreach ($data as $key => $value) {
-            $parts = explode('.', $key);
-            $nested = &$output;
-            while (count($parts) > 1) {
-                $nested = &$nested[array_shift($parts)];
-                if (!is_array($nested)) {
-                    $nested = [];
-                }
-            }
-            $nested[array_shift($parts)] = $value;
-        }
-        return $output;
     }
 }
