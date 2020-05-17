@@ -59,9 +59,9 @@ class Common extends Injectable
         return $this->getDI()->get('cache')->has($p_key);
     }
 
-    protected function getCache($p_key){
+    protected function getCache($p_key, $p_default = null){
 
-        return $this->getDI()->get('cache')->get($p_key);
+        return $this->getDI()->get('cache')->get($p_key, $p_default);
     }
 
     protected function setCache($p_key, $p_data, $p_lifetime = 3600){
@@ -72,6 +72,11 @@ class Common extends Injectable
     protected function deleteCache($p_key){
 
         return $this->getDI()->get('cache')->delete($p_key);
+    }
+
+    protected function deleteMultipleCache($p_keys = array()){
+
+        return $this->getDI()->get('cache')->deleteMultiple($p_keys);
     }
 
     //COMMON SESSION MANAGMENT
@@ -211,7 +216,7 @@ class Common extends Injectable
 
         $this->initScope($globalScopeKey);
 
-        return $this->getScope($globalScopeKey)->all($p_key);
+        return $this->getScope($globalScopeKey)->all();
     }
 
     protected function setGetParam($p_key, $p_value){
@@ -337,7 +342,7 @@ class Common extends Injectable
 
         $this->initScope($globalScopeKey);
 
-        return $this->getScope($globalScopeKey)->all($p_key);
+        return $this->getScope($globalScopeKey)->all();
     }
 
     protected function setPostParam($p_key, $p_value){
@@ -400,7 +405,7 @@ class Common extends Injectable
 
         $this->initScope($globalScopeKey);
 
-        return $this->getScope($globalScopeKey)->all($p_key);
+        return $this->getScope($globalScopeKey)->all();
     }
 
     protected function setFilesParam($p_key, $p_value){
@@ -431,7 +436,7 @@ class Common extends Injectable
 
         $globalScopeKey     = "json.scope";
 
-        return $this->getDI()->get('global')->hs($globalScopeKey);
+        return $this->getDI()->get('global')->has($globalScopeKey);
     }
 
     protected function getJsonParam(){
@@ -520,6 +525,18 @@ class Common extends Injectable
             case 'session':
                 $result = $this->getSession($p_name);
                 break;
+
+            case 'url':
+                $result = $this->getUrlParam($p_name);
+                break;
+
+            case 'get':
+                $result = $this->getGetParam($p_name);
+                break;
+
+            case 'post':
+                $result = $this->getPostParam($p_name);
+                break;
     
             default:
                 $result = null;
@@ -531,38 +548,47 @@ class Common extends Injectable
     
     protected function parseFunction($p_name, $p_params){
         
+        $params     = array();
+
+        if(!is_null($p_params)){
+
+            $params     = \explode(",", $p_params);
+        }
         
-        $params     = \explode(",", $p_params);
-                    
         return      call_user_func_array(array($this, $p_name),$params);
     }
     
     protected function parseBlockValue($p_input, $p_forceTo = "any"){
         
         $result = $p_input;
-        
-        $blockValuePattern   = '/^(fun|var|exp)\((.*):(.*)\)$/';
-        
-        if(preg_match($blockValuePattern, $result, $matches)){
+
+        $matched                = false;
+
+        //VARIABLES MATCH
+        if(!$matched && preg_match('/^(var)\((.*):(.*)\)$/', $result, $matches)){
+
+            $result     = $this->parseVariable($matches[2], $matches[3]);
+            $matched    = true;
+        }
+
+        //FUNCTIONS MATCH
+        if(!$matched && preg_match('/^(fun)\((.*):(.*)\)$/', $result, $matches)){
             
-            switch ($matches[1]) {
-                
-                case 'var':
-                    $result = $this->parseVariable($matches[2], $matches[3]);
-                    break;
-                
-                case 'fun':
-                    $result = $this->parseFunction($matches[2], $matches[3]);
-                    break;
-                
-                case 'exp':
-                    $result = $this->parseExpression($matches[3]);
-                    break;
-                
-                default:
-                    $result = null;
-                    break;
-            }
+            $result     = $this->parseFunction($matches[2], $matches[3]);
+            $matched    = true;
+        }
+
+        if(!$matched && preg_match('/^(fun)\((.*)\)$/', $result, $matches)){
+            
+            $result     = $this->parseFunction($matches[2], null);
+            $matched    = true;
+        }
+
+        //FUNCTIONS MATCH
+        if(!$matched && preg_match('/^(exp)\((.*)\)$/', $result, $matches)){
+
+            $result     = $this->parseExpression($matches[2]);
+            $matched    = true;
         }
         
         if($p_forceTo == "string"){
@@ -621,65 +647,6 @@ class Common extends Injectable
         
         return $result;
     }
-
-    protected function replaceValuesOLD($p_value){
-        $result = $p_value;
-        
-        if(\is_string($p_value)){
-
-            $pattern = '/^.*(v|f)\{(.*)\((.*)\)\}.*$/';
-            
-            $matches = array();
-
-            if(\preg_match($pattern, $p_value, $matches)){
-
-                if($matches[1] == "v"){
-
-                    switch ($matches[2]) {
-                        case 'session':
-                            $result = $this->getSession($matches[3]);
-                            break;
-
-                        case 'global':
-                            $result = $this->getGlobal($matches[3]);
-                            break;
-
-                        case 'service':
-                            $result = $this->getService($matches[3]);
-                            break;
-
-                        case 'local':
-                            $result = $this->getLocal($matches[3]);
-                            break;
-                        
-                        default:
-                            # code...
-                            break;
-                    }
-                }else if($matches[1] == "f"){
-
-                    $method     = $matches[2];
-                    $params     = \explode(",", $matches[3]);
-                    
-                    $result     = call_user_func_array(array($this, $method),$params);
-                }
-            }
-
-            //RECURSIVE
-            
-        }else if(\is_array($p_value)){
-
-            $result = array();
-            
-            foreach($p_value as $key=>$value){
-
-                $result[$key] = $this->replaceValues($value);
-            }
-        }
-
-        return $result;
-    }
-    
 }
 
 ?>

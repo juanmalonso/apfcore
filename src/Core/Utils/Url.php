@@ -9,9 +9,9 @@ class Url
 
         for($p = 0; $p < count($p_params); $p++){
 
-            if(strpos($p_params[$p], ":") !== false){
+            if(strpos($p_params[$p], "_p_") !== false){
 
-                $partes = explode(":", $p_params[$p]);
+                $partes = explode("_p_", $p_params[$p]);
 
                 if(strpos($partes[1], ",") !== false){
 

@@ -47,9 +47,9 @@ class DataEngine extends Common
 
         $this->type         = new Type($p_di, $this->database);
         $this->field        = new Field($p_di, $this->database, $this->type);
-        $this->definition   = new Definition($p_di, $this->database, $this->field);
         $this->relation     = new Relation($p_di, $this->database);
         $this->model        = new Model($p_di, $this->database, $this->relation);
+        $this->definition   = new Definition($p_di, $this->database, $this->model, $this->field);
         $this->object       = new NbsObject($p_di, $this->database, $this->elastic, $this->model, $this->definition);
 
         $this->group        = new Group($p_di, $this->database);
@@ -131,11 +131,11 @@ class DataEngine extends Common
 
         //TODO : Validacion is ModelExist
 
-        $this->_eventsManager->fire("object-engine:beforeEditObject", $this, array('model'=>$p_model, 'id' => $p_id, 'data'=>$p_data));
+        //$this->_eventsManager->fire("object-engine:beforeEditObject", $this, array('model'=>$p_model, 'id' => $p_id, 'data'=>$p_data));
 
         $result = $this->object->edit($p_model, $p_id, $p_data);
 
-        $this->_eventsManager->fire("object-engine:afterEditObject", $this, array('model'=>$p_model, 'id' => $p_id, 'data'=>$p_data, 'result' => $result));
+        //$this->_eventsManager->fire("object-engine:afterEditObject", $this, array('model'=>$p_model, 'id' => $p_id, 'data'=>$p_data, 'result' => $result));
 
         return $result;
     }

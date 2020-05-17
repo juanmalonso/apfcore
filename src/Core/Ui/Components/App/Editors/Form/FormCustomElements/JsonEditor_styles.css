@@ -1,0 +1,35 @@
+#___id_ td{
+    padding: 0px;
+    border: 0px solid #FFFFFF;
+}
+
+#___id_ input {
+    padding: 0px;
+}
+
+#___id_ select {
+    padding: 0px;
+}
+
+.jsoneditor-menu, .jsoneditor-undo, .jsoneditor-redo, .jsoneditor-modes, .jsoneditor-search {
+
+    display: none;
+}
+
+.has-status-bar {
+
+    margin: 0px !important;
+    padding: 0px !important;
+}
+
+.has-nav-bar {
+
+    margin: 0px !important;
+    padding: 0px !important;
+}
+
+.jsoneditor-statusbar {
+
+    margin-top: -30px !important;
+    z-index: 10;
+}

@@ -17,8 +17,8 @@ class Elastic extends Common
         $result = false;
 
         try {
-
-            $config = array_merge((array)$this->getDI()->get('config')->elastic->options, $p_params);
+            
+            $config = array_merge($this->getDI()->get('config')->connections->elasticsearch->toArray(), $p_params);
 
             $client = new \Elastica\Client($config);
 
@@ -153,16 +153,16 @@ class Elastic extends Common
                 
                 $mapping = new \Elastica\Type\Mapping();
                 $mapping->setType($type);
-
+                
                 foreach ($p_mappingParams as $param => $value) {
 
                     $mapping->setParam($param, $value);
                 }
 
                 $mapping->setProperties($p_mappingProperties);
-
+                
                 $esResult = $mapping->send();
-
+                
                 if ($esResult->isOk()) {
 
                     $result = $type;
@@ -180,7 +180,7 @@ class Elastic extends Common
     }
 
     public function searchDocs(\Elastica\Type $p_type, $p_keyword, $p_fields, $p_sorts, $p_page, $p_rows, $p_facets, $p_filters){
-
+        
         $result = false;
 
         $query = new \Elastica\Query();

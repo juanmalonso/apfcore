@@ -1,7 +1,22 @@
 <div class="ui fluid container main-container">
     <div id="___id_" class="ui padded grid">
-        <div class="column">
-            <table class="ui celled striped table">
+        <div id="el_dimmable" class="column dimmable dimmed">
+
+            <!-- <div class="ui right very wide sidebar" id="xSidebar">
+                <div class="ui segment">asd</div>
+            </div>  -->
+
+            <div class="ui modal" id="xModal">
+                <div class="header" id="jsonModalHeader"></div>
+                <div class="content">
+                    <div ref="jeditor" style="width: 400px; height: 500px;"></div>
+                </div>
+            </div>
+
+            <div class="ui inverted dimmer">
+                <div class="ui active slow green double loader"></div>
+            </div>
+            <table class="ui celled striped loaded table" style="margin-top: 0px;">
                 <thead>
                     <tr>
                         <!-- rownum -->
@@ -18,24 +33,35 @@
                 </thead>
                 <tbody>
                     <tr v-for="(dataRow, rowIndex) in data.objects" :key="rowIndex">
-                        <td>&nbsp;</td>
-                        <td v-for="(rowField, fieldIndex) in tableFields" :key="fieldIndex">
+                        <td style="padding: 4px;">&nbsp;</td>
+                        <td v-for="(rowField, fieldIndex) in tableFields" :key="fieldIndex" style="padding: 4px;">
                             <template v-if="rowField.renderType == 'LINK'">
-                                <a href="#">${dataRow[fieldIndex]}</a>
+                                <a v-bind:href="parseStringBlocks(rowField.urlMap, dataRow)">${dataRow[fieldIndex]}</a>
                             </template>
-                            <template v-else>
+                            <template v-if="rowField.renderType == 'JSON'">
+                                <div class="ui icon mini basic button" v-on:click="doPopupJson(rowIndex + ' - ' + rowField.label,dataRow[fieldIndex])">
+                                    <i class="eye icon"></i>
+                                </div>
+                            </template>
+                            <template v-if="rowField.renderType == 'VALUE'">
                                 ${dataRow[fieldIndex]}
                             </template>
                         </td>
-                        <td v-if="_.size(linksFields) > 0">
+                        <td v-if="_.size(linksFields) > 0" style="padding: 2px;">
                             <template v-for="(rowLink, linkIndex) in linksFields">
-                                <a v-bind:class="'ui ' + rowLink.style + ' button'" v-bind:href="parseBlocks(rowLink.urlMap, dataRow)">${rowLink.label}</a>
+                                <a v-if="rowLink.type == 'link' && doCheckCondition(rowLink.condition, dataRow)" v-bind:class="'ui ' + rowLink.style + ' button'" v-bind:href="parseStringBlocks(rowLink.urlMap, dataRow)" style="margin: 2px;">${rowLink.label}</a>
+                                <a v-if="rowLink.type == 'actions'" v-bind:class="'ui ' + rowLink.style + ' button'" v-on:click="doComponentAction(rowLink.actions, dataRow, $event)" style="margin: 2px;">${rowLink.label}</a>
+                                <select v-if="rowLink.type == 'selector'" class="ui search links dropdown" style="margin: 2px;" v-on:change="event => onSelectLinkOption(linkIndex, dataRow, event)">
+                                    <option>${rowLink.label}</option>
+                                    <option v-for="(option, optionIndex) in rowLink.options" :key="optionIndex" v-bind:value="optionIndex" >${option.label}</option>
+                                </select>
                             </template>
                         </td>
-                        <td v-if="_.size(actionsFields) > 0" class="right aligned" style="padding-right: 4px;">
+                        <td v-if="_.size(actionsFields) > 0" class="right aligned" style="padding: 4px;">
                             <div class="ui basic buttons">
                             <template v-for="(rowAction, linkIndex) in actionsFields">
-                                <a class="ui icon button" v-bind:href="rowAction.urlMap"><i v-bind:class=" rowAction.style + ' icon'"></i></a>
+                                <a v-if="rowAction.type == 'link'" class="ui icon button" v-bind:href="parseStringBlocks(rowAction.urlMap, dataRow)"><i v-bind:class=" rowAction.style + ' icon'"></i></a>
+                                <button v-if="rowAction.type == 'actions'" class="ui icon button" v-on:click="doComponentAction(rowAction.actions, dataRow, $event)"><i v-bind:class=" rowAction.style + ' icon'"></i></button>
                             </template>
                             </div>
                         </td>
@@ -44,17 +70,26 @@
                 <tfoot>
                     <tr>
                         <th v-bind:colspan="colsNum">
-                            <div class="ui right floated pagination mini menu">
-        
-                                <a class="icon item"><i class="left chevron icon"></i></a>
+                            <div v-if="data.pages > 1" class="ui right floated pagination mini menu">
 
-                                <a class="active item">1</a>
-                                <a class="item">2</a>
-                                <a class="item">3</a>
+                                <template v-if="paginator.type == 'actions'">
+                                    <a v-if="paginatorPrevPage != false" class="icon item" v-on:click="doComponentAction(paginator.actions, {'page':paginatorPrevPage,'rows':data.rows}, $event)"><i class="left chevron icon"></i></a>
+                                    <template v-for="(paginatorItem, paginatorIndex) in paginatorButtons">
+                                        <a v-if="paginatorItem == data.page" class="active item"> ${paginatorItem} </a>
+                                        <a v-if="paginatorItem != data.page" class="item" v-on:click="doComponentAction(paginator.actions, {'page':paginatorItem,'rows':data.rows}, $event)"> ${paginatorItem} </a>
+                                    </template>
+                                    <a v-if="paginatorNextPage != false" class="icon item" v-on:click="doComponentAction(paginator.actions, {'page':paginatorNextPage,'rows':data.rows}, $event)"><i class="right chevron icon"></i></a>
+                                </template>
                                 
-                                <div class="icon item"><i class="ellipsis horizontal icon"></i></div>
-                                        
-                                <a class="icon item" ><i class="right chevron icon"></i></a>
+                                <template v-if="paginator.type == 'links'">
+                                    <a v-if="paginatorPrevPage != false" class="icon item" v-bind:href="paginator.urlbase + '/page:' + paginatorPrevPage + '/rows:' + data.rows"><i class="left chevron icon"></i></a>
+                                    <template v-for="(paginatorItem, paginatorIndex) in paginatorButtons">
+                                        <a v-if="paginatorItem == data.page" class="active item"> ${paginatorItem} </a>
+                                        <a v-if="paginatorItem != data.page" class="item" v-bind:href="paginator.urlbase + '/page:' + paginatorItem + '/rows:' + data.rows"> ${paginatorItem} </a>
+                                    </template>
+                                    <a v-if="paginatorNextPage != false" class="icon item" v-bind:href="paginator.urlbase + '/page:' + paginatorNextPage + '/rows:' + data.rows"><i class="right chevron icon"></i></a>
+                                </template>
+                                <!-- <div class="icon item"><i class="ellipsis horizontal icon"></i></div>  -->
                                 
                             </div>
                         </th>

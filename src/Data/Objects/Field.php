@@ -42,13 +42,13 @@ class Field extends Common
 
             if($this->hasCache($cacheKey)){
 
-                $result = $this->getCache($cacheKey);
+                $result = $this->getCache($cacheKey, array());
             }else {
 
                 $fieldDataOptions['rows'] = 1000;
 
                 $fieldsData = $this->database->select('data_fields', $fieldDataOptions);
-
+                
                 if ($fieldsData) {
 
                     $result = array();
@@ -60,6 +60,9 @@ class Field extends Common
                         if($p_extended){
 
                             $fieldData = $this->fieldExtend($fieldData, $typeData);
+                        }else{
+        
+                            $fieldData = $this->fieldEncode($fieldData);
                         }
 
                         $fieldData['typId']                    = $typeData['typId'];
@@ -69,7 +72,7 @@ class Field extends Common
                         $result[] = $fieldData;
                     }
                 }
-
+                
                 $this->setCache($cacheKey, $result, $cacheLifetime);
             }
         }else{
@@ -79,7 +82,7 @@ class Field extends Common
 
             if($this->hasCache($cacheKey)){
 
-                $result = $this->getCache($cacheKey);
+                $result = $this->getCache($cacheKey, array());
             }else {
 
                 $fieldDataOptions['conditions'] = "dafId = '" . $p_fieldId . "'";
@@ -91,6 +94,9 @@ class Field extends Common
                 if($p_extended){
 
                     $fieldData = $this->fieldExtend($fieldData, $typeData);
+                }else{
+        
+                    $fieldData = $this->fieldEncode($fieldData);
                 }
 
                 $fieldData['typId']                    = $typeData['typId'];
@@ -111,30 +117,50 @@ class Field extends Common
 
         $resultSet = $this->database->insert('data_fields', $p_data);
 
-        return $resultSet;
-    }
+        if(isset($p_data['dafId'])){
 
-    public function edit($p_id, $p_data){
-
-        $resultSet = $this->database->update('data_fields', $p_data, "dafId = '$p_id'");
-
-        $cacheKeys       = array('data_field_' . $p_id, 'data_field_all');
-
-        foreach($cacheKeys as $key){
-
-            if($this->hasCache($key)){
-
-                $this->deleteCache($key);
-            }
+            $this->deleteFieldCache($p_data['dafId']);
         }
 
         return $resultSet;
     }
 
+    public function edit($p_id, $p_data){
+        
+        $resultSet = $this->database->update('data_fields', $p_data, "dafId = '$p_id'");
+
+        $this->deleteFieldCache($p_id);
+
+        return $resultSet;
+    }
+
+    protected function deleteFieldCache($p_dafId){
+
+        $keys   = array();
+        $keys[] = 'data_field_all';
+        $keys[] = 'data_field_' . $p_dafId;
+
+        $this->deleteMultipleCache($keys);
+    }
+
+    protected function fieldEncode($p_data){
+        
+        $p_data['dafUiOptions']             = \Nubesys\Core\Utils\Struct::toObject(\Nubesys\Core\Utils\Struct::encodeFieldValue($p_data['dafUiOptions']));
+        $p_data['dafIndexOptions']          = \Nubesys\Core\Utils\Struct::toObject(\Nubesys\Core\Utils\Struct::encodeFieldValue($p_data['dafIndexOptions']));
+        $p_data['dafTypOptions']            = \Nubesys\Core\Utils\Struct::toObject(\Nubesys\Core\Utils\Struct::encodeFieldValue($p_data['dafTypOptions']));
+        $p_data['dafTypValidationOptions']  = \Nubesys\Core\Utils\Struct::toObject(\Nubesys\Core\Utils\Struct::encodeFieldValue($p_data['dafTypValidationOptions']));
+        $p_data['dafAttachFileOptions']     = \Nubesys\Core\Utils\Struct::toObject(\Nubesys\Core\Utils\Struct::encodeFieldValue($p_data['dafAttachFileOptions']));
+        
+        return $p_data;
+    }
+
     protected function fieldExtend($p_data, $p_typeData){
 
-        $p_data['dafTypOptions']            = \Nubesys\Platform\Util\Parse::extendFieldValues($p_typeData['typOptions'], $p_data['dafTypOptions']);
-        $p_data['dafTypValidationOptions']  = \Nubesys\Platform\Util\Parse::extendFieldValues($p_typeData['typValidationOptions'], $p_data['dafTypValidationOptions']);
+        $p_data['dafUiOptions']             = \Nubesys\Core\Utils\Struct::toObject(\Nubesys\Core\Utils\Struct::encodeFieldValue($p_data['dafUiOptions']));
+        $p_data['dafIndexOptions']          = \Nubesys\Core\Utils\Struct::toObject(\Nubesys\Core\Utils\Struct::encodeFieldValue($p_data['dafIndexOptions']));
+        $p_data['dafTypOptions']            = \Nubesys\Core\Utils\Struct::extendFieldValues($p_typeData['typOptions'], $p_data['dafTypOptions']);
+        $p_data['dafTypValidationOptions']  = \Nubesys\Core\Utils\Struct::extendFieldValues($p_typeData['typValidationOptions'], $p_data['dafTypValidationOptions']);
+        $p_data['dafAttachFileOptions']     = \Nubesys\Core\Utils\Struct::toObject(\Nubesys\Core\Utils\Struct::encodeFieldValue($p_data['dafAttachFileOptions']));
 
         return $p_data;
     }

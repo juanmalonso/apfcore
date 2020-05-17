@@ -61,7 +61,7 @@ class Model extends Common
             
             if($this->hasCache($cacheKey)){
 
-                $result = $this->getCache($cacheKey);
+                $result = $this->getCache($cacheKey, array());
             }else {
 
                 $modelDataOptions['rows'] = 1000;
@@ -73,15 +73,8 @@ class Model extends Common
                     $result = array();
 
                     foreach ($resultSet as $model) {
-
-                        $modelTemp = array();
-
-                        foreach ($model as $field => $value) {
-
-                            $modelTemp[$field] = \Nubesys\Core\Utils\Struct::decodeJsonField($field, $value, $jsonFields);
-                        }
-
-                        $result[] = $modelTemp;
+                        
+                        $result[] = $this->modEncode($model);
                     }
 
                     if(is_array($result) && count($result) > 0){
@@ -100,7 +93,7 @@ class Model extends Common
             
             if($this->hasCache($cacheKey)){
                 
-                $result = $this->getCache($cacheKey);
+                $result = $this->getCache($cacheKey, array());
             }else {
                 
                 $modelDataOptions['conditions'] = "modId = '" . $p_modId . "'";
@@ -109,18 +102,13 @@ class Model extends Common
                 
                 if(is_array($resultSet) && count($resultSet) > 0){
                 
-                    $result = array();
-
-                    foreach ($resultSet as $field => $value) {
-
-                        $result[$field] = \Nubesys\Core\Utils\Struct::decodeJsonField($field, $value, $jsonFields);
-                    }
+                    $result = $this->modEncode($resultSet);
                     
                     $this->setCache($cacheKey, $result, $cacheLifetime);
                 }
             }
         }
-
+        
         return $result;
     }
 
@@ -138,7 +126,7 @@ class Model extends Common
 
             $result = array_merge($this->getInRelations($p_modId), $this->getOutRelations($p_modId));
         }
-
+        
         return $result;
     }
     
@@ -199,13 +187,27 @@ class Model extends Common
         $result = false;
 
         //NAME OF INDEX AND TYPE
-        $result = $this->getDI()->get('config')->application->client . '_system';
+        $result = $this->getDI()->get('config')->main->id . '_system';
 
         $modelData = $this->get($p_modId);
 
         if(isset($modelData['modIndexOptions']) && property_exists($modelData['modIndexOptions'],'index')){
 
-            $result = $this->getDI()->get('config')->application->client . '_' . $modelData['modIndexOptions']->index;
+            $result = $this->getDI()->get('config')->main->id . '_' . $modelData['modIndexOptions']->index;
+        }
+
+        return $result;
+    }
+
+    public function getParent($p_modId){
+
+        $result = false;
+
+        $modelData = $this->get($p_modId);
+        
+        if(isset($modelData['modParent'])){
+
+            $result = $modelData['modParent'];
         }
 
         return $result;
@@ -226,22 +228,19 @@ class Model extends Common
             }
         }
 
+        if(isset($p_data['modId'])){
+
+            $this->deleteModelCache($p_data['modId']);
+        }
+
         return $result;
     }
 
     public function edit($p_id, $p_data){
-
+        
         $resultSet = $this->database->update('data_models', $p_data, "modId = '$p_id'");
-
-        $cacheKeys       = array('data_model_' . $p_id, 'data_model_all');
-
-        foreach($cacheKeys as $key){
-
-            if($this->hasCache($key)){
-
-                $this->deleteCache($key);
-            }
-        }
+        
+        $this->deleteModelCache($p_id);
 
         return $resultSet;
     }
@@ -429,5 +428,25 @@ class Model extends Common
         }
 
         return $result;
+    }
+
+    protected function deleteModelCache($p_modId){
+
+        $keys   = array();
+        $keys[] = 'data_model_all';
+        $keys[] = 'data_model_' . $p_modId;
+
+        $this->deleteMultipleCache($keys);
+    }
+
+    protected function modEncode($p_data){
+        
+        $p_data['modIndexOptions']      = \Nubesys\Core\Utils\Struct::toObject(\Nubesys\Core\Utils\Struct::encodeFieldValue($p_data['modIndexOptions']));
+        $p_data['modUiOptions']         = \Nubesys\Core\Utils\Struct::toObject(\Nubesys\Core\Utils\Struct::encodeFieldValue($p_data['modUiOptions']));
+        $p_data['modCacheOptions']      = \Nubesys\Core\Utils\Struct::toObject(\Nubesys\Core\Utils\Struct::encodeFieldValue($p_data['modCacheOptions']));
+        $p_data['modVersionsOptions']   = \Nubesys\Core\Utils\Struct::toObject(\Nubesys\Core\Utils\Struct::encodeFieldValue($p_data['modVersionsOptions']));
+        $p_data['modStatesOptions']     = \Nubesys\Core\Utils\Struct::toObject(\Nubesys\Core\Utils\Struct::encodeFieldValue($p_data['modStatesOptions']));
+        
+        return $p_data;
     }
 }

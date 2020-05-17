@@ -38,7 +38,22 @@ class UiComponent extends Common {
         $this->setViewVar("id", $this->getId());
     }
 
+    //COMPONENTS REFERENCE NAMES
+    protected function registerReference($p_name){
+
+        $globalScopeKey     = "references.scope";
+
+        $this->initScope($globalScopeKey);
+
+        $this->getScope($globalScopeKey)->set($p_name, $this->getId());
+    }
+
     //ID
+    public function getHashId(){
+
+        return md5($this->id);
+    }
+
     public function getId(){
 
         return $this->id;
@@ -73,16 +88,6 @@ class UiComponent extends Common {
         $className      = strtolower(array_pop($pathPartes));
 
         $this->id = implode("-", array_map(function ($e){ return \Phalcon\Text::uncamelize($e);}, $pathPartes)) . "-" . $className .  "-" . md5(microtime(true));
-    }
-
-    //COMPONENTS REFERENCE NAMES
-    protected function registerReference($p_name){
-
-        $globalScopeKey     = "references.scope";
-
-        $this->initScope($globalScopeKey);
-
-        $this->getScope($globalScopeKey)->set($p_name, $this->getId());
     }
 
     //LOCAL SCOPE
@@ -144,10 +149,13 @@ class UiComponent extends Common {
 
     protected function setAllLocals($p_values){
         
-        foreach($p_values as $key=>$value){
+        //if(! is_null($p_values)){
             
-            $this->setLocal($key, $value);
-        }
+            foreach($p_values as $key=>$value){
+                
+                $this->setLocal($key, $value);
+            }
+        //}
     }
 
     //PARENT SCOPE
@@ -243,7 +251,7 @@ class UiComponent extends Common {
 
         $pathPartes     = explode("\\", $this->getClassPath());
 
-        return "uid/" . implode("_", array_map(function ($e){ return \Phalcon\Text::uncamelize($e);}, $pathPartes));
+        return "uid/" . implode("_", array_map(function ($e){ return \Phalcon\Text::uncamelize($e, "-");}, $pathPartes));
     }
 
     //VIEW VARS
@@ -277,7 +285,10 @@ class UiComponent extends Common {
     //SNIPPETS
     protected function compileCssSnippets(){
 
-        $this->addCssSnippet($this->getId(), $this->view->renderCode($this->view->getTemplate('styles')));
+        if($this->view->hasTemplate('styles')){
+            
+            $this->addCssSnippet($this->getId(), $this->view->renderCode($this->view->getTemplate('styles')));
+        }
     }
 
     protected function addCssSnippet($p_id, $p_code){
@@ -287,11 +298,14 @@ class UiComponent extends Common {
 
     protected function compileJsSnippets(){
 
-        $this->addJsSnippet($this->getId(), $this->view->renderCode($this->view->getTemplate('script')));
+        if($this->view->hasTemplate('script')){
+        
+            $this->addJsSnippet($this->getId(), $this->view->renderCode($this->view->getTemplate('script')));
+        }
     }
 
     protected function addJsSnippet($p_id, $p_code){
-   
+        
         $this->getDI()->get('global')->get('service')->addJsSnippet($p_id, $p_code);
     }
 

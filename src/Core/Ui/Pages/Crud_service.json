@@ -1,0 +1,172 @@
+{
+  "accessControl": true,
+  "title": "CRUD - {var(url:5)}",
+  "navigation": {
+    "user": {
+      "label": "var(session:user_login)",
+      "url": "http://localhost/profile",
+      "avatar": "fun(getSession:user_avatar)"
+    },
+    "items": [
+      {
+        "label": "Inicio",
+        "url": "http://localhost/board/",
+        "icon": "home icon"
+      }
+    ]
+  },
+  "application": {
+    "type": "dataobjectscrud",
+    "serviceActions": {
+      "default": "list",
+      "paramNum": 6
+    },
+    "dataSources": {
+      "objects": {
+        "adapter": "objects",
+        "options": {
+          "model": "{var(url:5)}"
+        }
+      },
+      "fgroups": {
+        "adapter": "table",
+        "options": {
+          "table": "fields_groups"
+        }
+      }
+    },
+    "urlMaps": {
+      "LIST": "{var(global:urlbase)}crud/{var(url:5)}/list",
+      "ADD": "{var(global:urlbase)}crud/{var(url:5)}/add",
+      "EDIT": "{var(global:urlbase)}crud/{var(url:5)}/edit/%(data:_id)%",
+      "DELETE": "{var(global:urlbase)}crud/{var(url:5)}/delete/%(data:_id)%"
+    },
+    "topBar": {
+      "list": {
+        "title": {
+          "type": "text",
+          "text": "CRUD - LIST - {var(url:5)}"
+        },
+        "actions": [
+          {
+            "type": "link",
+            "label": "nuevo",
+            "urlMap": "var(local:application.urlMaps.ADD)",
+            "style": "green",
+            "icon": "plus icon"
+          }
+        ]
+      },
+      "edit": {
+        "title": {
+          "type": "text",
+          "text": "CRUD - EDIT - {var(url:5)}"
+        },
+        "actions": [
+          {
+            "type": "link",
+            "label": "cancelar",
+            "urlMap": "var(local:application.urlMaps.LIST)",
+            "style": "basic",
+            "icon": "angle left icon"
+          },
+          {
+            "type": "actions",
+            "label": "guardar",
+            "actions": [
+              {
+                "scope": "_service",
+                "name": "doSaveEditorData",
+                "params": {
+                  "editorReferenceName": "editor"
+                }
+              }
+            ],
+            "style": "green",
+            "icon": "save icon"
+          }
+        ]
+      },
+      "add": {
+        "title": {
+          "type": "text",
+          "text": "CRUD - EDIT - {var(url:5)}"
+        },
+        "actions": [
+          {
+            "type": "link",
+            "label": "cancelar",
+            "urlMap": "var(local:application.urlMaps.LIST)",
+            "style": "basic",
+            "icon": "angle left icon"
+          },
+          {
+            "type": "actions",
+            "label": "agregar",
+            "actions": [
+              {
+                "scope": "_service",
+                "name": "doSaveEditorData",
+                "params": {
+                  "editorReferenceName": "editor"
+                }
+              }
+            ],
+            "style": "green",
+            "icon": "save icon"
+          }
+        ]
+      }
+    },
+    "editor": {
+      "type": "form",
+      "async": false,
+      "objectsDataSource": "objects",
+      "fgroupsDataSource": "fgroups",
+      "objectToSaveIdParamNum": 7
+    },
+    "selector": {
+      "type": "tablelist",
+      "async": false,
+      "dataSource": "objects",
+      "links": [],
+      "actions": [
+        {
+          "type": "link",
+          "label": "editar",
+          "style": "edit green",
+          "urlMap": "var(local:application.urlMaps.EDIT)"
+        },
+        {
+          "type": "actions",
+          "label": "borrar",
+          "style": "trash alternate red",
+          "urlMap": "var(local:application.urlMaps.DELETE)",
+          "actions": [
+            {
+              "scope": "_local",
+              "name": "doLocalTest",
+              "params": {
+                "objId": "%(data:_id)%"
+              }
+            }
+          ]
+        }
+      ],
+      "paginator": {
+        "type": "links",
+        "actions": [
+          {
+            "scope": "_local",
+            "name": "goToPage",
+            "params": {
+              "page": "%(data:page)%",
+              "rows": "%(data:rows)%"
+            }
+          }
+        ],
+        "urlbase": "var(local:application.urlMaps.LIST)"
+      }
+    }
+  }
+}

@@ -38,7 +38,7 @@ class Group extends Common
 
             if($this->hasCache($cacheKey)){
 
-                $result = $this->getCache($cacheKey);
+                $result = $this->getCache($cacheKey, array());
             }else {
 
                 $groupsData = $this->database->select('fields_groups', $fieldsGroupsOptions);
@@ -62,7 +62,7 @@ class Group extends Common
 
             if($this->hasCache($cacheKey)){
 
-                $result = $this->getCache($cacheKey);
+                $result = $this->getCache($cacheKey, array());
             }else {
 
                 $fieldsGroupsOptions['conditions'] = "flgId = '" . $p_groupId . "'";
@@ -83,6 +83,11 @@ class Group extends Common
 
         $resultSet = $this->database->insert('fields_groups', $p_data);
 
+        if(isset($p_data['flgId'])){
+
+            $this->deleteGroupCache($p_data['flgId']);
+        }
+
         return $resultSet;
     }
 
@@ -90,17 +95,18 @@ class Group extends Common
 
         $resultSet = $this->database->update('fields_groups', $p_data, "flgId = '$p_id'");
 
-        $cacheKeys       = array('data_group_' . $p_id, 'data_groups_all');
-
-        foreach($cacheKeys as $key){
-
-            if($this->hasCache($key)){
-
-                $this->deleteCache($key);
-            }
-        }
+        $this->deleteGroupCache($p_id);
 
         return $resultSet;
+    }
+
+    protected function deleteGroupCache($p_flgId){
+
+        $keys   = array();
+        $keys[] = 'data_groups_all';
+        $keys[] = 'data_group_' . $p_flgId;
+
+        $this->deleteMultipleCache($keys);
     }
 
 }

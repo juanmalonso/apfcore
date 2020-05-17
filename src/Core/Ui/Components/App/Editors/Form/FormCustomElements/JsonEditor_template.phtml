@@ -1,0 +1,22 @@
+<div class="ui field" v-bind:class="{required: $attrs.required}">
+    
+    <div class="ui green mini icon buttons" style="margin-bottom: 5px;">
+        <button v-on:click.prevent="doMode('code')" class="ui button" v-bind:class="(mode == 'code') ? 'active' : ''"><i class="code icon"></i></button>
+        <button v-on:click.prevent="doMode('tree')" class="ui button" v-bind:class="(mode == 'tree') ? 'active' : ''"><i class="sitemap icon"></i></button>
+        <button v-on:click.prevent="doMode('form')" class="ui button" v-bind:class="(mode == 'form') ? 'active' : ''"><i class="edit outline icon"></i></button>
+    </div>
+
+    <div class="ui blue mini icon buttons" style="margin-bottom: 5px;">
+        <button v-on:click.prevent="doEmpty" class="ui button"><i class="eraser icon"></i></button>
+        <button v-if="mode == 'form' || mode == 'tree'" v-on:click.prevent="doCollapse" class="ui button"><i class="compress icon"></i></button>
+        <button v-if="mode == 'form' || mode == 'tree'" v-on:click.prevent="doExpand" class="ui button"><i class="expand icon"></i></button>
+        <button v-if="mode == 'code'" v-on:click.prevent="doIndent" class="ui button"><i class="indent left icon"></i></button>
+    </div>
+
+    <div class="ui input" v-bind:class="{disabled: $attrs.readOnly}" style="min-width: 100%;">
+        <div ref="feditor" style="width: 100%; height: 500px;"></div>
+        <input type="hidden" v-bind:id="'field_' + $attrs.id" v-bind:name="$attrs.id">
+    </div>
+
+    <p v-if="$attrs.info != ''" style="font-size:.8em">${ $attrs.info }</p>
+</div>

@@ -89,9 +89,9 @@ class NbsObject extends Common
 
     private function addRelation($p_model, $p_leftId, $p_rightId, $p_data){
 
-        $result = false;
+        $result                 = false;
 
-        $insertData         = array();
+        $insertData             = array();
 
         $modelData              = $this->model->get($p_model);
         $modelDefinition        = array();
@@ -100,13 +100,13 @@ class NbsObject extends Common
         
         $id                     = $this->getRelationId($p_model, $p_leftId, $p_rightId);
 
-        $insertData['_id'] = $id;
-        $insertData['modId'] = $p_model;
-        $insertData['relLeftObjId'] = $p_leftId;
-        $insertData['relRightObjId'] = $p_rightId;
-        $insertData['objTime'] = \Nubesys\Platform\Util\Utils::getTimeStamp($this->getDI());
-        $insertData['objDateAdd'] = \Nubesys\Platform\Util\Utils::getDateTime($this->getDI());
-        $insertData['objDateUpdated'] = $insertData['objDateAdd'];
+        $insertData['_id']              = $id;
+        $insertData['modId']            = $p_model;
+        $insertData['relLeftObjId']     = $p_leftId;
+        $insertData['relRightObjId']    = $p_rightId;
+        $insertData['objTime']          = \Nubesys\Core\Utils\Utils::getTimeStamp($this->getDI());
+        $insertData['objDateAdd']       = \Nubesys\Core\Utils\Utils::getDateTime($this->getDI());
+        $insertData['objDateUpdated']   = $insertData['objDateAdd'];
 
         //TODO: UserMenu Add, UserMenu Update, Function getActualUser
 
@@ -118,11 +118,11 @@ class NbsObject extends Common
             $insertData['objOrder'] = $p_data->objOrder;
         } else {
 
-            $insertData['objOrder'] = \Nubesys\Platform\Util\Utils::getSequenceNextValue($this->getDI(), $p_model . '_objects_orders');
+            $insertData['objOrder'] = \Nubesys\Core\Utils\Utils::getSequenceNextValue($this->getDI(), $p_model . '_objects_orders');
         }
 
-        $insertData['objPage1000'] = \Nubesys\Platform\Util\Utils::getPageSequence($this->getDI(), $p_model . '_page1000', 1000);
-        $insertData['objPage10000'] = \Nubesys\Platform\Util\Utils::getPageSequence($this->getDI(), $p_model . '_page10000', 10000);
+        $insertData['objPage1000'] = \Nubesys\Core\Utils\Utils::getPageSequence($this->getDI(), $p_model . '_page1000', 1000);
+        $insertData['objPage10000'] = \Nubesys\Core\Utils\Utils::getPageSequence($this->getDI(), $p_model . '_page10000', 10000);
 
         /*
         //TODO : Parche para Trackaff
@@ -201,9 +201,9 @@ class NbsObject extends Common
 
         if($objectData){
 
-            $indexOldData                   = \Nubesys\Platform\Util\Parse::toArray($objectData);
+            $indexOldData                   = \Nubesys\Core\Utils\Struct::toArray($objectData);
 
-            $updateData['objDateUpdated']   = \Nubesys\Platform\Util\Utils::getDateTime($this->getDI());
+            $updateData['objDateUpdated']   = \Nubesys\Core\Utils\Utils::getDateTime($this->getDI());
 
             //TODO: UserMenu Add, UserMenu Update, Function getActualUser
 
@@ -395,66 +395,57 @@ class NbsObject extends Common
 
         //TODO : Validacion IsTable Exsist
 
-        $insertData         = array();
-        $indexData          = array();
-        $relationsData    = array();
+        $insertData                 = array();
+        $indexData                  = array();
+        $relationsData              = array();
 
-        $modelData              = $this->model->get($p_model);
-        $modelDefinition        = $this->definition->get($p_model, null);
-        $modelRelations         = $this->model->getRelations($p_model, 'IN');
+        $modelData                  = $this->model->get($p_model);
+        $modelDefinition            = $this->definition->get($p_model, null);
+        $modelRelations             = $this->model->getRelations($p_model, 'IN');
         
-        $id                     = $this->getIdValue($p_data, $modelData, $modelDefinition);
+        //ID DEL OBJETO
+        $id                         = $this->getIdValue($p_data, $modelData, $modelDefinition);
         
         if($id !== false){
 
             if(!$this->has($p_model, $id)) {
                 
-                $insertData['_id'] = $id;
-                $insertData['modId'] = $p_model;
-                $insertData['objTime'] = \Nubesys\Platform\Util\Utils::getTimeStamp($this->getDI());
-                $insertData['objDateAdd'] = \Nubesys\Platform\Util\Utils::getDateTime($this->getDI());
-                $insertData['objDateUpdated'] = $insertData['objDateAdd'];
+                $insertData['_id']              = $id;
+                $insertData['modId']            = $p_model;
+                $insertData['objTime']          = \Nubesys\Core\Utils\Utils::getTimeStamp($this->getDI());
+                $insertData['objDateAdd']       = \Nubesys\Core\Utils\Utils::getDateTime($this->getDI());
+                $insertData['objDateUpdated']   = $insertData['objDateAdd'];
 
                 //TODO: UserMenu Add, UserMenu Update, Function getActualUser
 
                 //TODO: Agregar Version Strategy en modelos, none | secuencial | store
 
                 //TODO: Agregar Order Strategy en modelos, none | time | manual | ambos
-                if (property_exists($p_data, 'objOrder')) {
+                if (isset($p_data['objOrder'])){
 
-                    $insertData['objOrder'] = $p_data->objOrder;
+                    $insertData['objOrder']     = $p_data['objOrder'];
                 } else {
 
-                    $insertData['objOrder'] = \Nubesys\Platform\Util\Utils::getSequenceNextValue($this->getDI(), $p_model . '_objects_orders');
+                    $insertData['objOrder']     = \Nubesys\Core\Utils\Utils::getSequenceNextValue($this->getDI(), $p_model . '_objects_orders');
                 }
 
-                $insertData['objPage1000'] = \Nubesys\Platform\Util\Utils::getPageSequence($this->getDI(), $p_model . '_page1000', 1000);
-                $insertData['objPage10000'] = \Nubesys\Platform\Util\Utils::getPageSequence($this->getDI(), $p_model . '_page10000', 10000);
+                $insertData['objPage1000']      = \Nubesys\Core\Utils\Utils::getPageSequence($this->getDI(), $p_model . '_page1000', 1000);
+                $insertData['objPage10000']     = \Nubesys\Core\Utils\Utils::getPageSequence($this->getDI(), $p_model . '_page10000', 10000);
 
-
+                
                 if(is_object($modelData['modStatesOptions']) && property_exists($modelData['modStatesOptions'], "stateable")){
 
                     if($modelData['modStatesOptions']->stateable == true){
 
-                        $insertData['objState'] = $p_data->state;
+                        $insertData['objState'] = $p_data['state'];
                     }
                 }
-                /*
-                //TODO : Parche para Trackaff
-                if($p_model == 'tkfunnels'){
-                    
-                    $insertData['objPartitionIndex'] = \Nubesys\Platform\Util\Utils::getWeekOfYearKey($this->getDI());
-                }else{
-                    
-                    $insertData['objPartitionIndex'] = \Nubesys\Platform\Util\Utils::getYearWeekKey($this->getDI());
-                }
-                */
 
                 $insertData['objPartitionIndex'] = $this->getPartitionIndex($modelData);
 
-                if (property_exists($p_data, 'objActive')) {
+                if (isset($p_data['objActive'])) {
 
-                    $insertData['objActive'] = $p_data->objActive;
+                    $insertData['objActive'] = $p_data['objActive'];
                 } else {
 
                     $insertData['objActive'] = true;
@@ -473,15 +464,58 @@ class NbsObject extends Common
 
                         $fieldId = $modelField['dafId'];
 
-                        if (property_exists($p_data, $fieldId)) {
+                        if (isset($p_data[$fieldId])) {
 
-                            $_dataTemp[$fieldId] = $p_data->$fieldId;
+                            if($modelField['typSaveAs'] == "JSON"){
+                                
+                                if(\is_string($p_data[$fieldId])){
+    
+                                    $_dataTemp[$fieldId] = json_decode($p_data[$fieldId]);
+                                }else{
+    
+                                    $_dataTemp[$fieldId] = $p_data[$fieldId];
+                                }
+                                
+                            }else{
+    
+                                $_dataTemp[$fieldId] = $p_data[$fieldId];
+                            }
                         } else {
 
-                            $_dataTemp[$fieldId] = $modelField['defDafDefaultValue'];
+                            if($modelField['typSaveAs'] == "JSON"){
+                                
+                                if(\is_string($p_data[$fieldId])){
+
+                                    if($modelField['defDafDefaultValue'] = ""){
+
+                                        $modelField['defDafDefaultValue'] = "{}";
+                                    }
+    
+                                    $_dataTemp[$fieldId] = json_decode($modelField['defDafDefaultValue']);
+                                }else{
+    
+                                    $_dataTemp[$fieldId] = $modelField['defDafDefaultValue'];
+                                }
+                                
+                            }else{
+    
+                                $_dataTemp[$fieldId] = $modelField['defDafDefaultValue'];
+                            }
                         }
 
                         $indexData['objData'][$fieldId] = $_dataTemp[$fieldId];
+                    }
+
+                    foreach ($modelDefinition as $modelField) {
+                    
+                        $fieldId = $modelField['dafId'];
+    
+                        if (isset($p_data[$fieldId])) {
+    
+                            
+    
+                            $indexNewData['objData'][$fieldId] = $p_data[$fieldId];
+                        }
                     }
 
                     $insertData['objData'] = json_encode($this->encodeUtf8($_dataTemp));
@@ -510,11 +544,11 @@ class NbsObject extends Common
 
                             $relationsData[$modelRelation['modId']] = array();
 
-                            if (property_exists($p_data, $fieldId)) {
+                            if (isset($p_data[$fieldId])) {
                                 //TODO ojo cuando halla datos de relacion
-                                $indexData['relData'][$fieldId] = $p_data->$fieldId;
+                                $indexData['relData'][$fieldId] = $p_data[$fieldId];
 
-                                $relationsData[$modelRelation['modId']] = $p_data->$fieldId;
+                                $relationsData[$modelRelation['modId']] = $p_data[$fieldId];
                             }
                         }
                         
@@ -553,12 +587,12 @@ class NbsObject extends Common
         $modelDefinition        = $this->definition->get($p_model, null);
         $modelRelations         = $this->model->getRelations($p_model, 'IN');
 
-        $objDateAdd             = \Nubesys\Platform\Util\Utils::getDateTime($this->getDI());
-        $objTime                = \Nubesys\Platform\Util\Utils::getTimeStamp($this->getDI());
+        $objDateAdd             = \Nubesys\Core\Utils\Utils::getDateTime($this->getDI());
+        $objTime                = \Nubesys\Core\Utils\Utils::getTimeStamp($this->getDI());
         $objDateUpdated         = $objDateAdd;
 
-        $objPage1000            = \Nubesys\Platform\Util\Utils::getPageSequence($this->getDI(), $p_model . '_page1000', 1000);
-        $objPage10000           = \Nubesys\Platform\Util\Utils::getPageSequence($this->getDI(), $p_model . '_page10000', 10000);
+        $objPage1000            = \Nubesys\Core\Utils\Utils::getPageSequence($this->getDI(), $p_model . '_page1000', 1000);
+        $objPage10000           = \Nubesys\Core\Utils\Utils::getPageSequence($this->getDI(), $p_model . '_page10000', 10000);
 
         $objPartitionIndex      = $this->getPartitionIndex($modelData);
 
@@ -614,7 +648,7 @@ class NbsObject extends Common
                     foreach ($modelDefinition as $modelField) {
 
                         $fieldId = $modelField['dafId'];
-
+                        var_dump($data);exit();
                         if (property_exists($data, $fieldId)) {
 
                             $_dataTemp[$fieldId] = $data->$fieldId;
@@ -625,6 +659,7 @@ class NbsObject extends Common
 
                         $indexDataTmp['objData'][$fieldId] = $_dataTemp[$fieldId];
                     }
+
 
                     $insertDataTmp['objData'] = json_encode($this->encodeUtf8($_dataTemp));
 
@@ -747,18 +782,18 @@ class NbsObject extends Common
     }
 
     public function edit($p_model, $p_id, $p_data){
-
+        
         $result = false;
 
         $cacheKey       = 'data_object_' . $p_id;
 
         //TODO : Validacion IsTable Exsist
 
-        $updateData = array();
-        $relationsData = array();
-        $indexOldData = array();
-        $indexNewData = array();
-        $indexData = array();
+        $updateData             = array();
+        $relationsData          = array();
+        $indexOldData           = array();
+        $indexNewData           = array();
+        $indexData              = array();
 
         $modelData              = $this->model->get($p_model);
         $modelDefinition        = $this->definition->get($p_model, null);
@@ -768,23 +803,24 @@ class NbsObject extends Common
 
         if($objectData){
 
-            $indexOldData                   = \Nubesys\Platform\Util\Parse::toArray($objectData);
+            $indexOldData                   = \Nubesys\Core\Utils\Struct::toArray($objectData);
 
-            $updateData['objDateUpdated']   = \Nubesys\Platform\Util\Utils::getDateTime($this->getDI());
+            $updateData['objDateUpdated']   = \Nubesys\Core\Utils\Utils::getDateTime($this->getDI());
 
             //TODO: UserMenu Add, UserMenu Update, Function getActualUser
 
             //TODO: Agregar Version Strategy en modelos, none | secuencial | store
 
             //TODO: Agregar Order Strategy en modelos, none | time | secuencial | manual | ambos
-            if(property_exists($p_data,'objOrder')){
 
-                $updateData['objOrder']   = $p_data->objOrder;
+            if(isset($p_data['objOrder'])){
+
+                $updateData['objOrder']   = $p_data['objOrder'];
             }
 
-            if(property_exists($p_data,'objActive')){
+            if(isset($p_data['objActive'])){
 
-                $updateData['objActive']   = $p_data->objActive;
+                $updateData['objActive']   = $p_data['objActive'];
             }
 
             foreach($updateData as $key=>$value){
@@ -799,18 +835,32 @@ class NbsObject extends Common
                 $_dataTemp = array();
 
                 foreach ($modelDefinition as $modelField) {
-
+                    
                     $fieldId = $modelField['dafId'];
 
-                    if (property_exists($p_data, $fieldId)) {
+                    if (isset($p_data[$fieldId])) {
 
-                        $_dataTemp[$fieldId] = $p_data->$fieldId;
+                        if($modelField['typSaveAs'] == "JSON"){
+                            
+                            if(\is_string($p_data[$fieldId])){
 
-                        $indexNewData['objData'][$fieldId] = $p_data->$fieldId;
+                                $_dataTemp[$fieldId] = json_decode($p_data[$fieldId]);
+                            }else{
+
+                                $_dataTemp[$fieldId] = $p_data[$fieldId];
+                            }
+                            
+                        }else{
+
+                            $_dataTemp[$fieldId] = $p_data[$fieldId];
+                        }
+
+                        $indexNewData['objData'][$fieldId] = $p_data[$fieldId];
                     }
                 }
-
-                $updateData['objData'] = json_encode((object)array_replace_recursive((array)$objectData['objData'],(array)$this->encodeUtf8($_dataTemp)));
+                
+                $updateData['objData'] = json_encode(array_replace((array)$objectData['objData'],(array)$_dataTemp),true);
+                //$updateData['objData'] = json_encode((object)array_replace_recursive((array)$objectData['objData'],(array)$this->encodeUtf8($_dataTemp)));
 
             }else{
 
@@ -820,7 +870,7 @@ class NbsObject extends Common
             $tableName = $this->model->getModelObjectsTableName($p_model, $modelData['modType']);
 
             $updateConditions = "_id = '" . $p_id . "'";
-
+            
             $updateResult = $this->database->update($tableName, $updateData, $updateConditions);
 
             if($updateResult){
@@ -838,27 +888,24 @@ class NbsObject extends Common
 
                         $relationsData[$modelRelation['modId']] = array();
 
-                        if (property_exists($p_data, $fieldId)) {
-                            //TODO ojo cuando halla datos de relacion
-                            $indexNewData['relData'][$fieldId] = $p_data->$fieldId;
+                        if (isset($p_data[$fieldId])) {
+                            //TODO: ojo cuando halla datos de objeto de relacion
+                            $indexNewData['relData'][$fieldId] = $p_data[$fieldId];
 
-                            $relationsData[$modelRelation['modId']] = $p_data->$fieldId;
+                            $relationsData[$modelRelation['modId']] = $p_data[$fieldId];
                         }
                     }
                     
                     $this->setRelations($p_id, $relationsData);  
                 }
-
+                
                 $result = $p_id;
 
                 $indexData = array_replace_recursive($indexOldData,$indexNewData);
 
                 $this->indexUpdate($modelData, $modelDefinition, $modelRelations, $p_id, $indexData);
 
-                if($this->hasCache($key)){
-                    
-                    $this->deleteCache($cacheKey);
-                }
+                $this->deleteObjectCache($p_id);
             }else{
 
                 //TODO : NOT Updated
@@ -883,8 +930,6 @@ class NbsObject extends Common
     public function remove($p_model, $p_id){
 
         $result = false;
-
-        $cacheKey       = 'data_object_' . $p_id;
 
         //TODO : Validacion IsTable Exsist
 
@@ -916,7 +961,7 @@ class NbsObject extends Common
 
                 $this->indexRemove($modelData, $p_id);
 
-                $this->deleteCache($cacheKey);
+                $this->deleteObjectCache($p_id);
             }else{
 
                 //TODO : NOT Updated
@@ -936,6 +981,15 @@ class NbsObject extends Common
         }
 
         return $result;
+    }
+
+    protected function deleteObjectCache($p_id){
+
+        $keys   = array();
+        $keys[] = 'data_object_' . $p_id;
+        $keys[] = 'data_object_all';
+
+        $this->deleteMultipleCache($keys);
     }
 
     private function getPartitionIndex($p_modelData){
@@ -980,7 +1034,7 @@ class NbsObject extends Common
         $modelDefinition        = $this->definition->get($p_modelData['modId'], null);
         $modelRelations         = $this->model->getRelations($p_modelData['modId'], 'IN');
 
-        return $this->indexAdd($p_modelData, $modelDefinition, $modelRelations, $p_id, \Nubesys\Platform\Util\Parse::toArray($p_data));
+        return $this->indexAdd($p_modelData, $modelDefinition, $modelRelations, $p_id, \Nubesys\Core\Utils\Struct::toArray($p_data));
     }
 
     public function multiReindex($p_modelData, $p_data){
@@ -988,23 +1042,23 @@ class NbsObject extends Common
         $modelDefinition        = $this->definition->get($p_modelData['modId'], null);
         $modelRelations         = $this->model->getRelations($p_modelData['modId'], 'IN');
 
-        return $this->indexBulkAdd($p_modelData, $modelDefinition, $modelRelations, \Nubesys\Platform\Util\Parse::toArray($p_data));
+        return $this->indexBulkAdd($p_modelData, $modelDefinition, $modelRelations, \Nubesys\Core\Utils\Struct::toArray($p_data));
     }
 
     public function search($p_model, $p_query){
-
+       
         $result = false;
 
         $modelData              = $this->model->get($p_model);
         $modelDefinition        = $this->definition->get($p_model, null);
-        $modelRelations        = $this->model->getRelations($p_model, 'IN');
-
+        $modelRelations         = $this->model->getRelations($p_model, 'IN');
+        
         if (isset($modelData['modIndexOptions']) && is_object($modelData['modIndexOptions'])) {
 
             if (property_exists($modelData['modIndexOptions'], 'indexable') && $modelData['modIndexOptions']->indexable == true) {
 
                 $idsResults = $this->indexSearchIds($modelData, $modelDefinition, $modelRelations, $p_query);
-
+                
                 if ($idsResults != false && isset($idsResults['ids']) && isset($idsResults['totals']) && isset($idsResults['facets'])) {
 
                     $result = array();
@@ -1024,7 +1078,7 @@ class NbsObject extends Common
                 $result['objects']  = $this->list($p_model, $p_query);
             }
         }
-
+        
         return $result;
     }
 
@@ -1070,7 +1124,7 @@ class NbsObject extends Common
     }
 
     private function indexSearchIds($p_modelData, $p_modelDefinition, $p_modelRelations, $p_query){
-
+        
         $result = false;
 
         if($this->elastic->setClient()) {
@@ -1084,11 +1138,11 @@ class NbsObject extends Common
                     $typeName   = $this->getTypeName($p_modelData);
 
                     $index = $this->getIndex($indexName, $p_modelData);
-
+                    
                     if($index !== false){
 
                         $mapping = $this->getMapping($p_modelData, $p_modelDefinition, $p_modelRelations);
-
+                        
                         $type = $this->getType($index, $typeName, $mapping);
 
                         if($type !== false) {
@@ -1136,7 +1190,7 @@ class NbsObject extends Common
                             }
 
                             $queryResult = $this->elastic->searchDocs($type, $keyword, $fields, $orders, $page, $rows, $facets, $filters);
-
+                            
                             if($queryResult != false){
 
                                 $result = array();
@@ -1155,7 +1209,7 @@ class NbsObject extends Common
                 }
             }
         }
-
+        
         return $result;
     }
 
@@ -1328,7 +1382,7 @@ class NbsObject extends Common
 
         $indexArgs = array();
 
-        $indexArgs['analysis'] = $this->getDI()->get('config')->elastic->analysis;
+        $indexArgs['analysis'] = $this->getDI()->get('config')->main->elastic->analysis;
 
         if (property_exists($p_modelData['modIndexOptions'], 'analysis')) {
 
@@ -1350,21 +1404,21 @@ class NbsObject extends Common
 
     private function getTypeName($p_modelData){
 
-        return $this->getDI()->get('config')->application->client . '_' . $p_modelData['modId'];
+        return $this->getDI()->get('config')->main->id . '_' . $p_modelData['modId'];
     }
 
     private function getMapping($p_modelData, $p_modelDefinition, $p_modelRelations){
-
-        $basemapping = \Nubesys\Platform\Util\Parse::toObject((array)$this->getDI()->get('config')->elastic->basemapping->properties);
-
+        
+        $basemapping = \Nubesys\Core\Utils\Struct::toObject($this->getDI()->get('config')->main->elastic->basemapping->properties->toArray());
+        
         if (property_exists($p_modelData['modIndexOptions'], 'basemapping')) {
 
             if(property_exists($p_modelData['modIndexOptions']->basemapping,'properties')){
 
-                $basemapping = \Nubesys\Platform\Util\Parse::extendFieldValues($basemapping, $p_modelData['modIndexOptions']->basemapping->properties);
+                $basemapping = \Nubesys\Core\Utils\Struct::extendFieldValues($basemapping, $p_modelData['modIndexOptions']->basemapping->properties);
             }
         }
-
+        
         //OBJECT DATA MAPPING (PREDEFINIDO)
         $basedatamapping = new \stdClass();
         $basedatamapping->type = 'object';
@@ -1423,9 +1477,9 @@ class NbsObject extends Common
                 }
             }
         }
-
-        $datamapping = \Nubesys\Platform\Util\Parse::extendFieldValues($basedatamapping, $datamapping);
-
+        
+        $datamapping = \Nubesys\Core\Utils\Struct::extendFieldValues($basedatamapping, $datamapping);
+        
         $basemapping->objData = $datamapping;
 
         //RELATIONS DATA MAPPING (PREDEFINIDO)
@@ -1469,11 +1523,11 @@ class NbsObject extends Common
             }
         }
 
-        $relmapping = \Nubesys\Platform\Util\Parse::extendFieldValues($baserelmapping, $relmapping);
+        $relmapping = \Nubesys\Core\Utils\Struct::extendFieldValues($baserelmapping, $relmapping);
 
         $basemapping->relData = $relmapping;
 
-        return \Nubesys\Platform\Util\Parse::toArray($basemapping);
+        return \Nubesys\Core\Utils\Struct::toArray($basemapping);
     }
 
     private function getIndexableData($p_modelDefinition, $p_modelRelations, $p_data){
@@ -1578,21 +1632,22 @@ class NbsObject extends Common
     }
 
     public function get($p_model, $p_id){
-
+        
         $result = false;
 
-        $cacheKey       = 'data_object_' . $p_id;
+        $cacheKey       = 'data_object_' . $p_id . time();
         $cacheLifetime  = 3600;
         $cacheType      = 'file';
+        
 
-        //if($this->hasCache($cacheKey)){
+        if($this->hasCache($cacheKey)){
 
-        //    $result = $this->getCache($cacheKey);
-        //}else {
+            $result = $this->getCache($cacheKey, array());
+        }else {
 
             $modelData              = $this->model->get($p_model);
             $modelRelations         = $this->model->getRelations($p_model, 'IN');
-
+            
             $tableName = $this->model->getModelObjectsTableName($p_model, $modelData['modType']);
 
             if($this->database->isTableExist($tableName)){
@@ -1601,9 +1656,9 @@ class NbsObject extends Common
                 $selectOptions['conditions'] = "_id = '" . $p_id . "'";
     
                 $selectResult = $this->database->selectOne($tableName, $selectOptions);
-    
+                
                 if ($selectResult) {
-    
+                    
                     if (isset($selectResult['objData'])) {
     
                         $selectResult['objData'] = json_decode($selectResult['objData']);
@@ -1627,14 +1682,14 @@ class NbsObject extends Common
 
                         $selectResult['objData']->$fieldId = $rightObjects;
                     }
-    
+                    
                     $result = $selectResult;
                 }
             
             }
-            //$this->setCache($cacheKey, $result, $cacheLifetime);
-        //}
-      
+            $this->setCache($cacheKey, $result, $cacheLifetime);
+        }
+        
         return $result;
     }
 
@@ -1647,7 +1702,7 @@ class NbsObject extends Common
 
         if($this->hasCache($cacheKey)){
 
-            $result = $this->getCache($cacheKey);
+            $result = $this->getCache($cacheKey, "");
         }else {
 
             $objectData = $this->get($p_model, $p_id);
@@ -1842,21 +1897,21 @@ class NbsObject extends Common
 
             $nameFieldId = $nameField['dafId'];
 
-            if(property_exists($p_data,$nameFieldId)){
+            if(isset($p_data[$nameFieldId])){
 
-                $nameValue = $p_data->$nameFieldId;
+                $nameValue = $p_data[$nameFieldId];
 
                 if($p_model['modIdStrategy'] == 'SLUGPREFIX'){
 
-                    $result = $p_model['modId'] . '_' . \Nubesys\Platform\Util\Utils::slugify($nameValue);
+                    $result = $p_model['modId'] . '_' . \Nubesys\Core\Utils\Utils::slugify($nameValue);
                 }
 
                 if($p_model['modIdStrategy'] == 'SLUG'){
 
-                    $result = \Nubesys\Platform\Util\Utils::slugify($nameValue);
+                    $result = \Nubesys\Core\Utils\Utils::slugify($nameValue);
                 }
 
-                //TODO : Verificar si ya no existe el Objeto en la deb y agregarle un indice numerico
+                //TODO : Verificar si ya no existe el Objeto en la db y agregarle un indice numerico
             }else{
 
                 //TODO : no hay el campo como name en el data
@@ -1865,7 +1920,7 @@ class NbsObject extends Common
 
         if($p_model['modIdStrategy'] == 'CUSTOM'){
             
-            if(property_exists($p_data,'_id')){
+            if(isset($p_data['_id'])){
 
                 $result = $p_data->_id;
             }
@@ -1873,17 +1928,17 @@ class NbsObject extends Common
 
         if($p_model['modIdStrategy'] == 'UUID'){
 
-            $result = \Nubesys\Platform\Util\Utils::GUID($this->getDI());
+            $result = \Nubesys\Core\Utils\Utils::GUID($this->getDI());
         }
 
         if($p_model['modIdStrategy'] == 'AUTOINCREMENT'){
 
-            $result = \Nubesys\Platform\Util\Utils::getSequenceNextValue($this->getDI(), $p_model['modId'] . '_objects_autoid');
+            $result = \Nubesys\Core\Utils\Utils::getSequenceNextValue($this->getDI(), $p_model['modId'] . '_objects_autoid');
         }
 
         if($p_model['modIdStrategy'] == 'BASE36'){
 
-            $result = \Nubesys\Platform\Util\Utils::getU36($this->getDI());
+            $result = \Nubesys\Core\Utils\Utils::getU36($this->getDI());
         }
 
         return $result;
@@ -1903,6 +1958,38 @@ class NbsObject extends Common
         }
 
         return $result;
+    }
+
+    private function decodeUtf8($p_data){
+
+        //SI ES ARRAY
+        if(is_array($p_data)){
+
+            foreach($p_data as $key => $value){
+
+                if(is_string($value)){
+
+                    $p_data[$key] = utf8_decode($value);
+                }elseif(is_array($value) || is_object($value)){
+
+                    $p_data[$key] = $this->decodeUtf8($value);
+                }
+            }
+        }elseif(is_object($p_data)){
+
+            foreach($p_data as $key => $value){
+
+                if(is_string($value)){
+
+                    $p_data->$key = utf8_decode($value);
+                }elseif(is_array($value) || is_object($value)){
+
+                    $p_data->$key = $this->decodeUtf8($value);
+                }
+            }
+        }
+
+        return $p_data;
     }
 
     private function encodeUtf8($p_data){

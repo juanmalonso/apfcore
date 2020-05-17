@@ -1,0 +1,188 @@
+{
+  "accessControl": true,
+  "title": "Relations Manager",
+  "navigation": {
+    "user": {
+      "label": "var(session:user_login)",
+      "url": "http://localhost/profile",
+      "avatar": "fun(getSession:user_avatar)"
+    },
+    "items": [
+      {
+        "label": "Models",
+        "url": "http://localhost/models/",
+        "icon": "database purple icon"
+      },
+      {
+        "label": "Fields",
+        "url": "http://localhost/fields/",
+        "icon": "dot circle purple icon"
+      },
+      {
+        "label": "F. Groups",
+        "url": "http://localhost/fgroups/",
+        "icon": "sitemap purple icon"
+      },
+      {
+        "label": "Types",
+        "url": "http://localhost/types/",
+        "icon": "bullseye purple icon"
+      }
+    ]
+  },
+  "application": {
+    "type": "datacustoms",
+    "serviceActions": {
+      "default": "list",
+      "paramNum": 5
+    },
+    "dataSources": {
+      "relations": {
+        "adapter": "custom",
+        "options": {
+          "definitions": "fun(getObjectsDefinitions)",
+          "data": "fun(getObjectsData)"
+        }
+      },
+      "fgroups": {
+        "adapter": "table",
+        "options": {
+          "table": "fields_groups"
+        }
+      }
+    },
+    "urlMaps": {
+      "LIST": "{var(global:urlbase)}models/list"
+    },
+    "topBar": {
+      "list": {
+        "title": {
+          "type": "text",
+          "text": "var(local:title)"
+        },
+        "actions": [
+          {
+            "type": "link",
+            "label": "add relation data",
+            "urlMap": "var(local:application.urlMaps.ADD)",
+            "style": "green",
+            "icon": "plus icon"
+          }
+        ]
+      },
+      "edit": {
+        "title": {
+          "type": "text",
+          "text": "{var(local:title)} - EDIT"
+        },
+        "actions": [
+          {
+            "type": "link",
+            "label": "cancelar",
+            "urlMap": "var(local:application.urlMaps.LIST)",
+            "style": "basic",
+            "icon": "angle left icon"
+          },
+          {
+            "type": "actions",
+            "label": "guardar",
+            "actions": [
+              {
+                "scope": "_service",
+                "name": "doSaveEditorData",
+                "params": {
+                  "editorReferenceName": "editor"
+                }
+              }
+            ],
+            "style": "green",
+            "icon": "save icon"
+          }
+        ]
+      },
+      "add": {
+        "title": {
+          "type": "text",
+          "text": "{var(local:title)} - ADD"
+        },
+        "actions": [
+          {
+            "type": "link",
+            "label": "cancelar",
+            "urlMap": "var(local:application.urlMaps.LIST)",
+            "style": "basic",
+            "icon": "angle left icon"
+          },
+          {
+            "type": "actions",
+            "label": "agregar",
+            "actions": [
+              {
+                "scope": "_service",
+                "name": "doSaveEditorData",
+                "params": {
+                  "editorReferenceName": "editor"
+                }
+              }
+            ],
+            "style": "green",
+            "icon": "save icon"
+          }
+        ]
+      }
+    },
+    "editor": {
+      "type": "form",
+      "async": false,
+      "objectsDataSource": "relations",
+      "fgroupsDataSource": "fgroups",
+      "objectsSaveMethod": "saveObjectsData",
+      "objectsEditMethod": "editObjectsData",
+      "objectToSaveIdMethod": "getObjectToSaveId",
+      "objectGetMethod":"getObjectData"
+    },
+    "selector": {
+      "type": "tablelist",
+      "async": false,
+      "dataSource": "relations",
+      "links": [],
+      "actions": [
+        {
+          "type": "link",
+          "label": "editar",
+          "style": "edit green",
+          "urlMap": "var(local:application.urlMaps.EDIT)"
+        },
+        {
+          "type": "actions",
+          "label": "borrar",
+          "style": "trash alternate red",
+          "urlMap": "var(local:application.urlMaps.DELETE)",
+          "actions": [
+            {
+              "scope": "_local",
+              "name": "doLocalTest",
+              "params": {
+                "objId": "%(data:_id)%"
+              }
+            }
+          ]
+        }
+      ],
+      "paginator": {
+        "type": "actions",
+        "actions": [
+          {
+            "scope": "_local",
+            "name": "goToPage",
+            "params": {
+              "page": "%(data:page)%",
+              "rows": "%(data:rows)%"
+            }
+          }
+        ],
+        "urlbase": "var(local:application.urlMaps.LIST)"
+      }
+    }
+  }
+}

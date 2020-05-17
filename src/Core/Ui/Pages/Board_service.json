@@ -17,80 +17,138 @@
   },
   "application": {
     "type": "dataobjectscrud",
-    "serviceActions":{
-      "default":"list",
-      "paramNum":5
+    "serviceActions": {
+      "default": "list",
+      "paramNum": 5
     },
     "dataSources": {
-      "objects":{
-        "adapter":"objects",
-        "options":{
-          "model":"affiliates"
+      "objects": {
+        "adapter": "objects",
+        "options": {
+          "model": "advertisers"
+        }
+      },
+      "fgroups": {
+        "adapter": "table",
+        "options": {
+          "table": "fields_groups"
         }
       }
     },
-    "urlMaps":{
-      "LIST":"{var(global:urlbase)}board/list",
-      "ADD":"{var(global:urlbase)}board/edit/",
-      "EDIT":"{var(global:urlbase)}board/edit/%(data:_id)%",
-      "DELETE":"{var(global:urlbase)}board/delete/%(data:_id)%",
-      "SUBPAGE":"{var(global:urlbase)}board/subpage/%(data:_id)%/%(component:id)%",
-      "DETALLE":"{var(global:urlbase)}board/detalle/%(data:_id)%"
+    "urlMaps": {
+      "LIST": "{var(global:urlbase)}board/list",
+      "ADD": "{var(global:urlbase)}board/edit/",
+      "EDIT": "{var(global:urlbase)}board/edit/%(data:_id)%",
+      "DELETE": "{var(global:urlbase)}board/delete/%(data:_id)%",
+      "SUBPAGE": "{var(global:urlbase)}board/subpage/%(data:_id)%/%(component:id)%",
+      "DETALLE": "{var(global:urlbase)}board/detalle/%(data:_id)%"
     },
-    "topBar":{
-      "list":{
-        "title":{
-          "text":"MAIN BOARD"
+    "topBar": {
+      "list": {
+        "title": {
+          "type": "text",
+          "text": "MAIN BOARD"
         },
-        "actions":[
+        "actions": [
           {
-            "type":"link",
-            "label":"nuevo",
-            "urlMap":"var(local:application.urlMaps.ADD)",
-            "icon":"plus green icon"
+            "type": "link",
+            "label": "nuevo",
+            "urlMap": "var(local:application.urlMaps.ADD)",
+            "style": "green",
+            "icon": "plus icon"
+          }
+        ]
+      },
+      "edit": {
+        "title": {
+          "type": "text",
+          "text": "MAIN BOARD"
+        },
+        "actions": [
+          {
+            "type": "link",
+            "label": "cancelar",
+            "urlMap": "var(local:application.urlMaps.LIST)",
+            "style": "basic",
+            "icon": "angle left icon"
           },
           {
-            "type":"actions",
-            "label":"nuevo",
-            "actions":[
+            "type": "actions",
+            "label": "agregar",
+            "actions": [
               {
-                "scope":"_local",
-                "name":"doLocalTest",
-                "params":{
-                  "p1":"A",
-                  "p2":2
-                }
-              },
-              {
-                "scope":"_service",
-                "name":"doServiceTest",
-                "params":{
-                  "p1":"A"
-                }
-              },
-              {
-                "scope":"_parent",
-                "name":"doParentTest",
-                "params":{
-                  "p1":"G"
-                }
-              },
-              {
-                "scope":"topbar",
-                "name":"doRefereceTest",
-                "params":{
-                  "p1":"G"
-                }
+                "scope": "_service",
+                "name": "doSaveEditorData",
+                "params": {}
               }
             ],
-            "icon":"caret left icon"
+            "style": "green",
+            "icon": "save icon"
           }
         ]
       }
     },
+    "editor": {
+      "type": "form",
+      "async": false,
+      "objectsDataSource": "objects",
+      "fgroupsDataSource": "fgroups"
+    },
     "selector": {
       "type": "tablelist",
-      "dataSource":"objects"
+      "async": false,
+      "dataSource": "objects",
+      "links": [
+        {
+          "type": "link",
+          "label": "Link A",
+          "style": "teal",
+          "urlMap": "var(local:application.urlMaps.SUBPAGE)"
+        },
+        {
+          "type": "link",
+          "label": "Link B",
+          "style": "basic",
+          "urlMap": "var(local:application.urlMaps.DETALLE)"
+        }
+      ],
+      "actions": [
+        {
+          "type": "link",
+          "label": "editar",
+          "style": "edit green",
+          "urlMap": "var(local:application.urlMaps.EDIT)"
+        },
+        {
+          "type": "actions",
+          "label": "borrar",
+          "style": "trash alternate red",
+          "urlMap": "var(local:application.urlMaps.DELETE)",
+          "actions": [
+            {
+              "scope": "_local",
+              "name": "doLocalTest",
+              "params": {
+                "objId": "%(data:_id)%"
+              }
+            }
+          ]
+        }
+      ],
+      "paginator": {
+        "type": "actions",
+        "actions": [
+          {
+            "scope": "_local",
+            "name": "goToPage",
+            "params": {
+              "page": "%(data:page)%",
+              "rows": "%(data:rows)%"
+            }
+          }
+        ],
+        "urlbase": "var(local:application.urlMaps.LIST)"
+      }
     }
   }
 }

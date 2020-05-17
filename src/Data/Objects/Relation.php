@@ -39,19 +39,9 @@ class Relation extends Common
         return $result;
     }
 
-    public function add($p_data){
-        
-        $result = $this->database->insert('data_relations', $p_data);
-
-        return $result;
-    }
-
     public function get($p_relId){
 
         $result = false;
-        $jsonFields = array('relIndexOptions','relUiOptions');
-
-        //TODO : Cache de Types
 
         $relationDataOptions     = array();
 
@@ -65,25 +55,27 @@ class Relation extends Common
                 $result = $this->getCahe($cacheKey);
             }else {
                 
-                $relationDataOptions['rows'] = 1000;
+                $relationDataOptions['rows']    = 1000;
 
-                $resultSet = $this->database->select('data_relations', $relationDataOptions);
-                
-                $result = array();
-                
-                foreach ($resultSet as $relation) {
+                $resultSet                      = $this->database->select('data_relations', $relationDataOptions);
 
-                    $relationTemp = array();
+                if(is_array($resultSet)){
 
-                    foreach ($relation as $field => $value) {
+                    $result = array();
 
-                        $relationTemp[$field] = \Nubesys\Platform\Util\Parse::decodeJsonField($field, $value, $jsonFields);
+                    foreach ($resultSet as $relation) {
+
+                        $result[] = $this->relEncode($relation);
                     }
 
-                    $result[] = $relationTemp;
-                }
+                    if(is_array($result) && count($result) > 0){
 
-                $this->setCache($cacheKey, $result, $cacheLifetime);
+                        $this->setCache($cacheKey, $result, $cacheLifetime);
+                    }
+                }else{
+
+                    //TODO : NO
+                }
             }
         }else{
 
@@ -92,21 +84,19 @@ class Relation extends Common
             
             if($this->hasCache($cacheKey)){
 
-                $result = $this->getCache($cacheKey);
+                $result = $this->getCache($cacheKey, array());
             }else {
             
                 $relationDataOptions['conditions'] = "modId = '" . $p_relId . "'";
 
                 $resultSet = $this->database->selectOne('data_relations', $relationDataOptions);
                 
-                $result = array();
+                if(is_array($resultSet) && count($resultSet) > 0){
                 
-                foreach ($resultSet as $field => $value) {
-
-                    $result[$field] = \Nubesys\Platform\Util\Parse::decodeJsonField($field, $value, $jsonFields);
+                    $result = $this->relEncode($resultSet);
+                    
+                    $this->setCache($cacheKey, $result, $cacheLifetime);
                 }
-
-                $this->setCache($cacheKey, $result, $cacheLifetime);
             }
         }
 
@@ -115,15 +105,14 @@ class Relation extends Common
 
     public function getByModel($p_modId, $p_direction = 'LEFT'){
         
-        $result = false;
-        $jsonFields = array('relIndexOptions','relUiOptions');
+        $result = array();
 
         $cacheKey       = 'data_relations_' . $p_modId . '_in_' . $p_direction;
         $cacheLifetime  = 3600;
         
         if($this->hasCache($cacheKey)){
 
-            $result = $this->getCache($cacheKey);
+            $result = $this->getCache($cacheKey, array());
         }else {
             
             $relationDataOptions     = array();
@@ -138,25 +127,38 @@ class Relation extends Common
             }
 
             $resultSet = $this->database->select('data_relations', $relationDataOptions);
-            
-            $result = array();
-            
-            if($resultSet){
+
+            if(is_array($resultSet)){
+
+                $result = array();
+
                 foreach ($resultSet as $relation) {
 
-                    $relationTemp = array();
-
-                    foreach ($relation as $field => $value) {
-
-                        $relationTemp[$field] = \Nubesys\Platform\Util\Parse::decodeJsonField($field, $value, $jsonFields);
-                    }
-                
-                    $result[] = $relationTemp;
+                    $result[] = $this->relEncode($relation);
                 }
+
+                if(is_array($result) && count($result) > 0){
+
+                    $this->setCache($cacheKey, $result, $cacheLifetime);
+                }
+            }else{
+
+                //TODO : NO
             }
-            $this->setCache($cacheKey, $result, $cacheLifetime);
         }
         
+        return $result;
+    }
+
+    public function add($p_data){
+        
+        $result = $this->database->insert('data_relations', $p_data);
+
+        if(isset($p_data['modId'])){
+
+            $this->deleteRelationCache($p_data['modId']);
+        }
+
         return $result;
     }
 
@@ -164,16 +166,27 @@ class Relation extends Common
 
         $resultSet = $this->database->update('data_relations', $p_data, "modId = '$p_id'");
 
-        $cacheKeys       = array('data_relation_' . $p_id, 'data_relation_all');
-
-        foreach($cacheKeys as $key){
-
-            if($this->hasCache($key)){
-
-                $this->deleteCache($key);
-            }
-        }
+        $this->deleteRelationCache($p_id);
 
         return $resultSet;
+    }
+
+    protected function deleteRelationCache($p_relId){
+
+        $keys   = array();
+        $keys[] = 'data_relation_all';
+        $keys[] = 'data_relation_' . $p_relId;
+        $keys[] = 'data_relations_' . $p_relId . '_in_LEFT';
+        $keys[] = 'data_relations_' . $p_relId . '_in_RIGHT';
+
+        $this->deleteMultipleCache($keys);
+    }
+
+    protected function relEncode($p_data){
+        
+        $p_data['relIndexOptions']              = \Nubesys\Core\Utils\Struct::toObject(\Nubesys\Core\Utils\Struct::encodeFieldValue($p_data['relIndexOptions']));
+        $p_data['relUiOptions']                 = \Nubesys\Core\Utils\Struct::toObject(\Nubesys\Core\Utils\Struct::encodeFieldValue($p_data['relUiOptions']));
+        
+        return $p_data;
     }
 }

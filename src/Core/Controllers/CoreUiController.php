@@ -58,9 +58,9 @@ class CoreUiController extends Controller
 
             $uiServiceName          = "dataService";
 
-            if(isset($p_urlparams[3]) && method_exists($uiService, $p_urlparams[3] . "Service")){
+            if(isset($p_urlparams[2]) && method_exists($uiService, $p_urlparams[2] . "Service")){
 
-                $uiServiceName      = $p_urlparams[3] . "Service";
+                $uiServiceName      = $p_urlparams[2] . "Service";
             }
 
             $this->getDI()->get("responseManager")->setHeader("Content-Type", "application/json");

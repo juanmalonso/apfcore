@@ -10,13 +10,13 @@ class Struct
     }
 
     public static function toArray($p_object){
-
+        
         return (array)json_decode(json_encode($p_object),true);
     }
 
     public static function toObject($p_object){
-
-        return (object)json_decode(json_encode($p_object));
+        
+        return (object)json_decode(json_encode($p_object),false);
     }
 
     public static function flatten(array $arr, $prefix = '', $depth = 0, $adepth = 0)
@@ -51,6 +51,20 @@ class Struct
         return $out;
     }
 
+    public static function encodeFieldValue($p_value){
+        
+        if (is_string($p_value) && self::isValidJson($p_value)) {
+
+            return self::toObject(json_decode($p_value));
+        }elseif(is_string($p_value)){
+
+            return $p_value;
+        }else{
+
+            return self::toObject($p_value);
+        }
+    }
+
     public static function extendFieldValues($p_valueA, $p_valueB, $p_asString = false){
 
         $result = false;
@@ -66,21 +80,9 @@ class Struct
             }
         }else {
 
-            if (is_string($p_valueA) && self::isValidJson($p_valueA)) {
+            $objA = self::toArray(self::encodeFieldValue($p_valueA));
 
-                $objA = self::toArray(json_decode($p_valueA));
-            }else{
-
-                $objA = self::toArray($p_valueA);
-            }
-
-            if (is_string($p_valueB) && self::isValidJson($p_valueB)) {
-
-                $objB = self::toArray(json_decode($p_valueB));
-            }else{
-
-                $objB = self::toArray($p_valueB);
-            }
+            $objB = self::toArray(self::encodeFieldValue($p_valueB));
 
             $result = self::extendArray($objA, $objB);
 

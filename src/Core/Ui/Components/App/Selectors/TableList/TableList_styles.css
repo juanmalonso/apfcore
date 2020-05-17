@@ -1,2 +1,18 @@
 #___id_ {
 }
+
+.jsoneditor-menu, .jsoneditor-undo, .jsoneditor-redo, .jsoneditor-modes, .jsoneditor-search {
+
+    display: none;
+}
+
+#xModal {
+
+    margin-left: auto !important;
+    margin-right: 0px !important;
+    width: 1500px !important;
+    position: absolute !important;
+    top: auto !important;
+    left: auto !important;
+    right: 30px !important;
+}

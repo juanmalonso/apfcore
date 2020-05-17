@@ -1,0 +1,186 @@
+{
+  "accessControl": true,
+  "title": "Tablero Principal",
+  "navigation": {
+    "user": {
+      "label": "var(session:user_login)",
+      "url": "http://localhost/profile",
+      "avatar": "fun(getSession:user_avatar)"
+    },
+    "items": [
+      {
+        "label": "Inicio",
+        "url": "http://localhost/board/",
+        "icon": "home icon"
+      }
+    ]
+  },
+  "application": {
+    "type": "dataobjectscrud",
+    "serviceActions":{
+      "default":"list",
+      "paramNum":5
+    },
+    "dataSources": {
+      "objects":{
+        "adapter":"objects",
+        "options":{
+          "model":"advertisers"
+        }
+      }
+    },
+    "urlMaps":{
+      "LIST":"{var(global:urlbase)}board/list",
+      "ADD":"{var(global:urlbase)}board/edit/",
+      "EDIT":"{var(global:urlbase)}board/edit/%(data:_id)%",
+      "DELETE":"{var(global:urlbase)}board/delete/%(data:_id)%",
+      "SUBPAGE":"{var(global:urlbase)}board/subpage/%(data:_id)%/%(component:id)%",
+      "DETALLE":"{var(global:urlbase)}board/detalle/%(data:_id)%"
+    },
+    "topBar":{
+      "list":{
+        "title":{
+          "type":"text",
+          "text":"MAIN BOARD"
+        },
+        "actions":[
+          {
+            "type":"link",
+            "label":"nuevo",
+            "urlMap":"var(local:application.urlMaps.ADD)",
+            "style":"green",
+            "icon":"plus icon"
+          },
+          {
+            "type":"actions",
+            "label":"nuevo",
+            "actions":[
+              {
+                "scope":"_local",
+                "name":"doLocalTest",
+                "params":{
+                  "p1":"A",
+                  "p2":2
+                }
+              },
+              {
+                "scope":"_service",
+                "name":"doServiceTest",
+                "params":{
+                  "p1":"A"
+                }
+              },
+              {
+                "scope":"_parent",
+                "name":"doParentTest",
+                "params":{
+                  "p1":"G"
+                }
+              },
+              {
+                "scope":"topbar",
+                "name":"doRefereceTest",
+                "params":{
+                  "p1":"G"
+                }
+              }
+            ],
+            "style":"basic",
+            "icon":"caret left icon"
+          },
+          {
+            "type":"actions",
+            "label":"remote",
+            "actions":[
+              {
+                "scope":"_service",
+                "name":"doLoadData",
+                "params":{
+                  "type":"objects",
+                  "dataSource":"affiliates",
+                  "query":{
+                    "propiedad1":"valor1",
+                    "propiedad2":"valor2"
+                  }
+                }
+              }
+            ],
+            "style":"green",
+            "icon":"code branch icon"
+          }
+        ]
+      },
+      "edit":{
+        "title":{
+          "type":"text",
+          "text":"MAIN BOARD"
+        },
+        "actions":[
+          {
+            "type":"link",
+            "label":"agregar",
+            "urlMap":"var(local:application.urlMaps.LIST)",
+            "style":"blue",
+            "icon":"plus icon"
+          }
+        ]
+      }
+    },
+    "selector": {
+      "type": "tablelist",
+      "async":false,
+      "dataSource":"objects",
+      "links":[
+        {
+          "type":"link",
+          "label":"Link A",
+          "style":"teal",
+          "urlMap":"var(local:application.urlMaps.SUBPAGE)"
+        },
+        {
+          "type":"link",
+          "label":"Link B",
+          "style":"basic",
+          "urlMap":"var(local:application.urlMaps.DETALLE)"
+        }
+      ],
+      "actions":[
+        {
+          "type":"link",
+          "label":"editar",
+          "style":"edit green",
+          "urlMap":"var(local:application.urlMaps.EDIT)"
+        },
+        {
+          "type":"actions",
+          "label":"borrar",
+          "style":"trash alternate red",
+          "urlMap":"var(local:application.urlMaps.DELETE)",
+          "actions":[
+            {
+              "scope":"_local",
+              "name":"doLocalTest",
+              "params":{
+                  "objId":"%(data:_id)%"
+              }
+            }
+          ]
+        }
+      ],
+      "paginator":{
+        "type":"actions",
+        "actions":[
+          {
+            "scope":"_local",
+            "name":"goToPage",
+            "params":{
+              "page":"%(data:page)%",
+              "rows":"%(data:rows)%"
+            }
+          }
+        ],
+        "urlbase":"var(local:application.urlMaps.LIST)"
+      }      
+    }
+  }
+}

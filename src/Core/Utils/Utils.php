@@ -3,6 +3,120 @@ namespace Nubesys\Core\Utils;
 
 class Utils
 {
+    
+    public static function getGlobalValue($p_di, $p_key, $p_type = 'int'){
+
+        $result = false;
+
+        if(self::hasGlobalValue($p_di, $p_key)) {
+
+            $type = $p_type;
+
+            if ($p_type == 'jsono' || $p_type == 'jsona') {
+
+                $type = 'json';
+            }
+
+            $dateResult = $p_di->get('utildb')->query("SELECT _$type AS val FROM system_keyvalues WHERE _key = '$p_key';");
+            $dateResult = $dateResult->fetchAll($dateResult);
+
+            if (count($dateResult) > 0) {
+
+                if ($type == 'json') {
+
+                    $result = json_decode(utf8_encode($dateResult[0]['val']));
+
+                    if ($p_type == 'jsona') {
+
+                        $result = \Nubesys\Platform\Util\Parse::toArray($result);
+                    }
+
+                } else {
+
+                    $result = $dateResult[0]['val'];
+                }
+            }
+        }
+
+        return $result;
+    }
+
+    public static function hasGlobalValue($p_di, $p_key){
+
+        $result = false;
+
+        $dateResult = $p_di->get('utildb')->query("SELECT COUNT(*) AS cantidad FROM system_keyvalues WHERE _key = '$p_key';");
+        $dateResult = $dateResult->fetchAll($dateResult);
+
+        if(count($dateResult) > 0){
+
+            if($dateResult[0]['cantidad'] > 0){
+
+                $result = true;
+            }
+        }
+
+        return $result;
+    }
+
+    public static function removeGlobalValue($p_di, $p_key){
+
+        $result = true;
+
+        if(self::hasGlobalValue($p_di, $p_key)){
+
+            $result = $p_di->get('db')->delete('system_keyvalues', "_key = '$p_key'");
+        }
+
+        return $result;
+    }
+
+    public static function setGlobalValue($p_di, $p_key, $p_value, $p_type = 'int'){
+
+        $result = false;
+
+        $value = $p_value;
+        $field = $p_type;
+
+        switch ($p_type){
+
+            case 'int' :
+                $value = $p_value;
+                break;
+            case 'text' :
+                $value = $p_value;
+                break;
+            case 'varchar' :
+                $value = $p_value;
+                break;
+            case 'jsona' :
+                $value = json_encode(\Nubesys\Platform\Util\Parse::encodeUtf8($p_value));
+                $field  = 'json';
+                break;
+            case 'jsono' :
+                $value = json_encode(\Nubesys\Platform\Util\Parse::encodeUtf8($p_value));
+                $field  = 'json';
+                break;
+        }
+
+        $data = array();
+
+        if(self::hasGlobalValue($p_di, $p_key)){
+
+            $data['_' . $field] = $value;
+
+            $result = $p_di->get('utildb')->updateAsDict('system_keyvalues', $data, "_key = '$p_key'");
+        }else{
+
+            $data['_key']  = $p_key;
+            $data['_' . $field] = $value;
+
+            $result = $p_di->get('utildb')->insertAsDict('system_keyvalues', $data);
+        }
+
+        return $result;
+    }
+    
     public static function getDateTime($p_di){
 
         $result = false;
@@ -63,6 +177,53 @@ class Utils
         return $result;*/
 
         return (int)str_replace('.','',(string)microtime(true));
+    }
+
+    public static function getPageSequence($p_di, $p_key, $p_size){
+
+        $rowSequence = self::getSequenceCycleValue($p_di, $p_key . '_row', $p_size);
+
+        if($rowSequence == 0){
+
+            $result = self::getSequenceNextValue($p_di, $p_key);
+
+            self::setGlobalValue($p_di, $p_key, $result);
+        }else{
+
+            $result = self::getGlobalValue($p_di, $p_key);
+        }
+
+        return $result;
+    }
+
+    public static function getSequenceNextValue($p_di, $p_sequence){
+
+        $result = false;
+
+        $dateResult = $p_di->get('utildb')->query("SELECT NEXTVALUE('$p_sequence',1,1) AS sequence;");
+        $dateResult = $dateResult->fetchAll($dateResult);
+
+        if(count($dateResult) > 0){
+
+            $result = $dateResult[0]['sequence'];
+        }
+
+        return $result;
+    }
+
+    public static function getSequenceCycleValue($p_di, $p_sequence, $p_max = 9){
+
+        $result = false;
+
+        $dateResult = $p_di->get('utildb')->query("SELECT CYCLE('$p_sequence',$p_max) AS sequence;");
+        $dateResult = $dateResult->fetchAll($dateResult);
+
+        if(count($dateResult) > 0){
+
+            $result = $dateResult[0]['sequence'];
+        }
+
+        return $result;
     }
 
     public static function getMemorySequenceCycleValue($p_di, $p_sequence, $p_max = 9){
@@ -180,5 +341,49 @@ class Utils
     public static function getCrc32($p_str) {
 
         return crc32($p_str);
+    }
+
+    public static function jwtGenerate($p_secret, $p_data, $p_live = 1){
+        
+        $time                   = time();
+
+        $tokenObject            = array();
+        $tokenObject['iat']     = $time;
+        $tokenObject['exp']     = $time + (60*$p_live);
+        $tokenObject['data']    = $p_data;
+        
+        return \Firebase\JWT\JWT::encode($tokenObject, $p_secret);
+    }
+
+    public static function jwtValidate($p_secret, $p_data, $p_token){
+        
+        $result = false;
+
+        try {
+            
+            $tokenResult = \Firebase\JWT\JWT::decode($p_token, $p_secret, array('HS256'));
+            
+            if(is_object($tokenResult) && property_exists($tokenResult, "data")){
+
+                foreach($tokenResult->data as $key=>$value){
+                    
+                    if($tokenResult->data->$key != $p_data[$key]){
+                        
+                        $result = false;
+                        break;
+                    }
+                }
+
+                $tokenResult->timeleft = $tokenResult->exp - time();
+                
+                $result = $tokenResult;
+            }
+        } catch (\Throwable $th) {
+            
+            //var_dump($th);
+            //TODO: throw $th;
+        }
+
+        return $result;
     }
 }

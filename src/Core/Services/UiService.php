@@ -15,6 +15,8 @@ class UiService extends Service {
     protected $csssources;
     protected $jssources;
 
+    protected $snippedsk;
+
     public function __construct($p_di)
     {
         parent::__construct($p_di);
@@ -25,6 +27,8 @@ class UiService extends Service {
 
         $this->csssources   = new Register();
         $this->jssources    = new Register();
+
+        $this->snippedsk    = array();
 
         $this->generateId();
 
@@ -162,8 +166,15 @@ class UiService extends Service {
         }
     }
 
-    //VIEW VARS
+    //URL CLASS PATH
+    protected function getUrlClassPath(){
 
+        $pathPartes     = explode("\\", $this->getClassPath());
+
+        return "uid/" . implode("_", array_map(function ($e){ return \Phalcon\Text::uncamelize($e);}, $pathPartes));
+    }
+
+    //VIEW VARS
     protected function setViewVar($p_key, $p_value){
 
         $this->view->set($p_key, $p_value);
@@ -279,6 +290,7 @@ class UiService extends Service {
         }
 
         $this->view->strAppend($p_group, $_code);
+        
     }
 
     //SNIPPETS
@@ -315,9 +327,9 @@ class UiService extends Service {
 
     public function doPageRender($p_action, $p_params, $p_inherited = false){
         
-        $this->loadJsonTree();
-
         $this->setParams($p_params);
+        
+        $this->loadJsonTree();
         
         if(method_exists($this,$p_action)){
 
@@ -346,6 +358,51 @@ class UiService extends Service {
 
             return 0;
         }
+    }
+
+    //SERVICES (AJAX)
+    protected function setServiceStatus($p_status){
+
+        $this->getDI()->get("responseManager")->setStatus($p_status);
+    }
+
+    public function setServiceInfo($p_info){
+
+        $this->getDI()->get("responseManager")->setInfo($p_info);
+    }
+
+    public function setServiceData($p_data){
+
+        $this->getDI()->get("responseManager")->setData($p_data);
+    }
+
+    public function setServiceDebug($p_debug){
+
+        $this->getDI()->get("responseManager")->setDebug($p_debug);
+    }
+
+    public function setServiceError($p_message){
+
+        $this->getDI()->get("responseManager")->setError($p_message);
+    }
+
+    public function setServiceSuccess($p_data){
+
+        $this->getDI()->get("responseManager")->setSuccess($p_data);
+    }
+
+    public function doService($p_uiServiceName, $p_params){
+        
+        $this->loadJsonTree();
+        
+        $this->setParams($p_params);
+        
+        if(method_exists($this, $p_uiServiceName)){
+
+            $this->$p_uiServiceName();
+        }
+
+        return 0;
     }
 
     private function setView($p_vars){

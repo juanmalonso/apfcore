@@ -291,10 +291,7 @@ class Mysql extends Common
 
         //TODO : Retornar LastInserId
 
-
-
-
-
+        
 
         $query = "insert into 'tablename' (a, b, c) values ";
 

@@ -8,10 +8,12 @@ use Nubesys\Vue\Services\VueUiService;
 use Nubesys\Core\Ui\Components\Navigation\SideMenu\SideMenu;
 use Nubesys\Core\Ui\Components\App\Top\TopBar\TopBar;
 use Nubesys\Core\Ui\Components\App\Selectors\TableList\TableList;
+use Nubesys\Core\Ui\Components\App\Editors\Form\Form;
 
 //DATA SOURCE
 use Nubesys\Data\DataSource\DataSource;
 use Nubesys\Data\DataSource\DataSourceAdapters\Objects as ObjectsDataSource;
+use Nubesys\Data\DataSource\DataSourceAdapters\Table as TableDataSource;
 
 class Board extends VueUiService {
 
@@ -24,6 +26,7 @@ class Board extends VueUiService {
     protected $action                       = null;
     protected $baseUrlMaps                  = null;
 
+    //MAIN ACTION
     public function mainAction(){
 
         $this->accessControl();
@@ -36,6 +39,55 @@ class Board extends VueUiService {
         $this->generateSideMenu();
         
         $this->callServiceAction();
+
+        $this->generateTopBar();
+    }
+
+    //LIST SERVICE ACTION
+    protected function listAction(){
+
+        $this->setViewVar("content", "LIST");
+
+        $this->generateSelector();
+    }
+
+    //EDIT SERVICE ACTION
+    protected function editAction(){
+
+        $this->setViewVar("content", "EDIT");
+
+        $this->generateEditor();
+    }
+
+    //AJAX REMOTE SERVICES
+    public function loadDataService(){
+
+        $this->setDataSources();
+
+        //sleep(3);
+
+        if($this->hasJsonParam()){
+
+            $param      = $this->getJsonParam();
+
+            if(isset($param["datasource"])){
+
+                $objectsSelectorDataSource              = $this->getDataSource($param["datasource"]);
+
+                $dataSourceQuery            = array();
+                $dataSourceQuery['page']    = (isset($param["page"])) ? $param["page"] : 1;
+                $dataSourceQuery['rows']    = (isset($param["rows"])) ? $param["rows"] : 10;
+
+                $this->setServiceSuccess($objectsSelectorDataSource->getData($dataSourceQuery));
+            }else{
+
+                $this->setServiceError("Datasource param not Found");    
+            }
+        }else{
+
+            $this->setServiceError("Invalid Params");
+        }
+
     }
 
     //CALL SERVICE ACTION
@@ -64,28 +116,47 @@ class Board extends VueUiService {
         }
     }
 
-    //LIST ACTION
-    protected function listAction(){
-
-        $this->setViewVar("content", "Panel Principal de Prueba");
-
-        $this->generateTopBar();
-
-        //DEFINIR LOGICA DE ACCIONES EN EL JSON
-        $this->generateSelector();
-    }
-
     //DATA SOURCES
     protected function setDataSources(){
         
         $this->dataSources = array();
         
-        foreach($this->getLocal("application.dataSources") as $dataSoyrceName=>$dataSource){
+        foreach($this->getLocal("application.dataSources") as $dataSourceName=>$dataSource){
 
-            //TODO VER DE MODIFICAR EL DATASOURCE ADAPTER DINAMICAMENTE SEGUN OPCIONES                        
-
-            $this->setDataSource("objects", new DataSource($this->getDI(), new ObjectsDataSource($this->getDI(), $dataSource["options"])));
+            //TODO VER DE MODIFICAR EL DATASOURCE ADAPTER DINAMICAMENTE SEGUN OPCIONES
+            
+            switch ($dataSource["adapter"]) {
+                case 'objects':
+                    $this->setDataSource($dataSourceName, new DataSource($this->getDI(), new ObjectsDataSource($this->getDI(), $dataSource["options"])));
+                    break;
+                
+                case 'table':
+                    $this->setDataSource($dataSourceName, new DataSource($this->getDI(), new TableDataSource($this->getDI(), $dataSource["options"])));
+                    break;
+                default:
+                    # code...
+                    break;
+            }
         }
+        
+    }
+
+    //OBJECTS EDITOR
+    protected function generateEditor(){
+        
+        //PONER LOGICA SEGUN TIPO DE EDITOR
+        
+        //FORM EDITOR
+        $objectsEditorDataSource                = $this->getDataSource($this->getLocal("application.editor.objectsDataSource"));
+
+        $objectsEditorParams                    = array();
+        $objectsEditorParams['datasource']      = $this->getLocal("application.editor.objectsDataSource");
+        $objectsEditorParams['fields']          = $this->getEditorFields($objectsEditorDataSource);
+        $objectsEditorParams['fieldsGroups']     = $this->getEditorFieldsGroups($this->getDataSource($this->getLocal("application.editor.fgroupsDataSource")));
+        $objectsEditorParams['data']            = $this->getEditorData($objectsEditorDataSource);
+
+        $objectsEditor                          = new Form($this->getDI());
+        $this->placeComponent("main", $objectsEditor, $objectsEditorParams);
         
     }
 
@@ -98,8 +169,10 @@ class Board extends VueUiService {
         $objectsSelectorDataSource              = $this->getDataSource($this->getLocal("application.selector.dataSource"));
 
         $objectsSelectorParams                  = array();
+        $objectsSelectorParams['datasource']    = $this->getLocal("application.selector.dataSource");
         $objectsSelectorParams['fields']        = $this->getSelectorFields($objectsSelectorDataSource);
         $objectsSelectorParams['data']          = $this->getSelectorData($objectsSelectorDataSource);
+        $objectsSelectorParams['paginator']     = $this->getLocal("application.selector.paginator");
 
         $objectsSelector                        = new TableList($this->getDI());
         $this->placeComponent("main", $objectsSelector, $objectsSelectorParams);
@@ -170,91 +243,154 @@ class Board extends VueUiService {
 
         //TODO: FALTA LOGICA DE COMO MOSTRAR LAS ACCIONES Y LOS LINKS SEGUN MODELO (SELECT MENU, CONTEXTUAL MENU, ITEMS)
 
-        $links              = $this->getSelectorLinks();
+        $links              = $this->getLocal("application.selector.links");
         $linkIndex          = 0;
         
         foreach($links as $link){
 
             $fieldTemp                  = array();
+            $fieldTemp["type"]          = $link['type'];
             $fieldTemp["renderType"]    = "LINKBUTTON";
             $fieldTemp["label"]         = $link["label"];
-            $fieldTemp["urlMap"]        = $link["urlMap"];
             $fieldTemp["style"]         = $link["style"];
 
-            //TODO: FALTA LA LOGICA DE ACTIONS JS (PARA SERVICE y PARA LOCAL)
+            if($link['type'] == 'link'){
+
+                $fieldTemp["urlMap"]        = $link["urlMap"];
+            }else if($link['type'] == 'actions'){
+
+                $fieldTemp["actions"]       = $link["actions"];
+            }
 
             $result["link" . $linkIndex] = $fieldTemp;
             $linkIndex++;
         }
         
         
-        $actions            = $this->getSelectorActions();
+        $actions            = $this->getLocal("application.selector.actions");
         $actionIndex        = 0;
-
+        
         foreach($actions as $action){
 
             $fieldTemp                  = array();
+            $fieldTemp["type"]          = $action['type'];
             $fieldTemp["renderType"]    = "ACTIONBUTTON";
             $fieldTemp["label"]         = $action["label"];
             $fieldTemp["urlMap"]        = $action["urlMap"];
             $fieldTemp["style"]         = $action["style"];
 
-            //TODO: FALTA LA LOGICA DE ACTIONS JS (PARA SERVICE y PARA LOCAL)
+            if($action['type'] == 'link'){
+
+                $fieldTemp["urlMap"]        = $action["urlMap"];
+            }else if($action['type'] == 'actions'){
+
+                $fieldTemp["actions"]       = $action["actions"];
+            }
 
             $result["action" . $actionIndex] = $fieldTemp;
             $actionIndex++;
+        }
+        
+        return $result;
+    }
+
+    protected function getSelectorData($p_dataSource){
+        
+        $dataSourceQuery            = array();
+        $dataSourceQuery['page']    = ($this->hasUrlParam("page")) ? $this->getUrlParam("page") : 1;
+        $dataSourceQuery['rows']    = ($this->hasUrlParam("rows")) ? $this->getUrlParam("rows") : 10;
+
+        return $p_dataSource->getData($dataSourceQuery);
+    }
+
+    protected function getEditorFields($p_dataSource){
+        
+        //TODO : VER SI HACE FALTA LOGICA DISTINTA SEGUN TIPO DE EDITOR
+
+        //TODO : VER LOGICA DE LAYOUT DE FORMULARIOS Y EDITORES
+        $result             = array();
+        $result['main']     = array();
+        $result['info']     = array();
+        $result['side']     = array();
+
+        //FALTAN CARACTERISTICAS SEGUN MODEL (SHOW ID, SHOW NUM ROWS, SHOW DATEADD, SHOW DATE MODIFF, SHOW USER, ACTIVATABLE, DROPABLE,ETC)
+
+        //TODO : VER LOGICA DE ID SOLO READONLY  EN EL CASO DE EDITAR
+        
+        //VER LOS CAMAPOR ESPECIALES ORDER, STATUS, ACTIVATABLE ETC
+        //TODO: FALTAN LOS CAMPOS BASE
+        //TODO: FALTAN LOS CAMPOS RELACION
+        //TODO: FALTAN LOS CAMPOS TAGS
+        //TODO: FALTAN LOS CAMPOS OBJECTSR
+        //TODO: FALTAN LOS CAMPOS OBJECTR
+        
+
+        foreach($p_dataSource->getDataDefinitions() as $field=>$definition){
+
+            $fieldTemp                  = array();
+
+            $fieldTemp['id']            = $definition["id"];
+            $fieldTemp['type']          = $definition["type"];
+            $fieldTemp['group']         = $definition["group"];
+            $fieldTemp['order']         = $definition["order"];
+            $fieldTemp['default']       = $definition["defaultValue"];
+            $fieldTemp["label"]         = $definition["uiOptions"]->label;
+            $fieldTemp["icon"]          = $definition["uiOptions"]->icon;
+            $fieldTemp["help"]          = $definition["uiOptions"]->help;
+            $fieldTemp["info"]          = $definition["uiOptions"]->info;
+            $fieldTemp["hidden"]        = $definition["uiOptions"]->hidden;
+            $fieldTemp["required"]      = $definition["uiOptions"]->required;
+            $fieldTemp["readOnly"]      = $definition["uiOptions"]->readOnly;
+
+            $fieldTemp["options"]       = array();
+
+            foreach($definition["typeOptions"] as $option=>$value){
+
+                $fieldTemp["options"][$option]   = $value; 
+            }
+            
+            $fieldTemp["options"]["validation"]  = $definition["validationOptions"];
+            $fieldTemp["options"]["file"]        = $definition["attachFileOptions"];
+
+            if(!isset($result['main'][$fieldTemp['group']])){
+
+                $result['main'][$fieldTemp['group']] = array();
+            }
+
+            $result['main'][$fieldTemp['group']][$definition["id"]] = $fieldTemp;
+            
+        }
+
+        //TODO: FALTA LOGICA DE COMO LAS RELACIONES
+        
+        return $result;
+    }
+
+    protected function getEditorFieldsGroups($p_dataSource){
+        
+        $result                     = array();
+
+        $dataSourceQuery            = array();
+        
+        $queryResult                = $p_dataSource->getData($dataSourceQuery);
+
+        foreach ($queryResult['objects'] as $object) {
+            
+            $result[$object['flgId']] = $object['flgName'];
         }
 
         return $result;
     }
 
-    protected function getSelectorActions(){
-
-        $result     = array();
-
-        //TODO : DEFINIR CONDICIONANTES
-
-        $result[]   = array(
-            "label"         => "editar",
-            "style"         => "edit green",
-            "urlMap"        => $this->getLocal("application.urlMaps.EDIT")
-        );
-
-        $result[]   = array(
-            "label"         => "borrar",
-            "style"         => "edit red",
-            "urlMap"        => $this->getLocal("application.urlMaps.DELETE")
-        );
-
-        //TODO : VER LOGICA DE ACCIONES ADICIONALES
-        return $result;
-    }
-
-    protected function getSelectorLinks(){
+    protected function getEditorData($p_dataSource){
         
-        $result     = array();
+        /*$dataSourceQuery            = array();
+        $dataSourceQuery['page']    = ($this->hasUrlParam("page")) ? $this->getUrlParam("page") : 1;
+        $dataSourceQuery['rows']    = ($this->hasUrlParam("rows")) ? $this->getUrlParam("rows") : 10;
 
-        //TODO : DEFINIR CONDICIONANTES
+        return $p_dataSource->getData($dataSourceQuery);*/
 
-        $result[]   = array(
-            "label"         => "Link A",
-            "urlMap"        => $this->getLocal("application.urlMaps.SUBPAGE"),
-            "style"         => "teal",
-        );
-
-        $result[]   = array(
-            "label"         => "Link B",
-            "urlMap"        => $this->getLocal("application.urlMaps.DETALLE"),
-            "style"         => "basic",
-        );
-
-        //TODO : VER LOGICA DE LINKS ADICIONALES
-        return $result;
-    }
-
-    protected function getSelectorData($p_dataSource){
-
-        return $p_dataSource->getData();
+        return array();
     }
 
     //ROLE SIDE MENU

@@ -21,7 +21,7 @@ class Objects extends DataSourceAdapter {
         parent::__construct($p_di, $p_options);
 
         $this->options      = $p_options;
-
+        
         $this->dataEngine   = new DataEngine($this->getDI());
 
         $this->setModelData();
@@ -35,40 +35,166 @@ class Objects extends DataSourceAdapter {
 
     public function getData($p_query){
         
-        $result             = array();
-        $result['page']     = 1;
-        $result['rows']     = 10;
-        $result['totals']   = 3;
-        
-        $result['objects']  = array();
+        if(is_array($p_query)){
+            $result             = array();
+            $result['page']     = (isset($p_query['page'])) ? $p_query['page'] : 1;
+            $result['rows']     = (isset($p_query['rows'])) ? $p_query['rows'] : 10;
 
-        //TODO : PREPARAR EL QUERY Y LOS FILTROS (engine get Search)
-        $this->setModelDataObjects();
+            $validFilters           = array();
+            $validSearchFields      = array('_id');
 
-        //INICIO ROW NUM
-        $rownum = ($result['page'] * $result['rows']) - ($result['rows'] - 1);
+            foreach($this->getDataDefinitions() as $definition){
+                
+                //FILTERS
+                if(isset($p_query['filters']) && \is_array($p_query['filters'])){
 
-        foreach($this->modelDataObjects as $row){
+                    if(property_exists($definition['uiOptions'],'filterable')){
 
-            $rowTmp                     = array();
+                        if($definition['uiOptions']->filterable == true){
 
-            $rowTmp['num']              = $rownum++;
-            
-            foreach($row as $key=>$value){
+                            if(isset($p_query['filters'][$definition['id']])){
 
-                if($key == "objData"){
-
-                    foreach($value as $dataKey=>$dataValue){
-
-                        $rowTmp[$dataKey] = $dataValue;
+                                $validFilters['objData.' . $definition['id']] = (array)$p_query['filters'][$definition['id']];
+                            }
+                        }
                     }
-                }else{
+                }
 
-                    $rowTmp[$key] = $value;
+                //SEARCH FIELDS
+                if(property_exists($definition['uiOptions'],'searchable')){
+
+                    if($definition['uiOptions']->searchable == true){
+
+                        $validSearchFields[] = 'objData.' . $definition['id'];
+
+                        if($definition['type'] == 'objectr'){
+
+                            $validSearchFields[] = 'objData.' . $definition['id'] . '_flltxt';
+                        }
+
+                        if($definition['type'] == 'objectsr'){
+
+                            $validSearchFields[] = 'objData.' . $definition['id'] . '_flltxt';
+                        }
+                    }
                 }
             }
 
-            $result['objects'][] = $rowTmp;
+            $searchQuery                = array();
+            $searchQuery['rows']        = $result['rows'];
+            $searchQuery['page']        = $result['page'];
+            $searchQuery['filters']     = $validFilters;
+            $searchQuery['keyword']     = (count($validSearchFields) > 0) ? ((isset($p_query['keyword'])) ? $p_query['keyword'] : '*') : '*';
+            $searchQuery['fields']      = (count($validSearchFields) > 0) ? $validSearchFields : array('*');
+
+            if(isset($p_query['orders']) && \is_array($p_query['orders']) && count($p_query['orders']) > 0){
+
+                $searchQuery['orders']  = $p_query['orders'];
+            }
+            
+            $searchResult               = $this->dataEngine->searchObjects($this->options['model'], $searchQuery);
+            
+            if($searchResult != false){
+
+                $result['totals']       = $searchResult['totals'];
+                $result['pages']        = ceil($result['totals']/$result['rows']);
+                $result['objects']      = array();
+
+                $rownum = ($result['page'] * $result['rows']) - ($result['rows'] - 1);
+
+                if(isset($searchResult['objects']) && is_array($searchResult['objects'])){
+                    
+                    foreach($searchResult['objects'] as $row){
+
+                        $rowTmp                         = $this->normalizeObjectData($row);
+            
+                        $rowTmp['num']                  = $rownum++;
+            
+                        $result['objects'][]            = $rowTmp;
+                    }
+                }
+            }
+
+        }else{
+
+            $result = $this->normalizeObjectData($this->dataEngine->getObject($this->options['model'], $p_query));
+        }
+        
+        return $result;
+    }
+
+    public function getDataIdNames($p_query){
+
+        $queryResult = $this->getData($p_query);
+
+        $result             = array();
+        $result['page']     = $queryResult['page'];
+        $result['rows']     = $queryResult['rows'];
+        $result['totals']   = $queryResult['totals'];
+        $result['pages']    = $queryResult['pages'];
+        $result['objects']  = array();
+
+        $nameField          = $this->getNameField();
+
+        foreach($queryResult['objects'] as $object){
+            
+            $objectTmp          = array();
+            $objectTmp['id']    = $object['_id'];
+            $objectTmp['name']  = $object[$nameField];
+
+            $result['objects'][]           = $objectTmp;
+        }
+
+        return $result;
+    }
+
+    public function editObjectData($p_id, $p_data){
+
+        return $this->dataEngine->editObject($this->options['model'], $p_id, $p_data);
+    }
+
+    public function addObjectData($p_data){
+
+        return $this->dataEngine->addObject($this->options['model'], $p_data);
+    }
+
+    public function getModelData(){
+
+        return $this->modelData;
+    }
+
+    private function normalizeObjectData($p_data){
+
+        $result             = array();
+        
+        foreach($p_data as $key=>$value){
+
+            if($key == "objData"){
+
+                foreach($value as $dataKey=>$dataValue){
+
+                    $result[$dataKey]   = $dataValue;
+                }
+            }else{
+
+                $result[$key]           = $value;
+            }
+        }
+
+        return $result;
+    }
+
+    private function getNameField(){
+
+        $result = "_id";
+
+        foreach($this->modelDataDefinitions as $definition){
+
+            if($definition['isName'] == "1"){
+
+                $result = $definition['id'];
+                break;
+            }
         }
 
         return $result;
@@ -77,189 +203,120 @@ class Objects extends DataSourceAdapter {
     private function setModelData(){
 
         //LOGICA DE RECUPERACION DE MODEL DATA
-
-        $this->modelData                     = array();
-        $this->modelData['id']               = "affiliates";
-        $this->modelData['parent']           = "root";
-        $this->modelData["type"]             = "OBJECT";
-        $this->modelData["idStrategy"]       = "AUTOINCREMENT";
-        $this->modelData["partitionMode"]    = "NONE";
-
-        $this->modelData["uiOptions"]                            = new \stdClass();
-        $this->modelData["uiOptions"]->help                      = "Texto de ayuda del Modelo";
-        $this->modelData["uiOptions"]->icon                      = "users";
-        $this->modelData["uiOptions"]->name                      = "Afiliado";
-        $this->modelData["uiOptions"]->pluralName                = "Afiliados";
-        $this->modelData["uiOptions"]->manageAs                  = "LIST";
-        $this->modelData["uiOptions"]->description               = "Texto de Descripcion";
-
-        $this->modelData["indexOptions"]                         = new \stdClass();
-        $this->modelData["indexOptions"]->indexable              = true;
-        $this->modelData["indexOptions"]->index                  = "affiliates";
-        $this->modelData["indexOptions"]->analysis               = new \stdClass();
-        $this->modelData["indexOptions"]->basemapping            = new \stdClass();
-
-        $this->modelData["cacheOptions"]                         = new \stdClass();
-        $this->modelData["cacheOptions"]->cacheable              = true;
-        $this->modelData["cacheOptions"]->adapter                = "MEMORY";
-        $this->modelData["cacheOptions"]->cacheLife              = 3600;
-
-        $this->modelData["versionsOptions"]                      = new \stdClass();
-        $this->modelData["statesOptions"]                        = new \stdClass();
-
+        $modelDataTmp                       = $this->dataEngine->getModel($this->options['model']);
+        
+        $this->modelData                    = array();
+        $this->modelData['id']              = $modelDataTmp['modId'];
+        $this->modelData['parent']          = $modelDataTmp['modParent'];
+        $this->modelData["type"]            = $modelDataTmp['modType'];
+        $this->modelData["idStrategy"]      = $modelDataTmp['modIdStrategy'];;
+        $this->modelData["partitionMode"]   = $modelDataTmp['modPartitionMode'];;
+        $this->modelData["uiOptions"]       = $modelDataTmp['modUiOptions'];
+        $this->modelData["indexOptions"]    = $modelDataTmp['modIndexOptions'];
+        $this->modelData["cacheOptions"]    = $modelDataTmp['modCacheOptions'];
+        $this->modelData["versionsOptions"] = $modelDataTmp['modVersionsOptions'];
+        $this->modelData["statesOptions"]   = $modelDataTmp['modStatesOptions'];
     }
 
     private function setModelDataDefinitions(){
-
+        
         $this->modelDataDefinitions             = array();
 
-        $definitionsRow                         = array();
-        $definitionsRow["id"]                   = "name";
-        $definitionsRow["type"]                 = "text";
-        $definitionsRow["group"]                = "data";
-        $definitionsRow["defaultValue"]         = "";
-        $definitionsRow["order"]                = 1;
-        $definitionsRow["isName"]               = 1;
-        $definitionsRow["isImage"]              = 0;
+        /*
+        
+        TODO : COLOCAR AQUI LOS CAMPOS BASE ASI!!
 
+        $definitionsRow                                     = array();
+        $definitionsRow["id"]                               = "modId";
+        $definitionsRow["type"]                             = "text";
+        $definitionsRow["group"]                            = "data";
+        $definitionsRow["defaultValue"]                     = "";
+        $definitionsRow["order"]                            = 1;
+        $definitionsRow["isName"]                           = true;
+        $definitionsRow["isImage"]                          = false;
         $definitionsRow["uiOptions"]                        = new \stdClass();
-        $definitionsRow["uiOptions"]->help                  = "Texto de Ayuda del campo Nombre";
-        $definitionsRow["uiOptions"]->icon                  = "caret right";
-        $definitionsRow["uiOptions"]->label                 = "Nombre";
-        $definitionsRow["uiOptions"]->hidden                = false;
-        $definitionsRow["uiOptions"]->listable              = true;
-        $definitionsRow["uiOptions"]->readOnly              = true;
-        $definitionsRow["uiOptions"]->required              = true;
-        $definitionsRow["uiOptions"]->sortable              = true;
-        $definitionsRow["uiOptions"]->filterable            = true;
-        $definitionsRow["uiOptions"]->searchable            = true;
-
+        $definitionsRow["uiOptions"]->help                      = "";
+        $definitionsRow["uiOptions"]->icon                      = "caret right";
+        $definitionsRow["uiOptions"]->info                      = "";
+        $definitionsRow["uiOptions"]->label                     = "Model Name";
+        $definitionsRow["uiOptions"]->hidden                    = false;
+        $definitionsRow["uiOptions"]->readOnly                  = false;
+        $definitionsRow["uiOptions"]->listable                  = true;
+        $definitionsRow["uiOptions"]->required                  = true;
+        $definitionsRow["uiOptions"]->sortable                  = false;
+        $definitionsRow["uiOptions"]->filterable                = false;
+        $definitionsRow["uiOptions"]->searchable                = false;
         $definitionsRow["indexOptions"]                     = new \stdClass();
-        $definitionsRow["indexOptions"]->indexable          = true;
-        $definitionsRow["indexOptions"]->mapping            = new \stdClass();
-
-        $definitionsRow['typeOptions']                      = new \stdClass();
+        $definitionsRow["typeOptions"]                      = new \stdClass();
         $definitionsRow['validationOptions']                = new \stdClass();
         $definitionsRow['attachFileOptions']                = new \stdClass();
+        
+        */
 
-        $this->modelDataDefinitions[$definitionsRow["id"]]  = $definitionsRow;
+        $definitions            = $this->dataEngine->getDefinition($this->options['model'], null);
+        $definitionsLastOrder   = 0;
+        if(\is_array($definitions)){
 
-        $definitionsRow                         = array();
-        $definitionsRow["id"]                   = "description";
-        $definitionsRow["type"]                 = "text";
-        $definitionsRow["group"]                = "data";
-        $definitionsRow["defaultValue"]         = "";
-        $definitionsRow["order"]                = 1;
-        $definitionsRow["isName"]               = 0;
-        $definitionsRow["isImage"]              = 0;
-        $definitionsRow["isImage"]              = 0;
+            foreach($definitions as $definition){
 
-        $definitionsRow["uiOptions"]                        = new \stdClass();
-        $definitionsRow["uiOptions"]->help                  = "Texto de Ayuda del campo Descripción";
-        $definitionsRow["uiOptions"]->icon                  = "caret right";
-        $definitionsRow["uiOptions"]->label                 = "Descripcion";
-        $definitionsRow["uiOptions"]->hidden                = false;
-        $definitionsRow["uiOptions"]->listable              = true;
-        $definitionsRow["uiOptions"]->readOnly              = true;
-        $definitionsRow["uiOptions"]->required              = true;
-        $definitionsRow["uiOptions"]->sortable              = true;
-        $definitionsRow["uiOptions"]->filterable            = true;
-        $definitionsRow["uiOptions"]->searchable            = true;
+                $definitionsRow                                     = array();
+                $definitionsRow["id"]                               = $definition['dafId'];
+                $definitionsRow["type"]                             = $definition['typId'];
+                $definitionsRow["group"]                            = $definition['flgId'];
+                $definitionsRow["defaultValue"]                     = $definition['defDafDefaultValue'];
+                $definitionsRow["order"]                            = $definition['defOrder'];
+                $definitionsRow["isName"]                           = $definition['defIsName'];
+                $definitionsRow["isImage"]                          = $definition['defIsImage'];
+                $definitionsRow["isRelation"]                       = false;
+                $definitionsRow["uiOptions"]                        = $definition['defDafUiOptions'];
+                $definitionsRow["indexOptions"]                     = $definition['defDafIndexOptions'];
+                $definitionsRow['typeOptions']                      = $definition['defDafTypOptions'];
+                $definitionsRow['validationOptions']                = $definition['defDafTypValidationOptions'];
+                $definitionsRow['attachFileOptions']                = $definition['defDafAttachFileOptions'];
 
-        $definitionsRow["indexOptions"]                     = new \stdClass();
-        $definitionsRow["indexOptions"]->indexable          = true;
-        $definitionsRow["indexOptions"]->mapping            = new \stdClass();
+                $definitionsLastOrder                               = (int)$definitionsRow["order"];
 
-        $definitionsRow['typeOptions']                      = new \stdClass();
-        $definitionsRow['validationOptions']                = new \stdClass();
-        $definitionsRow['attachFileOptions']                = new \stdClass();
+                $this->modelDataDefinitions[$definitionsRow["id"]]  = $definitionsRow;
+            }
 
-        $this->modelDataDefinitions[$definitionsRow["id"]]  = $definitionsRow;
-    }
+        }
+        
+        $relations          = $this->dataEngine->getModelRelations($this->options['model'], "IN");
 
-    private function setModelDataObjects($p_query = array()){
+        if(\is_array($relations)){
 
-        $this->modelDataObjects                             = array();
+            foreach($relations as $relation){
 
-        $objectTmp                              = array();
-        $objectTmp["_id"]                       = "10";
-        $objectTmp["objTime"]                   = 15785800000000;
-        $objectTmp["objOrder"]                  = 1;
-        $objectTmp["objActive"]                 = 1;
+                $relationRow                                        = array();
+                $relationRow["id"]                                  = "rel_" . $relation['modId'];
+                $relationRow["type"]                                = "options";
 
-        $objectTmp["objData"]                   = new \stdClass();
-        $objectTmp["objData"]->name                 = "Affiliado1";
-        $objectTmp["objData"]->description          = "Affiliado1 Desc";
+                if(property_exists($relation['relUiOptions'], 'editGroup')){
 
-        $objectTmp["objDateAdd"]                = "2020-01-09 14:12:43";
-        $objectTmp["objUserAdd"]                = NULL;
-        $objectTmp["objDateUpdated"]            = "2020-01-09 14:12:43";
-        $objectTmp["objUserUpdated"]            = NULL;
-        $objectTmp["objDateErased"]             = "2020-01-09 14:12:43";
-        $objectTmp["objUserErased"]             = NULL;
-        $objectTmp["objErased"]                 = 0;
-        $objectTmp["objDateErased"]             = "2020-01-09 14:12:43";
-        $objectTmp["objUserErased"]             = NULL;
-        $objectTmp["objDateIndexed"]            = "2020-01-09 14:12:43";
-        $objectTmp["objPartitionIndex"]         = 1;
-        $objectTmp["objPage1000"]               = 1;
-        $objectTmp["objPage10000"]              = 1;
-        $objectTmp["objPage10000"]              = 1;
+                    $relationRow["group"]                           = $relation['relUiOptions']->editGroup;
+                }else{
 
-        $this->modelDataObjects[] = $objectTmp;
-
-        $objectTmp                              = array();
-        $objectTmp["_id"]                       = "11";
-        $objectTmp["objTime"]                   = 15785800000000;
-        $objectTmp["objOrder"]                  = 1;
-        $objectTmp["objActive"]                 = 1;
-
-        $objectTmp["objData"]                   = new \stdClass();
-        $objectTmp["objData"]->name                 = "Affiliado2";
-        $objectTmp["objData"]->description          = "Affiliado2 Desc";
-
-        $objectTmp["objDateAdd"]                = "2020-01-09 14:12:43";
-        $objectTmp["objUserAdd"]                = NULL;
-        $objectTmp["objDateUpdated"]            = "2020-01-09 14:12:43";
-        $objectTmp["objUserUpdated"]            = NULL;
-        $objectTmp["objDateErased"]             = "2020-01-09 14:12:43";
-        $objectTmp["objUserErased"]             = NULL;
-        $objectTmp["objErased"]                 = 0;
-        $objectTmp["objDateErased"]             = "2020-01-09 14:12:43";
-        $objectTmp["objUserErased"]             = NULL;
-        $objectTmp["objDateIndexed"]            = "2020-01-09 14:12:43";
-        $objectTmp["objPartitionIndex"]         = 1;
-        $objectTmp["objPage1000"]               = 1;
-        $objectTmp["objPage10000"]              = 1;
-        $objectTmp["objPage10000"]              = 1;
-
-        $this->modelDataObjects[] = $objectTmp;
-
-        $objectTmp                              = array();
-        $objectTmp["_id"]                       = "12";
-        $objectTmp["objTime"]                   = 15785800000000;
-        $objectTmp["objOrder"]                  = 1;
-        $objectTmp["objActive"]                 = 1;
-
-        $objectTmp["objData"]                   = new \stdClass();
-        $objectTmp["objData"]->name                 = "Affiliado3";
-        $objectTmp["objData"]->description          = "Affiliado3 Desc";
-
-        $objectTmp["objDateAdd"]                = "2020-01-09 14:12:43";
-        $objectTmp["objUserAdd"]                = NULL;
-        $objectTmp["objDateUpdated"]            = "2020-01-09 14:12:43";
-        $objectTmp["objUserUpdated"]            = NULL;
-        $objectTmp["objDateErased"]             = "2020-01-09 14:12:43";
-        $objectTmp["objUserErased"]             = NULL;
-        $objectTmp["objErased"]                 = 0;
-        $objectTmp["objDateErased"]             = "2020-01-09 14:12:43";
-        $objectTmp["objUserErased"]             = NULL;
-        $objectTmp["objDateIndexed"]            = "2020-01-09 14:12:43";
-        $objectTmp["objPartitionIndex"]         = 1;
-        $objectTmp["objPage1000"]               = 1;
-        $objectTmp["objPage10000"]              = 1;
-        $objectTmp["objPage10000"]              = 1;
-
-        $this->modelDataObjects[] = $objectTmp;
+                    $relationRow["group"]                           = "data";
+                }
+                
+                $relationRow["defaultValue"]                        = "";
+                $relationRow["order"]                               = $definitionsLastOrder++;
+                $relationRow["isName"]                              = false;
+                $relationRow["isImage"]                             = false;
+                $relationRow["isRelation"]                          = true;
+                $relationRow["uiOptions"]                           = $relation['relUiOptions'];
+                $relationRow["indexOptions"]                        = $relation['relIndexOptions'];
+                $relationRow['typeOptions']                         = new \stdClass();
+                $relationRow['validationOptions']                   = new \stdClass();
+                $relationRow['attachFileOptions']                   = new \stdClass();
+                $relationRow["leftModId"]                           = $relation['relLeftModId'];
+                $relationRow["leftDirection"]                       = $relation['relLeftDirection'];
+                $relationRow["rightModId"]                          = $relation['relRightModId'];
+                $relationRow["rightDirection"]                      = $relation['relRightDirection'];
+                $relationRow["cardinality"]                         = $relation['relCardinality'];
+                
+                $this->modelDataDefinitions[$relationRow["id"]]     = $relationRow;
+            }
+        }
     }
 }

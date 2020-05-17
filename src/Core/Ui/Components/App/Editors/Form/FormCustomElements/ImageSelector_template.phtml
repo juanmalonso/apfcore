@@ -1,0 +1,147 @@
+<div class="ui field" v-bind:class="{required: $attrs.required}">
+    
+    <div class="ui right very wide sidebar" v-bind:id="'sidebar_' + $attrs.id" style="width: 640px;">
+      
+      <div class="ui fluid container" style="border-bottom: 1px solid rgb(221, 221, 221); background-color: white;">
+        <div class="ui secondary menu">
+          <div class="left menu" style="padding-left: 10px;">
+            <div class="item" style="padding-left: 0px; margin-left: 0px;">
+              <div class="ui basic button" v-on:click="doCloseImageSelectorSlide()">
+                <i class="arrow left icon"></i> cancelar
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ui fluid container" style="padding: 14px; border-bottom: 1px solid rgb(221, 221, 221); background-color: white;">
+        <div class="ui horizontal segment">
+          image
+        </div>
+      </div>
+
+      <div class="ui fluid container" style="padding: 14px; background-color: white;">
+        
+        <div class="ui top attached tabular menu">
+          <div class="active item" data-tab="upload">Subir Imagen</div>
+          <div class="item" data-tab="gallery">Seleccionar de la Galería</div>
+          <div class="item" data-tab="download">Descargar</div>
+        </div>
+
+        <div class="ui bottom attached active tab segment" data-tab="upload">
+          <table class="ui celled striped selectable table">
+            <tbody>
+
+              <tr>
+                <td style="min-width:150px; max-width:150px; vertical-align: top;">
+                  <div class="ui large label" style="background-color: transparent;">
+                    <i class="edit outline icon'"></i>Nombre de la Imagen
+                  </div>
+                </td> 
+                <td>
+                  <div class="ui input" style="width:350px;">
+                    <input type="text" v-bind:id="'file_upload_name_' + $attrs.id" v-bind:value="uploadImageName">
+                  </div>
+                </td>
+              </tr>
+
+              <tr>
+                <td style="min-width:150px; max-width:150px; vertical-align: top;">
+                  <div class="ui large label" style="background-color: transparent;">
+                    <i class="edit outline icon'"></i>Descripción de la Imagen
+                  </div>
+                </td> 
+                <td>
+                  <textarea id="upload_image_description" name="upload_image_description" rows="3" cols="50">${uploadImageDescription}</textarea>
+                </td>
+              </tr>
+
+              <tr>
+                <td style="min-width:150px; max-width:150px; vertical-align: top;">
+                  <div class="ui large label" style="background-color: transparent;">
+                    <i class="edit outline icon'"></i>Propiedades de la Imagen
+                  </div>
+                </td> 
+                <td>
+                  
+                  <table>
+                    <tr>
+                      <td>
+                        Type
+                      </td>
+                      <td>
+                        <div class="ui input">
+                          <input type="text" readonly="" v-bind:id="'file_upload_typemime_' + $attrs.id" v-bind:value="uploadImageTypemime">
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        Extension
+                      </td>
+                      <td>
+                        <div class="ui input">
+                          <input type="text" readonly="" v-bind:id="'file_upload_extension_' + $attrs.id" v-bind:value="uploadImageExtension">
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        Size [bytes]
+                      </td>
+                      <td>
+                        <div class="ui input">
+                          <input type="text" readonly="" v-bind:id="'file_upload_size_' + $attrs.id" v-bind:value="uploadImageSize">
+                        </div>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+
+              <tr>
+                <td style="min-width:150px; max-width:150px; vertical-align: top;">
+                  <div class="ui large label" style="background-color: transparent;">
+                    <i class="edit outline icon'"></i>Subir Archivo
+                  </div>
+                </td> 
+                <td>
+                  <input type="file" v-bind:id="'file_' + $attrs.id" style="display: none;"  v-on:change="event => onSelectedFile(event)">
+                  <div class="ui blue fluid button" v-on:click="doBrowseFile()">Seleccionar Archivo</div>
+                  <br />
+                  <div class="ui green fluid disabled button" v-bind:id="'upload_buttom_' + $attrs.id" v-on:click="event => doUploadImage(event)">Subir Archivo</div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="ui bottom attached tab segment" data-tab="gallery">
+          <p>asd</p>
+          <p>asd</p>
+        </div>
+
+        <div class="ui bottom attached tab segment" data-tab="download">
+          <p>asd</p>
+          <p>asd</p>
+        </div>
+
+      </div>
+
+
+
+      
+
+
+    </div>
+
+    <div class="ui icon massive button" v-on:click="doOpenImageSelectorSlide()">
+      <i class="camera icon"></i>
+    </div>
+    
+    <!--<div class="ui input" style="width: 450px;" v-bind:class="{disabled: $attrs.readOnly}">
+      <input v-if="!isTextArea()" type="text" placeholder="" v-bind:id="'field_' + $attrs.id" v-bind:name="$attrs.id">
+      <textarea v-if="isTextArea()" cols="60" v-bind:rows="$attrs.options.rows" ></textarea>
+    </div> -->
+    <p v-if="$attrs.info != ''" style="font-size:.8em">${ $attrs.info }</p>
+</div>

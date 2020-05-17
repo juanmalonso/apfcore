@@ -1,9 +1,9 @@
-<div class="ui fluid container main-container">
+<div class="ui fluid container main-container" style="position: fixed; z-index: 100; border-bottom: 1px solid #dddddd; background-color: white;">
     <div class="ui secondary menu module-menu">
         <div class="left menu">
             <div class="item">
                 <div class="ui breadcrumb">
-                    <div class="active section">Board</div>
+                    <div v-if="title.type == 'text'" class="active section">${title.text}</div>
                 </div>    
             </div>
         </div>
@@ -26,14 +26,14 @@
             </a>
             -->
             <!-- ACTIONS -->
-            <template v-for="(item, index) in actions">
-                <a v-if="item.type == 'link'" class="ui item basic button" v-bind:href="parseBlocks(item.urlMap, {})">
+            <div class="item" v-for="(item, index) in actions" style="padding-left: 0px; margin-left: 0px;">
+                <a v-if="item.type == 'link'" v-bind:class="'ui ' + item.style + ' button'" v-bind:href="parseStringBlocks(item.urlMap, {})">
                     <i v-bind:class="item.icon"></i> ${item.label}
                 </a>
-                <button v-if="item.type == 'actions'" class="ui item basic button" v-on:click.once="doComponentAction(item.actions, $event)">
+                <button v-if="item.type == 'actions'" v-bind:class="'ui ' + item.style + ' button'" v-on:click="doComponentAction(item.actions, {}, $event)">
                     <i v-bind:class="item.icon"></i> ${item.label}
                 </button>
-            </template>
+            </div>
         </div>
     </div>
 </div>

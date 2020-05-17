@@ -90,7 +90,10 @@ class View extends Common {
                     $code = $this->loadTemplateFile($this->defaultBasePath, $template->name, $template->extension);
                 }
 
-                $this->setTemplate($template->name, $code);
+                if($code != ""){
+
+                    $this->setTemplate($template->name, $code);
+                }
             }
         }
     }
@@ -118,8 +121,21 @@ class View extends Common {
         return $this->vars->get($p_matches[1]);
     }
 
+    protected function replaceElementCallBack($p_matches){
+        //var_dump($p_matches);
+
+        //var_dump($this->vars->all());
+
+        return $this->vars->get("Element" . $p_matches[1]);
+    }
+
     protected function replaceVars($p_code){
+        
+        //VARS REPLACE
         $result = preg_replace_callback('!\_\_\_(\w+)\_!', array($this,'replaceCallBack'), $p_code);
+
+        //ELEMENT REPLACE
+        $result = preg_replace_callback('!Element(\w+)!', array($this,'replaceElementCallBack'), $result);
 
         //TODO: REEPLAZOS MANUALES
 
@@ -136,8 +152,8 @@ class View extends Common {
             ob_start();
 
             extract($p_vars, EXTR_OVERWRITE);
-
-            eval(' ?>'.$this->getDI()->get('voltService')->getCompiler()->compileString($p_content));
+            
+            eval(' ?>'.$this->getDI()->get('voltService')->getCompiler()->compileString((is_null($p_content)) ? "" : $p_content));
 
             $result = ob_get_clean();
         }

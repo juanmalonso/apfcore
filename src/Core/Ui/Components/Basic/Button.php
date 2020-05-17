@@ -10,15 +10,13 @@ class Button extends VueUiComponent {
 
         $this->setJsDataVar("buttonClass", "primary");
         $this->setJsDataVar("iconClass", "dog");
-
-        //$this->readJsonFilesTest();
     }
 
     public function testService(){
         
         $buttonsClasses = array("orange", "red", "black", "grey", "yellow", "olive", "green", "blue", "violet", "purple", "pink", "brown");
 
-        //sleep(3);
+        sleep(3);
 
         $result = new \stdClass();
         $result->buttonClass = $buttonsClasses[rand(0, 11)];
@@ -30,7 +28,7 @@ class Button extends VueUiComponent {
         
         $iconClasses = array("cat", "crow", "dog", "dove", "dragon", "feather", "feather alternate", "fish", "frog", "hippo", "horse", "kiwi");
 
-        //sleep(3);
+        sleep(3);
 
         $result = new \stdClass();
         $result->iconClass = $iconClasses[rand(0, 11)];
