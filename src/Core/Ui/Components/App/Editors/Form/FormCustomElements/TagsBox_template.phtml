@@ -1,6 +1,6 @@
 <div class="ui field" v-bind:class="{required: $attrs.required}">
     
-    <select class="ui search dropdown" v-bind:class="{disabled: $attrs.readOnly}" v-bind:id="'field_' + $attrs.id" v-bind:name="$attrs.id + '[]'" multiple="">
+    <select class="ui search dropdown" v-bind:class="{disabled: $attrs.readOnly}" v-bind:id="'field_' + $attrs.id" v-bind:name="$attrs.id + '[]'" multiple="" v-bind:form="$attrs.forForm">
           <option v-for="(option, index) in $attrs.options.data" :key="index" v-bind:value="option.value">${option.label}</option>
     </select>
     <p v-if="$attrs.info != ''" style="font-size:.8em">${ $attrs.info }</p>

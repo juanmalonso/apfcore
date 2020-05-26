@@ -373,7 +373,7 @@ class Elastic extends Common
             $exceptionData['trace']     = $e->getTraceAsString();
             $exceptionData['doc']     = $doc->getData();
             
-            $this->logError("Elastic ResponseException " . $e->getMessage(),"Elastic", $exceptionData);
+            //$this->logError("Elastic ResponseException " . $e->getMessage(),"Elastic", $exceptionData);
 
         }catch (\Elastica\Exception\JSONParseException $e){
 
@@ -382,7 +382,7 @@ class Elastic extends Common
             $exceptionData['trace']     = $e->getTraceAsString();
             $exceptionData['doc']     = $doc->getData();
             
-            $this->logError("Elastic JSONParseException " . $e->getMessage(),"Elastic", $exceptionData);
+            //$this->logError("Elastic JSONParseException " . $e->getMessage(),"Elastic", $exceptionData);
         }catch (\Elastica\Exception\ElasticsearchException $e){
 
             $exceptionData              = array();
@@ -391,8 +391,10 @@ class Elastic extends Common
             $exceptionData['trace']     = $e->getTraceAsString();
             $exceptionData['doc']     = $doc->getData();
             
-            $this->logError("Elastic ElasticsearchException " . $e->getMessage(),"Elastic",$exceptionData);
+            //$this->logError("Elastic ElasticsearchException " . $e->getMessage(),"Elastic",$exceptionData);
         }
+
+        
 
         return $result;
     }

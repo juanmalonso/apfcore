@@ -5,6 +5,7 @@ namespace Nubesys\Core\Response;
 use Nubesys\Core\Common;
 use Nubesys\Core\Response\ResponseAdapters\Data;
 use Nubesys\Core\Response\ResponseAdapters\Web;
+use Nubesys\Core\Response\ResponseAdapters\File;
 use Nubesys\Core\Register;
 
 class ResponseManager extends Common {
@@ -26,6 +27,10 @@ class ResponseManager extends Common {
 
             case 'data':
                 $this->adapter = new Data($p_di);
+                break;
+
+            case 'file':
+                $this->adapter = new File($p_di);
                 break;
         }
 

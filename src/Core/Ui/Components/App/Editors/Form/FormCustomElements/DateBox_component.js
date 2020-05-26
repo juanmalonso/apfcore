@@ -11,10 +11,8 @@ Vue.component("___tag_", {
       
       value = _self.$attrs.data[this.$attrs.id];
     }
-    
-    $('#field_' + this.$attrs.id).val(value);
 
-    $('#field_' + this.$attrs.id).parent().calendar({
+    $('#field_calendar_' + this.$attrs.id).parent().calendar({
       type: 'datetime',
       ampm: false,
       formatter: {
@@ -35,13 +33,18 @@ Vue.component("___tag_", {
       }
   });
 
-  $('#field_' + this.$attrs.id).parent().calendar('set date',moment(value,'YYYY-MM-DD HH:mm:ss').toDate(),true,true);
+  $('#field_' + this.$attrs.id).val(value);
+  $('#field_calendar_' + this.$attrs.id).parent().calendar('set date',moment(value,'YYYY-MM-DD HH:mm:ss').toDate(),true,true);
 
   },
   methods: {
     getFieldValue: function () {
+      
+      var dateCalendar = moment($('#field_calendar_' + this.$attrs.id).parent().calendar('get date'),'YYYY-MM-DD HH:mm:ss').format();
+      
+      $('#field_' + this.$attrs.id).val(dateCalendar.replace("T"," ").substr(0, 19));
 
-      return $('#field_' + this.$attrs.id).parent().calendar('get date');
+      return $('#field_' + this.$attrs.id).val();
     },
     doValidateField: function (){
 

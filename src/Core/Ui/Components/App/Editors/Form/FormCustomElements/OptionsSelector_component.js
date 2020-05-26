@@ -17,7 +17,7 @@ Vue.component("___tag_", {
     
     //FIELD
     if(this.$attrs.editAs == "FIELD"){
-
+      
       $('#field_' + this.$attrs.id).val(value);
       $('#field_' + this.$attrs.id).dropdown('set selected',value);
 

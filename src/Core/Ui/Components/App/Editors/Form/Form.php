@@ -16,6 +16,8 @@ class Form extends VueUiComponent {
 
         $this->addJsSource("https://cdn.jsdelivr.net/npm/semantic-ui-calendar@0.0.8/dist/calendar.min.js");
         $this->addCssSource("https://cdn.jsdelivr.net/npm/semantic-ui-calendar@0.0.8/dist/calendar.min.css");
+
+        $this->addJsSource("https://cdn.jsdelivr.net/npm/@json-editor/json-editor@latest/dist/jsoneditor.min.js");
         
         $this->setJsDataVar("token", $this->getLocal("token"));
         $this->setJsDataVar("datasource", $this->getLocal("datasource"));
@@ -38,5 +40,6 @@ class Form extends VueUiComponent {
         $this->placeVueCustomElement("tags-box");
         $this->placeVueCustomElement("date-box");
         $this->placeVueCustomElement("image-selector");
+        $this->placeVueCustomElement("schema-form");
     }
 }

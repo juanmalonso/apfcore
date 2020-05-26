@@ -1,2 +1,27 @@
 #___id_ {
 }
+
+.galleryButton {
+    
+    border: 4px solid #cccccc !important;
+}
+
+.galleryButton i {
+    
+    display: none;
+}
+
+.galleryButton:hover {
+    
+    border: 4px solid #888888 !important;
+}
+
+.galleryButtonSelected {
+
+    border: 4px solid #FE9A76 !important;
+}
+
+.galleryButtonSelected i {
+
+    display: none;
+}

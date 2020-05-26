@@ -1,9 +1,10 @@
 <div class="ui field" v-bind:class="{required: $attrs.required}">
     
-    <div class="ui right very wide sidebar" v-bind:id="'sidebar_' + $attrs.id" style="width: 640px;">
+    <div class="ui right very wide sidebar" v-bind:id="'sidebar_' + $attrs.id" style="width: 640px; background-color: #ffffff; overflow: hidden;">
       
       <div class="ui fluid container" style="border-bottom: 1px solid rgb(221, 221, 221); background-color: white;">
         <div class="ui secondary menu">
+          
           <div class="left menu" style="padding-left: 10px;">
             <div class="item" style="padding-left: 0px; margin-left: 0px;">
               <div class="ui basic button" v-on:click="doCloseImageSelectorSlide()">
@@ -11,21 +12,35 @@
               </div>
             </div>
           </div>
+
+          <div class="right menu" style="padding-left: 10px;">
+            <div class="item" style="padding-left: 0px; margin-left: 0px;">
+              <div class="ui green disabled button" v-on:click="doAcceptSelectedImage()" v-bind:id="'aceptar_button_' + $attrs.id">
+                <i class="check icon"></i> aceptar
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
 
       <div class="ui fluid container" style="padding: 14px; border-bottom: 1px solid rgb(221, 221, 221); background-color: white;">
-        <div class="ui horizontal segment">
-          image
+        <div v-if="imageSelectedName != ''" class="ui segments">
+          <div class="ui segment">
+            Imagen Seleccionada
+          </div>
+          <div class="ui segment">
+            <img v-bind:src="basepath + 'image/sq100/' + imageSelectedName + '.jpg'" style="border-radius: 8px 8px 8px 8px;-moz-border-radius: 8px 8px 8px 8px; -webkit-border-radius: 8px 8px 8px 8px; border: 0px solid #000000; width:100px;" />
+          </div>
         </div>
       </div>
 
       <div class="ui fluid container" style="padding: 14px; background-color: white;">
         
         <div class="ui top attached tabular menu">
-          <div class="active item" data-tab="upload">Subir Imagen</div>
-          <div class="item" data-tab="gallery">Seleccionar de la Galería</div>
-          <div class="item" data-tab="download">Descargar</div>
+          <div class="active item imageSelectorTab" data-tab="upload">Subir Imagen</div>
+          <div class="item imageSelectorTab" data-tab="gallery">Seleccionar de la Galería</div>
+          <div class="item imageSelectorTab" data-tab="download">Descargar</div>
         </div>
 
         <div class="ui bottom attached active tab segment" data-tab="upload">
@@ -106,42 +121,44 @@
                   </div>
                 </td> 
                 <td>
-                  <input type="file" v-bind:id="'file_' + $attrs.id" style="display: none;"  v-on:change="event => onSelectedFile(event)">
+                  <input type="file" accept="image/*" v-bind:id="'file_' + $attrs.id" style="display: none;"  v-on:change="event => onSelectedFile(event)">
                   <div class="ui blue fluid button" v-on:click="doBrowseFile()">Seleccionar Archivo</div>
                   <br />
-                  <div class="ui green fluid disabled button" v-bind:id="'upload_buttom_' + $attrs.id" v-on:click="event => doUploadImage(event)">Subir Archivo</div>
+                  <div class="ui green fluid disabled button" v-bind:id="'upload_button_' + $attrs.id" v-on:click="event => doUploadImage(event)">Subir Archivo</div>
                 </td>
               </tr>
             </tbody>
           </table>
         </div>
 
-        <div class="ui bottom attached tab segment" data-tab="gallery">
-          <p>asd</p>
-          <p>asd</p>
+        <div class="ui bottom attached tab segment" data-tab="gallery" v-bind:id="'gallery_' + $attrs.id">
+          <div v-for="(image, index) in galleryData" :key="index" class="ui icon massive basic button galleryButton" v-bind:id="'gallery_button_' + image._id" v-bind:style="'min-width: 100px; min-height: 100px;padding-top: 38px; margin: 10px; background-image: url(\''+ basepath +'image\/sq100\/' + image._id + '.jpg\');'" v-on:click="doGallerySelectImage(image._id)">
+            <i class="check icon"></i>
+          </div>
         </div>
 
         <div class="ui bottom attached tab segment" data-tab="download">
-          <p>asd</p>
-          <p>asd</p>
+          TEST
         </div>
 
       </div>
-
-
-
-      
-
-
     </div>
 
-    <div class="ui icon massive button" v-on:click="doOpenImageSelectorSlide()">
-      <i class="camera icon"></i>
+    <div v-for="(image, index) in images" class="ui icon massive button" v-on:click="doOpenImageSelectorSlide(index)" v-bind:style="'min-width: 100px;min-height: 100px;padding-top: 38px;background-image: url(\''+ basepath +'image\/sq100\/' + image + '.jpg\');'">
+      <i class="pen blue icon" style="color:white;"></i>
     </div>
+
+    <div v-if="(!isMultiple() && !hasImages()) || (isMultiple())" class="ui icon massive basic button" v-on:click="doOpenImageSelectorSlide('_' + (imagesMaxIndex() + 1))" style="min-width: 100px;min-height: 100px;padding-top: 38px;">
+      <i class="plus icon"></i>
+    </div>
+
+    <select v-if="isMultiple()" v-bind:id="'field_' + $attrs.id" v-bind:name="$attrs.id + '[]'" multiple="" v-bind:form="$attrs.forForm">
+          <option v-for="(image, index) in images" :key="index" v-bind:value="image" selected="true">${image}</option>
+    </select>
+
+    <select v-if="!isMultiple()" v-bind:id="'field_' + $attrs.id" v-bind:name="$attrs.id" v-bind:form="$attrs.forForm">
+          <option v-for="(image, index) in images" :key="index" v-bind:value="image" selected="true">${image}</option>
+    </select>
     
-    <!--<div class="ui input" style="width: 450px;" v-bind:class="{disabled: $attrs.readOnly}">
-      <input v-if="!isTextArea()" type="text" placeholder="" v-bind:id="'field_' + $attrs.id" v-bind:name="$attrs.id">
-      <textarea v-if="isTextArea()" cols="60" v-bind:rows="$attrs.options.rows" ></textarea>
-    </div> -->
     <p v-if="$attrs.info != ''" style="font-size:.8em">${ $attrs.info }</p>
 </div>

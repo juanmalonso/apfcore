@@ -80,13 +80,21 @@ class Objects extends DataSourceAdapter {
                 }
             }
 
+            if(isset($this->options['hardfilters'])){
+
+                foreach($this->options['hardfilters'] as $field=>$terms){
+
+                    $validFilters["objData." . $field]       = $terms; 
+                }
+            }
+
             $searchQuery                = array();
             $searchQuery['rows']        = $result['rows'];
             $searchQuery['page']        = $result['page'];
             $searchQuery['filters']     = $validFilters;
             $searchQuery['keyword']     = (count($validSearchFields) > 0) ? ((isset($p_query['keyword'])) ? $p_query['keyword'] : '*') : '*';
             $searchQuery['fields']      = (count($validSearchFields) > 0) ? $validSearchFields : array('*');
-
+            
             if(isset($p_query['orders']) && \is_array($p_query['orders']) && count($p_query['orders']) > 0){
 
                 $searchQuery['orders']  = $p_query['orders'];
@@ -124,37 +132,75 @@ class Objects extends DataSourceAdapter {
     }
 
     public function getDataIdNames($p_query){
+        $result                 = false;
 
-        $queryResult = $this->getData($p_query);
+        $nameField              = $this->getNameField();
+        $imageField             = $this->getImageField();
 
-        $result             = array();
-        $result['page']     = $queryResult['page'];
-        $result['rows']     = $queryResult['rows'];
-        $result['totals']   = $queryResult['totals'];
-        $result['pages']    = $queryResult['pages'];
-        $result['objects']  = array();
+        if($this->options['model'] == "image"){
 
-        $nameField          = $this->getNameField();
-
-        foreach($queryResult['objects'] as $object){
-            
-            $objectTmp          = array();
-            $objectTmp['id']    = $object['_id'];
-            $objectTmp['name']  = $object[$nameField];
-
-            $result['objects'][]           = $objectTmp;
+            $imageField         = "_id";
         }
 
+        if(\is_array($p_query)){
+
+            $queryResult = $this->getData($p_query);
+
+            $result             = array();
+            $result['page']     = $queryResult['page'];
+            $result['rows']     = $queryResult['rows'];
+            $result['totals']   = $queryResult['totals'];
+            $result['pages']    = $queryResult['pages'];
+            $result['objects']  = array();
+
+            foreach($queryResult['objects'] as $object){
+                
+                $objectTmp              = array();
+                $objectTmp['id']        = $object['_id'];
+                $objectTmp['name']      = $object[$nameField];
+                $objectTmp['image']     = $object[$imageField];
+                $objectTmp['icon']      = (isset($object['icon'])) ? $object['icon'] : "";
+
+                $result['objects'][]           = $objectTmp;
+            }
+
+        }else{
+
+            $queryResult = $this->getData($p_query);
+            
+            $result             = array();
+            $result['id']       = $queryResult['_id'];
+            $result['name']     = $queryResult[$nameField];
+            $result['image']    = $queryResult[$imageField];
+            $result['icon']     = (isset($queryResult['icon'])) ? $queryResult['icon'] : "";
+        }
+        
         return $result;
     }
 
     public function editObjectData($p_id, $p_data){
+
+        if(isset($this->options['toSaveDefaultValues'])){
+
+            foreach($this->options['toSaveDefaultValues'] as $field=>$value){
+
+                $p_data[$field]       = $value; 
+            }
+        }
 
         return $this->dataEngine->editObject($this->options['model'], $p_id, $p_data);
     }
 
     public function addObjectData($p_data){
 
+        if(isset($this->options['toSaveDefaultValues'])){
+
+            foreach($this->options['toSaveDefaultValues'] as $field=>$value){
+
+                $p_data[$field]       = $value; 
+            }
+        }
+        
         return $this->dataEngine->addObject($this->options['model'], $p_data);
     }
 
@@ -164,7 +210,7 @@ class Objects extends DataSourceAdapter {
     }
 
     private function normalizeObjectData($p_data){
-
+        
         $result             = array();
         
         foreach($p_data as $key=>$value){
@@ -191,6 +237,22 @@ class Objects extends DataSourceAdapter {
         foreach($this->modelDataDefinitions as $definition){
 
             if($definition['isName'] == "1"){
+
+                $result = $definition['id'];
+                break;
+            }
+        }
+
+        return $result;
+    }
+
+    private function getImageField(){
+
+        $result = "image";
+
+        foreach($this->modelDataDefinitions as $definition){
+
+            if($definition['isImage'] == "1"){
 
                 $result = $definition['id'];
                 break;
@@ -252,33 +314,51 @@ class Objects extends DataSourceAdapter {
         $definitionsRow['attachFileOptions']                = new \stdClass();
         
         */
+        
+        $notRenderableFields    = array();
+        if(isset($this->options['notRenderableFields'])){
+
+            $notRenderableFields = $this->options['notRenderableFields'];
+        }
 
         $definitions            = $this->dataEngine->getDefinition($this->options['model'], null);
         $definitionsLastOrder   = 0;
         if(\is_array($definitions)){
 
             foreach($definitions as $definition){
+                
+                if(!in_array($definition['dafId'], $notRenderableFields)){
 
-                $definitionsRow                                     = array();
-                $definitionsRow["id"]                               = $definition['dafId'];
-                $definitionsRow["type"]                             = $definition['typId'];
-                $definitionsRow["group"]                            = $definition['flgId'];
-                $definitionsRow["defaultValue"]                     = $definition['defDafDefaultValue'];
-                $definitionsRow["order"]                            = $definition['defOrder'];
-                $definitionsRow["isName"]                           = $definition['defIsName'];
-                $definitionsRow["isImage"]                          = $definition['defIsImage'];
-                $definitionsRow["isRelation"]                       = false;
-                $definitionsRow["uiOptions"]                        = $definition['defDafUiOptions'];
-                $definitionsRow["indexOptions"]                     = $definition['defDafIndexOptions'];
-                $definitionsRow['typeOptions']                      = $definition['defDafTypOptions'];
-                $definitionsRow['validationOptions']                = $definition['defDafTypValidationOptions'];
-                $definitionsRow['attachFileOptions']                = $definition['defDafAttachFileOptions'];
+                    $definitionsRow                                     = array();
+                    $definitionsRow["id"]                               = $definition['dafId'];
+                    $definitionsRow["type"]                             = $definition['typId'];
+                    $definitionsRow["group"]                            = $definition['flgId'];
+                    $definitionsRow["defaultValue"]                     = $definition['defDafDefaultValue'];
 
-                $definitionsLastOrder                               = (int)$definitionsRow["order"];
+                    if($definition['typId'] == "json" && ($definition['defDafDefaultValue'] == "" || $definition['defDafDefaultValue'] == "{}")){
 
-                $this->modelDataDefinitions[$definitionsRow["id"]]  = $definitionsRow;
+                        $definitionsRow["defaultValue"]                 = new \stdClass();
+
+                    }elseif(($definition['typId'] == "objectsr" || $definition['typId'] == "tags" || $definition['typId'] == "options") && ($definition['defDafDefaultValue'] == "" || $definition['defDafDefaultValue'] == "[]")){
+
+                        $definitionsRow["defaultValue"]                 = array();
+                    }
+
+                    $definitionsRow["order"]                            = $definition['defOrder'];
+                    $definitionsRow["isName"]                           = $definition['defIsName'];
+                    $definitionsRow["isImage"]                          = $definition['defIsImage'];
+                    $definitionsRow["isRelation"]                       = false;
+                    $definitionsRow["uiOptions"]                        = $definition['defDafUiOptions'];
+                    $definitionsRow["indexOptions"]                     = $definition['defDafIndexOptions'];
+                    $definitionsRow['typeOptions']                      = $definition['defDafTypOptions'];
+                    $definitionsRow['validationOptions']                = $definition['defDafTypValidationOptions'];
+                    $definitionsRow['attachFileOptions']                = $definition['defDafAttachFileOptions'];
+
+                    $definitionsLastOrder                               = (int)$definitionsRow["order"];
+
+                    $this->modelDataDefinitions[$definitionsRow["id"]]  = $definitionsRow;
+                }
             }
-
         }
         
         $relations          = $this->dataEngine->getModelRelations($this->options['model'], "IN");

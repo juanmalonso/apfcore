@@ -1,6 +1,6 @@
 {
   "accessControl": true,
-  "title": "CRUD - {var(url:5)}",
+  "title": "Paquetes",
   "navigation": {
     "user": {
       "label": "var(session:user_login)",
@@ -9,9 +9,29 @@
     },
     "items": [
       {
-        "label": "Inicio",
-        "url": "http://localhost/board/",
-        "icon": "home icon"
+        "label": "Paquetes",
+        "url": "http://localhost/paquetes/",
+        "icon": "gifts icon"
+      },
+      {
+        "label": "Categorias",
+        "url": "http://localhost/categorias/",
+        "icon": "sitemap icon"
+      },
+      {
+        "label": "Destinos",
+        "url": "http://localhost/destinos/",
+        "icon": "map icon"
+      },
+      {
+        "label": "Servicios",
+        "url": "http://localhost/servicios/",
+        "icon": "tasks icon"
+      },
+      {
+        "label": "Temporadas",
+        "url": "http://localhost/temporadas/",
+        "icon": "cloud sun icon"
       }
     ]
   },
@@ -19,13 +39,16 @@
     "type": "dataobjectscrud",
     "serviceActions": {
       "default": "list",
-      "paramNum": 6
+      "paramNum": 5
     },
     "dataSources": {
       "objects": {
         "adapter": "objects",
         "options": {
-          "model": "{var(url:5)}"
+          "model": "contenidoturismo",
+          "notRenderableFields":[
+            "intinerario"
+          ]
         }
       },
       "fgroups": {
@@ -36,17 +59,17 @@
       }
     },
     "urlMaps": {
-      "LIST": "{var(global:urlbase)}crud/{var(url:5)}/list",
-      "ADD": "{var(global:urlbase)}crud/{var(url:5)}/add",
-      "EDIT": "{var(global:urlbase)}crud/{var(url:5)}/edit/%(data:_id)%",
-      "DELETE": "{var(global:urlbase)}crud/{var(url:5)}/delete/%(data:_id)%",
-      "IMAGE": "{var(global:urlbase)}image/sq60/%(data:imagen)%.jpg"
+      "LIST": "{var(global:urlbase)}paquetes/list",
+      "ADD": "{var(global:urlbase)}paquetes/add",
+      "EDIT": "{var(global:urlbase)}paquetes/edit/%(data:_id)%",
+      "DELETE": "{var(global:urlbase)}paquetes/delete/%(data:_id)%",
+      "IMAGE": "{var(global:urlbase)}image/sq60/%(data:imagen.id)%.jpg"
     },
     "topBar": {
       "list": {
         "title": {
           "type": "text",
-          "text": "CRUD - LIST - {var(url:5)}"
+          "text": "Paquetes - LIST"
         },
         "actions": [
           {
@@ -61,7 +84,7 @@
       "edit": {
         "title": {
           "type": "text",
-          "text": "CRUD - EDIT - {var(url:5)}"
+          "text": "Paquetes - EDIT"
         },
         "actions": [
           {
@@ -91,7 +114,7 @@
       "add": {
         "title": {
           "type": "text",
-          "text": "CRUD - EDIT - {var(url:5)}"
+          "text": "Paquetes - ADD"
         },
         "actions": [
           {
@@ -124,7 +147,7 @@
       "async": false,
       "objectsDataSource": "objects",
       "fgroupsDataSource": "fgroups",
-      "objectToSaveIdParamNum": 7
+      "objectToSaveIdParamNum": 6
     },
     "selector": {
       "type": "tablelist",

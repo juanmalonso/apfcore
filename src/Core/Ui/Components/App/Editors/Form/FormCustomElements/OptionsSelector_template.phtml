@@ -1,14 +1,16 @@
 <div class="ui field" v-bind:class="{required: $attrs.required}">
-    <select v-if="!isMultiple() && $attrs.editAs == 'FIELD'" class="ui search dropdown" v-bind:class="{disabled: $attrs.readOnly}" v-bind:id="'field_' + $attrs.id" v-bind:name="$attrs.id">
+       
+    <select v-if="!isMultiple() && $attrs.editAs == 'FIELD'" class="ui search dropdown" v-bind:class="{disabled: $attrs.readOnly}" v-bind:id="'field_' + $attrs.id" v-bind:name="$attrs.id" v-bind:form="$attrs.forForm">
           <option v-for="(option, index) in $attrs.options.data" :key="index" v-bind:value="option.value">${option.label}</option>
     </select>
-    <select v-if="isMultiple() && $attrs.editAs == 'FIELD'" class="ui search dropdown" v-bind:class="{disabled: $attrs.readOnly}" v-bind:id="'field_' + $attrs.id" v-bind:name="$attrs.id + '[]'" multiple="">
+    <select v-if="isMultiple() && $attrs.editAs == 'FIELD'" class="ui search dropdown" v-bind:class="{disabled: $attrs.readOnly}" v-bind:id="'field_' + $attrs.id" v-bind:name="$attrs.id + '[]'" multiple="" v-bind:form="$attrs.forForm">
           <option v-for="(option, index) in $attrs.options.data" :key="index" v-bind:value="option.value">${option.label}</option>
     </select>
+
     <div v-if="isMultiple() && $attrs.editAs == 'LIST'" class="ui segment" style="overflow: auto; max-height: 300px;">
       <template v-for="(option, index) in $attrs.options.data">
             <div class="ui checkbox" v-bind:class="{'read-only': $attrs.readOnly}">
-                  <input type="checkbox" v-bind:id="'field_' + $attrs.id + '_' + index" v-bind:name="$attrs.id + '[]'" v-bind:value="option.value">
+                  <input type="checkbox" v-bind:id="'field_' + $attrs.id + '_' + index" v-bind:name="$attrs.id + '[]'" v-bind:value="option.value" v-bind:form="$attrs.forForm">
                   <label>${option.label}</label>
             </div><br />
       </template>
@@ -16,7 +18,7 @@
     <div v-if="!isMultiple() && $attrs.editAs == 'LIST'" class="ui segment" style="overflow: auto; max-height: 300px;">
       <template v-for="(option, index) in $attrs.options.data">
             <div class="ui radio checkbox" v-bind:class="{'read-only': $attrs.readOnly}">
-                  <input type="radio" v-bind:id="'field_' + $attrs.id + '_' + index" v-bind:name="$attrs.id" v-bind:value="option.value">
+                  <input type="radio" v-bind:id="'field_' + $attrs.id + '_' + index" v-bind:name="$attrs.id" v-bind:value="option.value" v-bind:form="$attrs.forForm">
                   <label>${option.label}</label>
             </div><br />
       </template>

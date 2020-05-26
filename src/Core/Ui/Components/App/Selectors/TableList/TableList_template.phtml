@@ -21,8 +21,10 @@
                     <tr>
                         <!-- rownum -->
                         <th style="width:36px;">#</th>
+                        <!-- image -->
+                        <th v-if="hasImageField()" style="width:36px;">&nbsp;</th>
                         <!-- fields -->
-                        <th v-for="(field, fieldIndex) in tableFields" :key="fieldIndex">
+                        <th v-if="field.renderType != 'IMAGE'" v-for="(field, fieldIndex) in tableFields" :key="fieldIndex">
                             ${field.label}
                         </th>
                         <!-- links -->
@@ -33,8 +35,14 @@
                 </thead>
                 <tbody>
                     <tr v-for="(dataRow, rowIndex) in data.objects" :key="rowIndex">
-                        <td style="padding: 4px;">&nbsp;</td>
-                        <td v-for="(rowField, fieldIndex) in tableFields" :key="fieldIndex" style="padding: 4px;">
+                        <td style="padding: 4px; text-align: center;">
+                        ${dataRow['num']}
+                        </td>
+                        <td v-if="hasImageField() && rowField.renderType == 'IMAGE'" v-for="(rowField, fieldIndex) in tableFields" :key="fieldIndex" style="padding: 4px;">
+                            <img v-if="dataRow.imagen.id.length > 0" v-bind:src="parseStringBlocks(rowField.imgSrcMap, dataRow)" />
+                            <img v-if="dataRow.imagen.id.length == ''" v-bind:src="basepath + 'image/sq60/image_no-image.jpg'" />
+                        </td>
+                        <td v-if="rowField.renderType != 'IMAGE'" v-for="(rowField, fieldIndex) in tableFields" :key="fieldIndex" style="padding: 4px;">
                             <template v-if="rowField.renderType == 'LINK'">
                                 <a v-bind:href="parseStringBlocks(rowField.urlMap, dataRow)">${dataRow[fieldIndex]}</a>
                             </template>
@@ -42,6 +50,13 @@
                                 <div class="ui icon mini basic button" v-on:click="doPopupJson(rowIndex + ' - ' + rowField.label,dataRow[fieldIndex])">
                                     <i class="eye icon"></i>
                                 </div>
+                            </template>
+                            <template v-if="rowField.renderType == 'TAGS'">
+                                <div v-if="_.isString(tagValue)" v-for="(tagValue, index) in dataRow[fieldIndex]" :key="index" class="ui blue label">${tagValue}</div>
+                                <div v-if="_.isObject(tagValue) && _.has(tagValue, 'name') && tagValue.name != ''" v-for="(tagValue, index) in dataRow[fieldIndex]" :key="index" class="ui blue label">${tagValue.name}</div>
+                            </template>
+                            <template v-if="rowField.renderType == 'IMAGETAGS'">
+                                <img v-if="_.isObject(tagValue) && _.has(tagValue, 'image')" v-for="(tagValue, index) in dataRow[fieldIndex]" :key="index" v-bind:src="doGetImageUrl(tagValue.id)" style="margin: 5px;" />
                             </template>
                             <template v-if="rowField.renderType == 'VALUE'">
                                 ${dataRow[fieldIndex]}

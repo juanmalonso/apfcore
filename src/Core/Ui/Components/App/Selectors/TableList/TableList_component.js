@@ -6,7 +6,7 @@ Vue.component("___tag_", {
   mounted: function () {
     var _self = this;
 
-    console.log($('#el_dimmable').dimmer('hide'));
+    //console.log($('#el_dimmable').dimmer('hide'));
 
     $('.dropdown').dropdown();
 
@@ -53,6 +53,10 @@ Vue.component("___tag_", {
 
       return result;
     },
+    doGetImageUrl: function (image){
+
+      return this.basepath + "image/sq50/" + image + ".jpg";
+    },
     doLocalTest: function (params, event) {
 
       console.log("doLocalTest", params, event);
@@ -91,17 +95,35 @@ Vue.component("___tag_", {
       console.log("onLoadPageDataError", response, message);
     },
     onStartLoadingDimmer: function (emitter) {
-      console.log("onStartLoadingDimmer", $('#el_dimmable'));
+      //console.log("onStartLoadingDimmer", $('#el_dimmable'));
       $('#el_dimmable').dimmer('show');
     },
     onEndLoadingDimmer: function (emitter) {
-      console.log("onEndLoadingDimmer", $('#el_dimmable'));
+      //console.log("onEndLoadingDimmer", $('#el_dimmable'));
       $('#el_dimmable').dimmer('hide');
+    },
+    hasImageField: function(){
+      var result = false;
+      
+      _.each(this.tableFields , function (value, key, list){
+
+        if(!result && value.renderType == "IMAGE"){
+
+          result = true;
+        }
+      });
+      //console.log(result);
+      return result;
     }
   },
   computed: {
     colsNum: function () {
       var result = 1; //numrows column
+
+      if(this.hasImageField()){
+
+        result += 1;
+      }
 
       result += _.size(this.tableFields);
 

@@ -2,12 +2,9 @@
 
 namespace Nubesys\Core\Services;
 
-use Nubesys\Core\Common;
-use Nubesys\Core\Ui\View\View;
-use Phalcon\Mvc\View\Engine\Volt;
-use Nubesys\Core\Register;
+use Nubesys\Core\Services\Service;
 
-class WsService extends Common {
+class WsService extends Service {
 
     public function __construct($p_di)
     {

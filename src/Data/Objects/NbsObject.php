@@ -461,9 +461,9 @@ class NbsObject extends Common
                     $_dataTemp = array();
 
                     foreach ($modelDefinition as $modelField) {
-
+                        
                         $fieldId = $modelField['dafId'];
-
+                        
                         if (isset($p_data[$fieldId])) {
 
                             if($modelField['typSaveAs'] == "JSON"){
@@ -480,30 +480,23 @@ class NbsObject extends Common
     
                                 $_dataTemp[$fieldId] = $p_data[$fieldId];
                             }
+
+                            $indexData['objData'][$fieldId] = $_dataTemp[$fieldId];
                         } else {
 
-                            if($modelField['typSaveAs'] == "JSON"){
-                                
-                                if(\is_string($p_data[$fieldId])){
+                            if($modelField['typId'] == "json"){
 
-                                    if($modelField['defDafDefaultValue'] = ""){
-
-                                        $modelField['defDafDefaultValue'] = "{}";
-                                    }
-    
-                                    $_dataTemp[$fieldId] = json_decode($modelField['defDafDefaultValue']);
-                                }else{
-    
-                                    $_dataTemp[$fieldId] = $modelField['defDafDefaultValue'];
-                                }
+                                $_dataTemp[$fieldId] = json_decode("{}");
                                 
+                            }else if($modelField['typId'] == "objectsr" || $modelField['typId'] == "tags" || $modelField['typId'] == "options"){
+
+                                $_dataTemp[$fieldId] = json_decode("[]");
+
                             }else{
-    
+
                                 $_dataTemp[$fieldId] = $modelField['defDafDefaultValue'];
                             }
                         }
-
-                        $indexData['objData'][$fieldId] = $_dataTemp[$fieldId];
                     }
 
                     foreach ($modelDefinition as $modelField) {
@@ -512,17 +505,15 @@ class NbsObject extends Common
     
                         if (isset($p_data[$fieldId])) {
     
-                            
-    
                             $indexNewData['objData'][$fieldId] = $p_data[$fieldId];
                         }
                     }
-
-                    $insertData['objData'] = json_encode($this->encodeUtf8($_dataTemp));
-
+                    
+                    $insertData['objData'] = json_encode($_dataTemp, JSON_UNESCAPED_UNICODE);
+                    
                 } else {
 
-                    $insertData['objData'] = json_encode($this->encodeUtf8(new \stdClass()));
+                    $insertData['objData'] = json_encode(new \stdClass());
                 }
                 
                 $tableName = $this->model->getModelObjectsTableName($p_model, $modelData['modType']);
@@ -856,10 +847,30 @@ class NbsObject extends Common
                         }
 
                         $indexNewData['objData'][$fieldId] = $p_data[$fieldId];
+
+                    }else{
+                        /*
+                        if($modelField['typId'] == "json"){
+
+                            $_dataTemp[$fieldId] = json_decode("{}");
+                            
+                        }else if($modelField['typId'] == "objectsr" || $modelField['typId'] == "tags" || $modelField['typId'] == "options"){
+
+                            $_dataTemp[$fieldId] = json_decode("[]");
+
+                        }else{
+
+                            $_dataTemp[$fieldId] = $modelField['defDafDefaultValue'];
+                        }
+
+                        $indexNewData['objData'][$fieldId] = $_dataTemp[$fieldId];
+                        */
                     }
+
+                    
                 }
                 
-                $updateData['objData'] = json_encode(array_replace((array)$objectData['objData'],(array)$_dataTemp),true);
+                $updateData['objData'] = json_encode(array_replace((array)$objectData['objData'],(array)$_dataTemp),JSON_UNESCAPED_UNICODE);
                 //$updateData['objData'] = json_encode((object)array_replace_recursive((array)$objectData['objData'],(array)$this->encodeUtf8($_dataTemp)));
 
             }else{

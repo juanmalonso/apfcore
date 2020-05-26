@@ -2,10 +2,11 @@
     <div class="ui calendar">
         <div class="ui left icon input" v-bind:class="{disabled: $attrs.readOnly}">
             <i class="calendar icon"></i>
-            <input type="text" v-bind:id="'field_' + $attrs.id" v-bind:name="$attrs.id">
+            <input type="text" v-bind:id="'field_calendar_' + $attrs.id">
         </div>
     </div>
 
+    <input type="hidden" v-bind:id="'field_' + $attrs.id" v-bind:name="$attrs.id">
 
     <p v-if="$attrs.info != ''" style="font-size:.8em">${ $attrs.info }</p>
 </div>

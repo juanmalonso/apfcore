@@ -29,7 +29,7 @@ class Controller extends PhalconController
                     break;
 
                 case 'bin':
-                    $servicePathPartes      = \array_merge(array($urlparams[1], $urlparams[2], "bin"), explode("_", $urlparams[3]));
+                    $servicePathPartes      = \array_merge(array($urlparams[1], $urlparams[2], "fs"), explode("_", $urlparams[3]));
                     break;
 
                 case 'flow':

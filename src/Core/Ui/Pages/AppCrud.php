@@ -35,6 +35,10 @@ class AppCrud extends VueUiService {
         $this->setTitle($this->getLocal("title"));
         
         $this->setDataSources();
+
+        //MAIN MODEL
+        //TODO : validar posibles errores aqui!
+        $this->setJsDataVar("model", $this->getLocal("application.dataSources." . $this->getLocal("application.editor.objectsDataSource") . ".options.model"));
         
         //TODO : VER LOGICA Y OPCIONES DE TIPO DE APPLICACION
         $this->generateSideMenu();
@@ -109,7 +113,7 @@ class AppCrud extends VueUiService {
         $editorAditionalParams      = array();
         
         if($this->hasPostParam("datasource")){
-
+           
             $toEditData             = $this->getEditorSaveData($this->allPostParams());
             
             if($toEditData !== false){
@@ -325,7 +329,7 @@ class AppCrud extends VueUiService {
         
         
         foreach($p_dataSource->getDataDefinitions() as $field=>$definition){
-
+            
             $fieldTemp                  = array();
             $fieldTemp['renderType']    = "VALUE";
             
@@ -341,18 +345,36 @@ class AppCrud extends VueUiService {
                         $fieldTemp["renderType"]        = "LINK";
                         $fieldTemp["urlMap"]            = $this->getLocal("application.urlMaps.EDIT");
 
-                    }
-
-                    if($definition["isImage"]){
+                    }else if($definition["isImage"]){
 
                         $fieldTemp["renderType"]        = "IMAGE";
-                        $fieldTemp["imgSrcMap"]         = "#";
+                        $fieldTemp["imgSrcMap"]         = $this->getLocal("application.urlMaps.IMAGE");;
 
-                    }
+                    }else{
 
-                    if($definition["type"] == "json"){
+                        if($definition["type"] == "json"){
 
-                        $fieldTemp["renderType"]            = "JSON";
+                            $fieldTemp["renderType"]            = "JSON";
+                        }
+
+                        if($definition["type"] == "tags"){
+
+                            $fieldTemp["renderType"]            = "TAGS";
+                        }
+
+                        if($definition['type'] == "objectr" || $definition['type'] == "objectsr"){
+
+                            //TODO: Configurar si el tag se vera como link o enlace a detalles o imagenes etc!
+                            $fieldTemp["renderType"]            = "TAGS";
+
+                            if(property_exists($definition['typeOptions'], 'model')){
+
+                                if($definition['typeOptions']->model == "image"){
+
+                                    $fieldTemp["renderType"]    = "IMAGETAGS";
+                                }
+                            }
+                        }
                     }
 
                     if(!$definition['isRelation']){
@@ -506,7 +528,49 @@ class AppCrud extends VueUiService {
         $dataSourceQuery['page']    = ($this->hasUrlParam("page")) ? $this->getUrlParam("page") : 1;
         $dataSourceQuery['rows']    = ($this->hasUrlParam("rows")) ? $this->getUrlParam("rows") : 10;
         
-        return $p_dataSource->getData($dataSourceQuery);
+        $data                       = $p_dataSource->getData($dataSourceQuery);
+        
+        $definitions                = $p_dataSource->getDataDefinitions();
+        
+        foreach($data['objects'] as $row=>$object){
+            
+            foreach($object as $field=>$value){
+                
+                if(isset($definitions[$field])){
+                    
+                    if($definitions[$field]['type'] == "objectr"){
+
+                        if($value != "" && property_exists($definitions[$field]['typeOptions'], 'model')){
+
+                            $valueIdNames                   = $this->getModelDataIdNames($definitions[$field]['typeOptions']->model, $value);
+
+                            $data['objects'][$row][$field]  = $valueIdNames;
+                        }
+                    }
+                    
+                    if($definitions[$field]['type'] == "objectsr"){
+
+                        if(is_array($value) && property_exists($definitions[$field]['typeOptions'], 'model')){
+
+                            $valueIdNamesTemp               = array();
+                            
+                            foreach($value as $objectId){
+                                
+                                
+                                $valueIdNames               = $this->getModelDataIdNames($definitions[$field]['typeOptions']->model, $objectId);
+
+                                $valueIdNamesTemp[$objectId]= $valueIdNames;
+                            }
+
+                            $data['objects'][$row][$field]  = $valueIdNamesTemp;
+                        }
+                    }
+                    
+                }
+            }
+        }
+
+        return                      $data;
     }
 
     /*______   _____    _____   _______    ____    _____  
@@ -522,7 +586,7 @@ class AppCrud extends VueUiService {
     protected function generateEditor($p_aditionalParams = array()){
         
         //PONER LOGICA SEGUN TIPO DE EDITOR
-        
+
         //FORM EDITOR
         $objectsEditorDataSource                = $this->getDataSource($this->getLocal("application.editor.objectsDataSource"));
 
@@ -598,13 +662,20 @@ class AppCrud extends VueUiService {
 
                     if(isset($fieldTemp['options']['model'])){
 
-                        $modelDataIdNames                       = $this->getModelDataIdNames($fieldTemp['options']['model']);
+                        
+                        $modelDataIdNamesParams                     = array();
+                        if(isset($fieldTemp['options']['hardfilters'])){
+
+                            $modelDataIdNamesParams['hardfilters']  = $fieldTemp['options']['hardfilters'];
+                        }
+
+                        $modelDataIdNames                       = $this->getModelDataIdNames($fieldTemp['options']['model'], $modelDataIdNamesParams);
                         
                         $fieldTempData                          = array();
     
                         foreach($modelDataIdNames['objects'] as $object){
     
-                            $fieldTempData[]                    = array('label' => $object['name'], 'value' => $object['id']);
+                            $fieldTempData[]                    = array('label' => $object['name'], 'value' => $object['id'], 'image' => $object['image'], 'icon' => $object['icon']);
                         }
     
                         $fieldTemp["options"]["data"]           = $fieldTempData;
@@ -639,7 +710,7 @@ class AppCrud extends VueUiService {
 
                 foreach($modelDataIdNames['objects'] as $object){
 
-                    $fieldTempData[]                    = array('label' => $object['name'], 'value' => $object['id']);
+                    $fieldTempData[]                    = array('label' => $object['name'], 'value' => $object['id'], 'image' => $object['image'], 'icon' => $object['icon']);
                 }
 
                 $fieldTemp["options"]["data"]           = $fieldTempData;
@@ -658,18 +729,36 @@ class AppCrud extends VueUiService {
     }
 
     //MODEL ID AND NAMES FIELDS
-    protected function getModelDataIdNames($p_model){
-        //TODO : Si hace falta recivir por parametro adicionales para el query
+    protected function getModelDataIdNames($p_model, $p_params = array()){
+        $result                         = false;
+
         $dataSourceOptions              = array();
         $dataSourceOptions['model']     = $p_model;
 
-        $dataSource                     = new DataSource($this->getDI(), new ObjectsDataSource($this->getDI(), $dataSourceOptions));
+        if(\is_array($p_params)){
 
-        $query                          = array();
-        $query['page']                  = 1;
-        $query['rows']                  = 1000;
+            //TODO : Si hace falta recivir por parametro adicionales para el query
+            if(isset($p_params['hardfilters'])){
 
-        return                          $dataSource->getDataIdNames($query);
+                $dataSourceOptions["hardfilters"] = (array)$p_params['hardfilters'];
+            }
+
+            $dataSource                     = new DataSource($this->getDI(), new ObjectsDataSource($this->getDI(), $dataSourceOptions));
+
+            $query                          = array();
+            $query['page']                  = 1;
+            $query['rows']                  = 1000;
+
+            $result                         = $dataSource->getDataIdNames($query);
+        }else{
+            
+            
+            $dataSource                     = new DataSource($this->getDI(), new ObjectsDataSource($this->getDI(), $dataSourceOptions));
+
+            $result                         = $dataSource->getDataIdNames($p_params);
+        }
+        
+        return                              $result;
     }
 
     //MODEL DATA
