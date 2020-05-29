@@ -158,7 +158,7 @@ class Objects extends DataSourceAdapter {
                 $objectTmp              = array();
                 $objectTmp['id']        = $object['_id'];
                 $objectTmp['name']      = $object[$nameField];
-                $objectTmp['image']     = $object[$imageField];
+                $objectTmp['image']     = (isset($object[$imageField])) ? $object[$imageField]: "";
                 $objectTmp['icon']      = (isset($object['icon'])) ? $object['icon'] : "";
 
                 $result['objects'][]           = $objectTmp;
@@ -171,7 +171,7 @@ class Objects extends DataSourceAdapter {
             $result             = array();
             $result['id']       = $queryResult['_id'];
             $result['name']     = $queryResult[$nameField];
-            $result['image']    = $queryResult[$imageField];
+            $result['image']    = (isset($object[$imageField])) ? $object[$imageField]: "";
             $result['icon']     = (isset($queryResult['icon'])) ? $queryResult['icon'] : "";
         }
         

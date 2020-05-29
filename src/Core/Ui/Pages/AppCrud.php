@@ -907,21 +907,35 @@ class AppCrud extends VueUiService {
 
     //ROLE SIDE MENU
     protected function generateSideMenu(){
+
+        /*
+        $this->setSession("user_loged", true);
+        $this->setSession("user_login", $userData['login']);
+        $this->setSession("user_roles", $userData['roles']);
+        $this->setSession("user_firstname", $userData['nombre']);
+        $this->setSession("user_lastname", $userData['apellido']);
+        $this->setSession("user_avatar", "https://www.kindpng.com/picc/b/269/2697881.png");
+        */
         
-        //TODO REEMPLAZAR POR LOS ITEMS DE MENU DE ROL
+        if($this->hasSession("user_login") && $this->hasSession("user_roles")){
 
-        $user                   = $this->getLocal("navigation.user");
+            $user               = array();
+            $user['label']      = $this->getSession("user_login");
+            $user['url']        = $this->getDI()->get('config')->main->url->base . "profile/";
+            $user['avatar']     = $this->getSession("user_avatar");
 
-        $items                  = $this->getLocal("navigation.items");
+            $userRolesMenuItems = $this->getUserRolesMenuItems($this->getSession("user_roles"));
 
-        $sideMenuParams             = array();
-        $sideMenuParams['user']     = $user;
-        $sideMenuParams['items']    = $items;
+            $items              = $this->getLocal("navigation.items");
 
 
-        $sideMenu                   = new SideMenu($this->getDI());
-        $this->placeComponent("side", $sideMenu, $sideMenuParams);
-        
+            $sideMenuParams             = array();
+            $sideMenuParams['user']     = $user;
+            $sideMenuParams['items']    = $items;
+
+            $sideMenu                   = new SideMenu($this->getDI());
+            $this->placeComponent("side", $sideMenu, $sideMenuParams);
+        }
     }
 
     //TOP BAR
@@ -957,6 +971,45 @@ class AppCrud extends VueUiService {
                 header("Location: " . $loginurl);
                 exit();
             }
+        }
+    }
+
+    protected function getUserRolesMenuItems($p_roles){
+
+        $dataSourceOptions              = array();
+        $dataSourceOptions['model']     = "roles";
+
+        $dataSource                     = new DataSource($this->getDI(), new ObjectsDataSource($this->getDI(), $dataSourceOptions));
+
+        $items                          = array();
+        
+        foreach($p_roles as $rol){
+
+            $roleDataTmp                = $dataSource->getData($rol);
+
+            if(isset($roleDataTmp['menus'])){
+
+                
+            }
+        }
+
+        exit();
+    }
+
+    protected function getMenuItems($p_menus){
+
+        $dataSourceOptions              = array();
+        $dataSourceOptions['model']     = "menus";
+
+        $dataSource                     = new DataSource($this->getDI(), new ObjectsDataSource($this->getDI(), $dataSourceOptions));
+
+        $items                          = array();
+        
+        foreach($p_menuitems as $item){
+
+            $itemDataTmp                = $dataSource->getData($item);
+
+            var_dump($itemDataTmp);
         }
     }
 }

@@ -4,6 +4,9 @@ namespace Nubesys\Auth\Ui\Components\Basic;
 
 use Nubesys\Vue\Ui\Components\VueUiComponent;
 
+use Nubesys\Data\DataSource\DataSource;
+use Nubesys\Data\DataSource\DataSourceAdapters\Objects as ObjectsDataSource;
+
 class BasicLoginForm extends VueUiComponent {
 
     public function mainAction(){
@@ -13,32 +16,48 @@ class BasicLoginForm extends VueUiComponent {
         if($this->hasPostParam('login') && $this->hasPostParam('password')){
             
             $userData   = false;
-            foreach($this->getDI()->get('config')->users->users->toArray() as $userDataTmp){
 
-                if($userDataTmp['login'] == $this->getPostParam('login') && $userDataTmp['password'] == $this->getPostParam('password')){
+            $dataSourceOptions              = array();
+            $dataSourceOptions['model']     = "usuario";
 
-                    $userData = $userDataTmp;
-                    break;
-                }
-            }
+            $dataSource                     = new DataSource($this->getDI(), new ObjectsDataSource($this->getDI(), $dataSourceOptions));
 
-            if($userData !== false){
+            $query                          = array();
+            $query['page']                  = 1;
+            $query['rows']                  = 1000;
+            $query['keyword']               = "objData.login:" . $this->getPostParam('login');
+
+            $result                         = $dataSource->getData($query);
+            
+            if(\is_array($result) && isset($result['objects'])){
                 
-                $this->setSession("user_loged", true);
-                $this->setSession("user_login", $userData['login']);
-                $this->setSession("user_role", $userData['role']);
-                $this->setSession("user_firstname", $userData['first_name']);
-                $this->setSession("user_lastname", $userData['last_name']);
-                $this->setSession("user_avatar", $userData['avatar']['url']);
+                foreach($result['objects'] as $userDataTmp){
+                    
+                    if($userDataTmp['login'] == $this->getPostParam('login') && $userDataTmp['password'] == $this->getPostParam('password')){
 
-                //TODO : Falta majejo de privilegios
-
-                $rolestr        = $userData['role'];
-                $startpage      = $this->getDI()->get('config')->main->url->base . $this->getDI()->get('config')->users->roles->$rolestr->startpage;
-
-                $this->setSession("user_startpage", $startpage);
-
-                header("Location: " . $startpage);
+                        $userData = $userDataTmp;
+                        break;
+                    }
+                }
+                
+                if($userData !== false){
+                
+                    $this->setSession("user_loged", true);
+                    $this->setSession("user_login", $userData['login']);
+                    $this->setSession("user_roles", $userData['roles']);
+                    $this->setSession("user_firstname", $userData['nombre']);
+                    $this->setSession("user_lastname", $userData['apellido']);
+                    $this->setSession("user_avatar", "https://www.kindpng.com/picc/b/269/2697881.png");
+    
+                    //TODO : Falta majejo de privilegios
+    
+                    //$rolestr      = $userData['role'];
+                    $startpage      = $this->getDI()->get('config')->main->url->base . 'board/';
+    
+                    $this->setSession("user_startpage", $startpage);
+    
+                    header("Location: " . $startpage);
+                }
             }
         }
 

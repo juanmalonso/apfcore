@@ -14,7 +14,7 @@ Vue.component("___tag_", {
     
     //TODO : ver la logica de DATA edition
 
-    const container = this.$refs.feditor
+    const container = this.$refs.eleditor
     const options   = {
         onChange: function () {
 

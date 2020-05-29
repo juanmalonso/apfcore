@@ -3,11 +3,10 @@ namespace Nubesys\Core\Ui\Components\App\Editors\Form\FormCustomElements;
 
 use Nubesys\Vue\Ui\Components\VueUiComponent;
 
-class JsonEditor extends VueUiComponent {
+class PasswordBox extends VueUiComponent {
 
     public function mainAction(){
         
-        $this->setJsDataVar("editor", new \stdClass());
-        $this->setJsDataVar("mode", "code");
+        $this->addJsSource("https://cdn.jsdelivr.net/crypto-js/3.1.2/rollups/sha1.js");
     }
 }
