@@ -425,23 +425,50 @@ class Definitions extends AppCrud {
 
     protected function getFieldsKeyNames(){
 
-        $tableDataSource                            = new \Nubesys\Data\DataSource\DataSourceAdapters\Table($this->getDI());
+        $result                         = array();
 
-        return                                      $tableDataSource->rawQuery("SELECT dafId AS 'value', dafId AS 'label' FROM data_fields");
+        $tableDataSource                = new \Nubesys\Data\DataSource\DataSourceAdapters\Table($this->getDI());
+
+        $queryResult                    = $tableDataSource->rawQuery("SELECT dafId AS 'value', dafId AS 'label' FROM data_fields");
+
+        foreach($queryResult as $row){
+
+            $result[]                   = $this->toObject($row);
+        }
+
+        return $result;
     }
 
     protected function getFieldsGroupsKeyNames(){
 
-        $tableDataSource                            = new \Nubesys\Data\DataSource\DataSourceAdapters\Table($this->getDI());
+        $result                         = array();
 
-        return                                      $tableDataSource->rawQuery("SELECT flgId AS 'value', flgName AS 'label' FROM fields_groups");
+        $tableDataSource                = new \Nubesys\Data\DataSource\DataSourceAdapters\Table($this->getDI());
+
+        $queryResult                    = $tableDataSource->rawQuery("SELECT flgId AS 'value', flgName AS 'label' FROM fields_groups");
+
+        foreach($queryResult as $row){
+
+            $result[]                   = $this->toObject($row);
+        }
+
+        return $result;
     }
 
     protected function getModelsKeyNames(){
 
-        $tableDataSource                            = new \Nubesys\Data\DataSource\DataSourceAdapters\Table($this->getDI());
+        $result                         = array();
 
-        return                                      $tableDataSource->rawQuery("SELECT modId AS 'value', modId AS 'label' FROM data_models");
+        $tableDataSource                = new \Nubesys\Data\DataSource\DataSourceAdapters\Table($this->getDI());
+
+        $queryResult                    = $tableDataSource->rawQuery("SELECT modId AS 'value', modId AS 'label' FROM data_models");
+
+        foreach($queryResult as $row){
+
+            $result[]                   = $this->toObject($row);
+        }
+
+        return $result;
     }
     
 

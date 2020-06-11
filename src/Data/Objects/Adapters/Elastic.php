@@ -471,7 +471,7 @@ class Elastic extends Common
     }
 
     public function updateDoc(\Elastica\Type $p_type, $p_id, $p_data){
-
+        
         $result = false;
 
         $doc = new \Elastica\Document($p_id, $p_data);

@@ -1,12 +1,8 @@
 <div class="ui field" v-bind:class="{required: $attrs.required}">
-    <div class="ui calendar">
-        <div class="ui left icon input" v-bind:class="{disabled: $attrs.readOnly}">
-            <i class="calendar icon"></i>
-            <input type="text" v-bind:id="'field_calendar_' + $attrs.id">
-        </div>
+    <div class="ui left icon input" v-bind:class="{disabled: $attrs.readOnly}">
+        <i class="calendar icon"></i>
+        <input type="text" v-bind:id="'field_' + $attrs.id" v-bind:name="$attrs.id" v-bind:form="$attrs.forForm">
     </div>
-
-    <input type="hidden" v-bind:id="'field_' + $attrs.id" v-bind:name="$attrs.id">
 
     <p v-if="$attrs.info != ''" style="font-size:.8em">${ $attrs.info }</p>
 </div>

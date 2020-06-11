@@ -72,7 +72,7 @@
       "ADD": "{var(global:urlbase)}servicios/add",
       "EDIT": "{var(global:urlbase)}servicios/edit/%(data:_id)%",
       "DELETE": "{var(global:urlbase)}servicios/delete/%(data:_id)%",
-      "IMAGE": "{var(global:urlbase)}image/sq60/%(data:imagen)%.jpg"
+      "IMAGE": "{var(global:urlbase)}image/sq60/%(data:imagen.id)%.jpg"
     },
     "topBar": {
       "list": {

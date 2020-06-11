@@ -1,0 +1,96 @@
+<div>
+<div class="ui fluid container" style="margin-top: 60px; background-color: #BF125D; min-height: 65px;">
+    <div class="ui container">
+        <div class="ui grid">
+            <div class="row">
+                <div class="twelve wide column">
+                    <div class="ui medium header" style="font-family: 'Dosis', sans-serif; font-size: 26px; font-weight: 700; letter-spacing: 2px; text-align: left; color: #ffffff;margin-top: 2px;">${data.label}</div>
+                </div>
+                <div class="four wide column">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+ 
+<!-- SLIDER -->
+<div class="ui fluid container">
+    <div class="swiper-container" style="width: 100%; min-height: 300px;">
+        <!-- Additional required wrapper -->
+        <div class="swiper-wrapper">
+            <!-- Slides -->
+            <div class="swiper-slide" v-bind:style="'background-image: url(\''+ basepath +'image\/org\/' + data.imagen + '.jpg\'); min-height: 300px; background-repeat: no-repeat; background-position: center center; background-size: cover;'"></div>
+            <div v-for="(imgId, imgIndex) in data.imagenes" :key="imgIndex" class="swiper-slide" v-bind:style="'background-image: url(\''+ basepath +'image\/org\/' + imgId + '.jpg\'); min-height: 300px; background-repeat: no-repeat; background-position: center center; background-size: cover;'"></div>
+        </div>
+        <!-- If we need pagination -->
+        <div class="swiper-pagination"></div>
+        <!-- If we need navigation buttons -->
+        <div class="swiper-button-prev" style="color: #EBB500 !important;"></div>
+        <div class="swiper-button-next" style="color: #EBB500 !important;"></div>
+        <!-- If we need scrollbar -->
+        <div class="swiper-scrollbar"></div>
+    </div>
+</div>
+ 
+<div class="ui container" style="margin-top: 40px;">
+    <div class="ui grid">
+        <div class="row">
+            <div class="eleven wide column">
+                <div class="ui medium header" style="font-family: 'Dosis', sans-serif; letter-spacing: 2px; text-align: left; margin-top: 2px;color:#4A4A4A;">Descripción</div>
+                <div style="font-family: 'Dosis', sans-serif; letter-spacing: 0px; text-align: justify; margin-top: 2px; color: #4A4A4A; font-size: 18px;">
+                ${data.description}
+                </div>
+            </div>
+            <div class="four wide column">
+                <div class="ui segment" style="margin-top: -110px; z-index: 100;">
+                    <div style="font-family: 'Dosis', sans-serif; letter-spacing: 0px; text-align: left; color: #4A4A4A; margin-bottom: 10px; font-weight: 700; font-size: 12px;">
+                        8 Noches      
+                    </div>
+                    <div style="font-family: 'Dosis', sans-serif; letter-spacing: 0px; text-align: left; color: #4A4A4A; margin-bottom: 10px;">
+                        <span v-if="data.preciodesde" style="color: #4A4A4A;">Desde</span>
+                        <span style="color: #E81F76; font-weight: bold;">${data.moneda} ${data.precio}</span> 
+                    </div>
+                    <div style="font-family: 'Dosis', sans-serif; letter-spacing: 0px; text-align: left; color: #4A4A4A; margin-bottom: 10PX;">
+                        <div class="ui basic fluid button" style="border: 0px solid rgba(255, 255, 255, 0) !important; background-color: #F7BE00; font-weight: bold; color: #ffffff; font-family: 'Dosis', sans-serif; letter-spacing: 2px;">Recervar Ahora</div>                         
+                    </div>
+                    <div style="font-family: 'Dosis', sans-serif; letter-spacing: 0px; text-align: left; color:#4A4A4A;">
+                        <span>Hasta 16 cuotas!</span>
+                        <br/>
+                        <span>Financiar con FPJ</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="eleven wide column">
+                <div class="ui medium header" style="font-family: 'Dosis', sans-serif; letter-spacing: 2px; text-align: left; margin-top: 2px;color:#4A4A4A;">Servicios</div>
+                <div style="font-family: 'Dosis', sans-serif; letter-spacing: 0px; text-align: justify; margin-top: 2px; color: #4A4A4A;">
+                    <div v-for="(servicioData, servicioIndex) in data.servicios" :key="servicioIndex" class="ui icon label" style="background-color: rgba(255, 255, 255, 0); font-weight: bold; letter-spacing: 1px; font-size: 14px; margin: 10px 0px 0px;">
+                        <i v-bind:class="servicioData.icon" style="color: #BF125D;"></i>
+                        ${servicioData.name}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div v-if="data.preciodesde" class="row">
+            <div class="eleven wide column">
+                <div class="ui medium header" style="font-family: 'Dosis', sans-serif; letter-spacing: 2px; text-align: left; margin-top: 2px;color:#4A4A4A;">Precios</div>
+                <table class="ui celled table">
+                    <tr v-for="(rowData, rowIndex) in data.variaciones.tabla" :key="index">
+                        <td>${rowData.col1}</td>
+                        <td>${data.moneda} ${rowData.col2}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div class="row">
+            <div class="eleven wide column">
+                <div class="ui medium header" style="font-family: 'Dosis', sans-serif; letter-spacing: 2px; text-align: left; margin-top: 2px;color:#4A4A4A;">Observaciones</div>
+                <div style="font-family: 'Dosis', sans-serif; letter-spacing: 0px; text-align: justify; margin-top: 2px; color: #4A4A4A; font-size: 12px;">
+                ${data.observaciones}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>

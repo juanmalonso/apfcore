@@ -84,8 +84,8 @@ class Relations extends AppCrud {
         $result['relLeftDirection']['defDafDefaultValue']                    = 'IN';
         $result['relLeftDirection']['defDafTypOptions']                      = new \stdClass();
         $result['relLeftDirection']['defDafTypOptions']->data                    = array();
-        $result['relLeftDirection']['defDafTypOptions']->data[]                  = array('label'=>'IN','value'=>'IN');
-        $result['relLeftDirection']['defDafTypOptions']->data[]                  = array('label'=>'OUT','value'=>'OUT');
+        $result['relLeftDirection']['defDafTypOptions']->data[]                  = $this->toObject(array('label'=>'IN','value'=>'IN'));
+        $result['relLeftDirection']['defDafTypOptions']->data[]                  = $this->toObject(array('label'=>'OUT','value'=>'OUT'));
         $result['relLeftDirection']['defDafUiOptions']                       = new \stdClass();
         $result['relLeftDirection']['defDafUiOptions']->help                = '';
         $result['relLeftDirection']['defDafUiOptions']->icon                = 'caret right';
@@ -140,8 +140,8 @@ class Relations extends AppCrud {
         $result['relRightDirection']['defDafDefaultValue']                    = 'OUT';
         $result['relRightDirection']['defDafTypOptions']                      = new \stdClass();
         $result['relRightDirection']['defDafTypOptions']->data                    = array();
-        $result['relRightDirection']['defDafTypOptions']->data[]                  = array('label'=>'IN','value'=>'IN');
-        $result['relRightDirection']['defDafTypOptions']->data[]                  = array('label'=>'OUT','value'=>'OUT');
+        $result['relRightDirection']['defDafTypOptions']->data[]                  = $this->toObject(array('label'=>'IN','value'=>'IN'));
+        $result['relRightDirection']['defDafTypOptions']->data[]                  = $this->toObject(array('label'=>'OUT','value'=>'OUT'));
         $result['relRightDirection']['defDafUiOptions']                       = new \stdClass();
         $result['relRightDirection']['defDafUiOptions']->help                = '';
         $result['relRightDirection']['defDafUiOptions']->icon                = 'caret right';
@@ -169,8 +169,8 @@ class Relations extends AppCrud {
         $result['relCardinality']['defDafDefaultValue']              = '1:n';
         $result['relCardinality']['defDafTypOptions']                = new \stdClass();
         $result['relCardinality']['defDafTypOptions']->data              = array();
-        $result['relCardinality']['defDafTypOptions']->data[]            = array('label'=>'1:n','value'=>'1:n');
-        $result['relCardinality']['defDafTypOptions']->data[]            = array('label'=>'1:1','value'=>'1:1');
+        $result['relCardinality']['defDafTypOptions']->data[]            = $this->toObject(array('label'=>'1:n','value'=>'1:n'));
+        $result['relCardinality']['defDafTypOptions']->data[]            = $this->toObject(array('label'=>'1:1','value'=>'1:1'));
         $result['relCardinality']['defDafUiOptions']                 = new \stdClass();
         $result['relCardinality']['defDafUiOptions']->help          = '';
         $result['relCardinality']['defDafUiOptions']->icon          = 'caret right';
@@ -316,9 +316,18 @@ class Relations extends AppCrud {
 
     protected function getModelsObjectsKeyNames(){
 
-        $tableDataSource                           = new \Nubesys\Data\DataSource\DataSourceAdapters\Table($this->getDI());
+        $result                         = array();
 
-        return                                     $tableDataSource->rawQuery("SELECT modId AS 'label', modid AS 'value' FROM data_models WHERE modType = 'OBJECT'");
+        $tableDataSource                = new \Nubesys\Data\DataSource\DataSourceAdapters\Table($this->getDI());
+
+        $queryResult                    = $tableDataSource->rawQuery("SELECT modId AS 'label', modid AS 'value' FROM data_models WHERE modType = 'OBJECT'");
+
+        foreach($queryResult as $row){
+
+            $result[]                   = $this->toObject($row);
+        }
+
+        return $result;
     }
 
     protected function getValidFieldGroupsIds(){

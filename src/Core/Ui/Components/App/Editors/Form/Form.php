@@ -10,14 +10,12 @@ class Form extends VueUiComponent {
     public function mainAction(){
 
         $this->registerReference("editor");
-
-        $this->addJsSource("https://cdn.jsdelivr.net/npm/jsoneditor@5.24.0/dist/jsoneditor.min.js");
-        $this->addCssSource("https://cdn.jsdelivr.net/npm/jsoneditor@5.24.0/dist/jsoneditor.min.css");
-
-        $this->addJsSource("https://cdn.jsdelivr.net/npm/semantic-ui-calendar@0.0.8/dist/calendar.min.js");
-        $this->addCssSource("https://cdn.jsdelivr.net/npm/semantic-ui-calendar@0.0.8/dist/calendar.min.css");
-
-        //$this->addJsSource("https://cdn.jsdelivr.net/npm/@json-editor/json-editor@latest/dist/jsoneditor.min.js");
+        
+        /*$this->addJsSource("https://cdn.jsdelivr.net/npm/semantic-ui-calendar@0.0.8/dist/calendar.min.js");
+        $this->addCssSource("https://cdn.jsdelivr.net/npm/semantic-ui-calendar@0.0.8/dist/calendar.min.css");*/
+        
+        $this->addJsSource("https://cdn.jsdelivr.net/npm/flatpickr@4.6.3/dist/flatpickr.min.js");
+        $this->addCssSource("https://cdn.jsdelivr.net/npm/flatpickr@4.6.3/dist/flatpickr.min.css");
         
         $this->setJsDataVar("token", $this->getLocal("token"));
         $this->setJsDataVar("datasource", $this->getLocal("datasource"));
@@ -41,6 +39,7 @@ class Form extends VueUiComponent {
         $this->placeVueCustomElement("tags-box");
         $this->placeVueCustomElement("date-box");
         $this->placeVueCustomElement("image-selector");
+        $this->placeVueCustomElement("avatar-selector");
         $this->placeVueCustomElement("schema-form");
     }
 }

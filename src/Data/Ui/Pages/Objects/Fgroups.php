@@ -117,9 +117,18 @@ class Fgroups extends AppCrud {
 
     protected function getTypesKeyNames(){
 
-        $tableDataSource                           = new \Nubesys\Data\DataSource\DataSourceAdapters\Table($this->getDI());
+        $result                         = array();
 
-        return                                     $tableDataSource->rawQuery("SELECT flgId AS 'value', flgName AS 'label' FROM fields_groups");
+        $tableDataSource                = new \Nubesys\Data\DataSource\DataSourceAdapters\Table($this->getDI());
+
+        $queryResult                    = $tableDataSource->rawQuery("SELECT flgId AS 'value', flgName AS 'label' FROM fields_groups");
+
+        foreach($queryResult as $row){
+
+            $result[]                   = $this->toObject($row);
+        }
+
+        return $result;
     }
 
     protected function saveObjectsData($p_data){

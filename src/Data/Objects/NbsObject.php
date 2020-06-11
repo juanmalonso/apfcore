@@ -405,7 +405,7 @@ class NbsObject extends Common
         
         //ID DEL OBJETO
         $id                         = $this->getIdValue($p_data, $modelData, $modelDefinition);
-        
+
         if($id !== false){
 
             if(!$this->has($p_model, $id)) {
@@ -468,7 +468,7 @@ class NbsObject extends Common
 
                             if($modelField['typSaveAs'] == "JSON"){
                                 
-                                if(\is_string($p_data[$fieldId])){
+                                if(\Nubesys\Core\Utils\Struct::isValidJson($p_data[$fieldId])){
     
                                     $_dataTemp[$fieldId] = json_decode($p_data[$fieldId]);
                                 }else{
@@ -828,13 +828,13 @@ class NbsObject extends Common
                 foreach ($modelDefinition as $modelField) {
                     
                     $fieldId = $modelField['dafId'];
-
+                    
                     if (isset($p_data[$fieldId])) {
-
+                        
                         if($modelField['typSaveAs'] == "JSON"){
                             
-                            if(\is_string($p_data[$fieldId])){
-
+                            if(\Nubesys\Core\Utils\Struct::isValidJson($p_data[$fieldId])){
+                                
                                 $_dataTemp[$fieldId] = json_decode($p_data[$fieldId]);
                             }else{
 
@@ -846,7 +846,7 @@ class NbsObject extends Common
                             $_dataTemp[$fieldId] = $p_data[$fieldId];
                         }
 
-                        $indexNewData['objData'][$fieldId] = $p_data[$fieldId];
+                        $indexNewData['objData'][$fieldId] = $_dataTemp[$fieldId];
 
                     }else{
                         /*
@@ -877,7 +877,7 @@ class NbsObject extends Common
 
                 $updateData['objData'] = json_encode(new \stdClass());
             }
-
+            
             $tableName = $this->model->getModelObjectsTableName($p_model, $modelData['modType']);
 
             $updateConditions = "_id = '" . $p_id . "'";
@@ -1057,7 +1057,7 @@ class NbsObject extends Common
     }
 
     public function search($p_model, $p_query){
-       
+        
         $result = false;
 
         $modelData              = $this->model->get($p_model);
@@ -1199,7 +1199,7 @@ class NbsObject extends Common
 
                                 $orders                 = $p_query['orders'];
                             }
-
+                            
                             $queryResult = $this->elastic->searchDocs($type, $keyword, $fields, $orders, $page, $rows, $facets, $filters);
                             
                             if($queryResult != false){
@@ -1660,12 +1660,12 @@ class NbsObject extends Common
             $modelRelations         = $this->model->getRelations($p_model, 'IN');
             
             $tableName = $this->model->getModelObjectsTableName($p_model, $modelData['modType']);
-
+            
             if($this->database->isTableExist($tableName)){
-
+                
                 $selectOptions = array();
                 $selectOptions['conditions'] = "_id = '" . $p_id . "'";
-    
+                
                 $selectResult = $this->database->selectOne($tableName, $selectOptions);
                 
                 if ($selectResult) {
@@ -1696,7 +1696,7 @@ class NbsObject extends Common
                     
                     $result = $selectResult;
                 }
-            
+                
             }
             $this->setCache($cacheKey, $result, $cacheLifetime);
         }
@@ -1901,7 +1901,7 @@ class NbsObject extends Common
     protected function getIdValue($p_data, $p_model, $p_definition){
         
         $result = false;
-
+        
         if($p_model['modIdStrategy'] == 'SLUGPREFIX' || $p_model['modIdStrategy'] == 'SLUG'){
 
             $nameField = $this->getNameField($p_definition);

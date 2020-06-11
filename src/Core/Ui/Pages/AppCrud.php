@@ -113,7 +113,7 @@ class AppCrud extends VueUiService {
         $editorAditionalParams      = array();
         
         if($this->hasPostParam("datasource")){
-           
+            
             $toEditData             = $this->getEditorSaveData($this->allPostParams());
             
             if($toEditData !== false){
@@ -362,14 +362,36 @@ class AppCrud extends VueUiService {
                             $fieldTemp["renderType"]            = "TAGS";
                         }
 
-                        if($definition['type'] == "objectr" || $definition['type'] == "objectsr"){
+                        if($definition['type'] == "options"){
 
-                            //TODO: Configurar si el tag se vera como link o enlace a detalles o imagenes etc!
+                            $fieldTemp["renderType"]            = "TAG";
+
+                            if(property_exists($definition['typeOptions'], 'multiple') && $definition['typeOptions']->multiple == true){
+
+                                $fieldTemp["renderType"]            = "TAGS";
+                            }
+                        }
+
+                        if($definition['type'] == "objectr"){
+
+                            $fieldTemp["renderType"]            = "TAG";
+
+                            if(property_exists($definition['typeOptions'], 'model')){
+
+                                if($definition['typeOptions']->model == "image" || $definition['typeOptions']->model == "avatar"){
+
+                                    $fieldTemp["renderType"]    = "IMAGETAG";
+                                }
+                            }
+                        }
+
+                        if($definition['type'] == "objectsr"){
+
                             $fieldTemp["renderType"]            = "TAGS";
 
                             if(property_exists($definition['typeOptions'], 'model')){
 
-                                if($definition['typeOptions']->model == "image"){
+                                if($definition['typeOptions']->model == "image" || $definition['typeOptions']->model == "avatar"){
 
                                     $fieldTemp["renderType"]    = "IMAGETAGS";
                                 }
@@ -524,52 +546,95 @@ class AppCrud extends VueUiService {
     //SELECTOR DATOS
     protected function getSelectorData($p_dataSource){
         
-        $dataSourceQuery            = array();
-        $dataSourceQuery['page']    = ($this->hasUrlParam("page")) ? $this->getUrlParam("page") : 1;
-        $dataSourceQuery['rows']    = ($this->hasUrlParam("rows")) ? $this->getUrlParam("rows") : 10;
-        
+        $dataSourceQuery                    = array();
+        $dataSourceQuery['page']            = ($this->hasUrlParam("page")) ? $this->getUrlParam("page") : 1;
+        $dataSourceQuery['rows']            = ($this->hasUrlParam("rows")) ? $this->getUrlParam("rows") : 10;
+
         $data                       = $p_dataSource->getData($dataSourceQuery);
         
         $definitions                = $p_dataSource->getDataDefinitions();
         
-        foreach($data['objects'] as $row=>$object){
-            
-            foreach($object as $field=>$value){
+        if(isset($data['objects']) && is_array($data['objects'])){
+
+            foreach($data['objects'] as $row=>$object){
                 
-                if(isset($definitions[$field])){
+                foreach($object as $field=>$value){
                     
-                    if($definitions[$field]['type'] == "objectr"){
+                    if(isset($definitions[$field])){
 
-                        if($value != "" && property_exists($definitions[$field]['typeOptions'], 'model')){
-
-                            $valueIdNames                   = $this->getModelDataIdNames($definitions[$field]['typeOptions']->model, $value);
-
-                            $data['objects'][$row][$field]  = $valueIdNames;
-                        }
-                    }
-                    
-                    if($definitions[$field]['type'] == "objectsr"){
-
-                        if(is_array($value) && property_exists($definitions[$field]['typeOptions'], 'model')){
-
-                            $valueIdNamesTemp               = array();
+                        if($definitions[$field]['type'] == "options" && $definitions[$field]['isName'] == false && $definitions[$field]['isRelation'] != true){
                             
-                            foreach($value as $objectId){
+                            if($value != ""){
                                 
-                                
-                                $valueIdNames               = $this->getModelDataIdNames($definitions[$field]['typeOptions']->model, $objectId);
+                                if(property_exists($definitions[$field]['typeOptions'], 'data')){
+                                    
+                                    $valueIdNames                                   = array();
+                                    
+                                    foreach($definitions[$field]['typeOptions']->data as $option){
+                                        
+                                        if(in_array($option->value, (array)$value)){
 
-                                $valueIdNamesTemp[$objectId]= $valueIdNames;
+                                            if(property_exists($definitions[$field]['typeOptions'], 'multiple') && $definitions[$field]['typeOptions'] == true){
+
+                                                $objectTmp                          = array();
+                                                $objectTmp['id']                    = $option->value;
+                                                $objectTmp['name']                  = $option->label;
+                                                $objectTmp['image']                 = (property_exists($option, "image")) ? $option->image : "";
+                                                $objectTmp['icon']                  = (property_exists($option, "icon")) ? $option->icon : "";
+
+                                                $valueIdNames[$objectTmp['id']]     = $objectTmp;
+                                            }else{
+
+                                                $objectTmp                          = array();
+                                                $objectTmp['id']                    = $option->value;
+                                                $objectTmp['name']                  = $option->label;
+                                                $objectTmp['image']                 = (property_exists($option, "image")) ? $option->image : "";
+                                                $objectTmp['icon']                  = (property_exists($option, "icon")) ? $option->icon : "";
+
+                                                $valueIdNames                       = $objectTmp;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+
+                                $data['objects'][$row][$field]  = $valueIdNames;
                             }
-
-                            $data['objects'][$row][$field]  = $valueIdNamesTemp;
                         }
+                        
+                        if($definitions[$field]['type'] == "objectr"){
+                            
+                            if($value != "" && property_exists($definitions[$field]['typeOptions'], 'model')){
+
+                                $valueIdNames                   = $this->getModelDataIdNames($definitions[$field]['typeOptions']->model, $value);
+
+                                $data['objects'][$row][$field]  = $valueIdNames;
+                            }
+                        }
+                        
+                        if($definitions[$field]['type'] == "objectsr"){
+                            
+                            if(is_array($value) && property_exists($definitions[$field]['typeOptions'], 'model')){
+
+                                $valueIdNamesTemp               = array();
+                                
+                                foreach($value as $objectId){
+                                    
+                                    
+                                    $valueIdNames               = $this->getModelDataIdNames($definitions[$field]['typeOptions']->model, $objectId);
+
+                                    $valueIdNamesTemp[$objectId]= $valueIdNames;
+                                }
+
+                                $data['objects'][$row][$field]  = $valueIdNamesTemp;
+                            }
+                        }
+                        
                     }
-                    
                 }
             }
         }
-
+        
         return                      $data;
     }
 
@@ -807,7 +872,23 @@ class AppCrud extends VueUiService {
 
             }
         }
+
+        //PARCHE ELECCIONES FILTERS
         
+        if($this->hasUrlParam("eleccion")){
+
+            $result["eleccion"]     = array($this->getUrlParam("eleccion"));
+        }
+
+        if($this->hasUrlParam("cargo")){
+
+            $result["cargo"]     = array($this->getUrlParam("cargo"));
+        }
+        
+        if($this->hasUrlParam("candidato")){
+
+            $result["candidato"]     = array($this->getUrlParam("candidato"));
+        }
         return $result;
     }
 
@@ -908,27 +989,45 @@ class AppCrud extends VueUiService {
     //ROLE SIDE MENU
     protected function generateSideMenu(){
 
-        /*
-        $this->setSession("user_loged", true);
-        $this->setSession("user_login", $userData['login']);
-        $this->setSession("user_roles", $userData['roles']);
-        $this->setSession("user_firstname", $userData['nombre']);
-        $this->setSession("user_lastname", $userData['apellido']);
-        $this->setSession("user_avatar", "https://www.kindpng.com/picc/b/269/2697881.png");
-        */
-        
-        if($this->hasSession("user_login") && $this->hasSession("user_roles")){
+        if($this->hasSession("user_loged") && $this->getSession("user_loged") == true){
 
-            $user               = array();
-            $user['label']      = $this->getSession("user_login");
-            $user['url']        = $this->getDI()->get('config')->main->url->base . "profile/";
-            $user['avatar']     = $this->getSession("user_avatar");
+            $userData               = $this->getSession("user_data");
 
-            $userRolesMenuItems = $this->getUserRolesMenuItems($this->getSession("user_roles"));
+            $user                   = array();
+            $user['label']          = $userData['login'];
+            $user['url']            = $this->getDI()->get('config')->main->url->base . "profile/";
+            $user['avatar']         = $this->getDI()->get('config')->main->url->base . "avatar/sq100/" . $userData['avatar'] . ".jpg";
 
-            $items              = $this->getLocal("navigation.items");
+            $items                  = array();
 
+            $userData['roles'][]    = $userData['role'];
+            
+            foreach($userData['roles'] as $role){
+                
+                if(isset($role['menus'])){
 
+                    foreach($role['menus'] as $menu){
+
+                        if(isset($menu['items'])){
+
+                            foreach($menu['items'] as $item){
+
+                                if(!isset($items[$item['id']])){
+
+                                    $itemTmp                = array();
+                                    $itemTmp['label']       = $item['name'];
+                                    $itemTmp['icon']        = $item['icon'];
+                                    $itemTmp['url']         = $this->getDI()->get('config')->main->url->base . $item['path'];
+
+                                    $items[$item['id']]     = $itemTmp;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            
             $sideMenuParams             = array();
             $sideMenuParams['user']     = $user;
             $sideMenuParams['items']    = $items;
@@ -971,45 +1070,6 @@ class AppCrud extends VueUiService {
                 header("Location: " . $loginurl);
                 exit();
             }
-        }
-    }
-
-    protected function getUserRolesMenuItems($p_roles){
-
-        $dataSourceOptions              = array();
-        $dataSourceOptions['model']     = "roles";
-
-        $dataSource                     = new DataSource($this->getDI(), new ObjectsDataSource($this->getDI(), $dataSourceOptions));
-
-        $items                          = array();
-        
-        foreach($p_roles as $rol){
-
-            $roleDataTmp                = $dataSource->getData($rol);
-
-            if(isset($roleDataTmp['menus'])){
-
-                
-            }
-        }
-
-        exit();
-    }
-
-    protected function getMenuItems($p_menus){
-
-        $dataSourceOptions              = array();
-        $dataSourceOptions['model']     = "menus";
-
-        $dataSource                     = new DataSource($this->getDI(), new ObjectsDataSource($this->getDI(), $dataSourceOptions));
-
-        $items                          = array();
-        
-        foreach($p_menuitems as $item){
-
-            $itemDataTmp                = $dataSource->getData($item);
-
-            var_dump($itemDataTmp);
         }
     }
 }

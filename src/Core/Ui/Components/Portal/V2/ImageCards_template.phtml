@@ -1,0 +1,21 @@
+<div class="ui container" style="margin-top: 40px;">
+    <div class="ui grid">
+        <div class="row">
+            <div class="sixteen wide column">
+                <div class="ui medium header" style="font-family: 'Dosis', sans-serif; font-size: 26px; font-weight: 700; letter-spacing: 2px; text-align: left; color: #BF125D; text-shadow: 2px 0px 10px #ffffff;">Destinos</div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="sixteen wide column">
+                <div class="ui four doubling cards">
+                    <a v-for="(cardData, cardIndex) in data" :key="cardIndex" class="ui raised card" v-bind:href="parseStringBlocks(urlLinkMap, cardData)">
+                        <div class="image">
+                            <div class="header" style="font-family: 'Dosis', sans-serif; font-size: 30px; font-weight: 700; letter-spacing: 2px; text-align: left; align-content: flex-end; position: absolute; bottom: 0px; padding: 10px; color: #ffffff; display: block; min-width: 100%; border-bottom-right-radius: 6px; border-bottom-left-radius: 6px; background-image: -webkit-linear-gradient(bottom, rgba(0, 0, 0, 0.65) 50%, rgba(0, 0, 0, 0) 100%); line-height: 29px;">${cardData.label}</div>
+                            <img v-bind:src="parseStringBlocks(imgSrcMap, cardData)">
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -124,8 +124,9 @@ class Objects extends DataSourceAdapter {
             }
 
         }else{
-
+            
             $result = $this->normalizeObjectData($this->dataEngine->getObject($this->options['model'], $p_query));
+            
         }
         
         return $result;

@@ -647,6 +647,16 @@ class Common extends Injectable
         
         return $result;
     }
+
+    protected function toObject($p_data){
+
+        return \Nubesys\Core\Utils\Struct::toObject($p_data);
+    }
+
+    protected function toArray($p_data){
+
+        return \Nubesys\Core\Utils\Struct::toArray($p_data);
+    }
 }
 
 ?>

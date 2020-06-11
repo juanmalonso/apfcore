@@ -73,7 +73,7 @@
       "ADD": "{var(global:urlbase)}categorias/add",
       "EDIT": "{var(global:urlbase)}categorias/edit/%(data:_id)%",
       "DELETE": "{var(global:urlbase)}categorias/delete/%(data:_id)%",
-      "IMAGE": "{var(global:urlbase)}image/sq60/%(data:imagen)%.jpg"
+      "IMAGE": "{var(global:urlbase)}image/sq60/%(data:imagen.id)%.jpg"
     },
     "topBar": {
       "list": {

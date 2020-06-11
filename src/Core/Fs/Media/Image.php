@@ -41,7 +41,7 @@ class Image extends FsService {
         $imageDataSource                = new DataSource($this->getDI(), new ObjectsDataSource($this->getDI(), $imageDataSourceOptions));
 
         $imageObjectData                = $imageDataSource->getData($imageName);
-
+        
         if(isset($imageObjectData['path']) && isset($imageObjectData['extension'])){
 
             $image                      = new ImageProcesor($this->getDI());

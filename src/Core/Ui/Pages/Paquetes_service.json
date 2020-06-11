@@ -47,7 +47,10 @@
         "options": {
           "model": "contenidoturismo",
           "notRenderableFields":[
-            "intinerario"
+            "intinerario",
+            "fechavig_desde",
+            "fechavig_hasta",
+            "mes"
           ]
         }
       },

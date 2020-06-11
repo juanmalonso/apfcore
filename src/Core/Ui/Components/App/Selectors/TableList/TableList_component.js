@@ -7,7 +7,7 @@ Vue.component("___tag_", {
     var _self = this;
 
     //console.log($('#el_dimmable').dimmer('hide'));
-
+    
     $('.dropdown').dropdown();
 
     const container = this.$refs.jeditor
@@ -17,6 +17,7 @@ Vue.component("___tag_", {
     }
 
     this.jeditor = new JSONEditor(container, options);
+    
   },
   methods: {
     doPopupJson: function (label, value){

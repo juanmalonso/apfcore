@@ -61,7 +61,7 @@ class Image extends File {
 
         $imageName                                  = $p_name;
         $imagePath                                  = $this->getFileAbsolutePath($p_relativePath) . '/' . $p_name . '.' . $p_originalExtension;
-
+        
         if(file_exists($imagePath)){
 
             $this->image                            = $this->imagine->open($imagePath);
@@ -84,7 +84,7 @@ class Image extends File {
                                 'jpeg_quality' => 100,
                             );
                             
-                            if($paramsArray[1] == "qty"){
+                            if(isset($paramsArray[1]) && $paramsArray[1] == "qty"){
 
                                 $options = $this->getCompressOptionsByQuality($paramsArray[2]);
                             }else{

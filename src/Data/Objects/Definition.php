@@ -95,9 +95,9 @@ class Definition extends Common
             }else {
 
                 $definitionsDataOptions['conditions'] = "modId = '" . $p_modelId . "'";
-
+                
                 $definitionsData = $this->database->select('data_definitions', $definitionsDataOptions);
-
+                
                 if ($definitionsData) {
 
                     $result = array();
@@ -120,21 +120,24 @@ class Definition extends Common
 
                         $result[] = $definitionData;
                     }
+                }
 
-                    if($p_extended){
+                if($p_extended){
                         
-                        $parentModelId                          = $this->model->getParent($p_modelId);
+                    $parentModelId                          = $this->model->getParent($p_modelId);
 
-                        if($parentModelId != "root"){
+                    if($parentModelId != "root"){
 
-                            $extendedResult                     = array();
-                            $parentExtendedDefinitionsKeys      = array();
-                            
-                            $parentDefinitions                  = $this->get($parentModelId, $p_fieldId, $p_extended);
-                            
-                            $lastParentDefinitionOrder          = 0;
-                            foreach($parentDefinitions as $parentDefinition){
+                        $extendedResult                     = array();
+                        $parentExtendedDefinitionsKeys      = array();
+                        
+                        $parentDefinitions                  = $this->get($parentModelId, $p_fieldId, $p_extended);
+                        
+                        $lastParentDefinitionOrder          = 0;
+                        foreach($parentDefinitions as $parentDefinition){
 
+                            if(\is_array($result)){
+                                
                                 foreach($result as $childDefinition){
 
                                     if($parentDefinition['dafId'] == $childDefinition['dafId']){
@@ -145,12 +148,14 @@ class Definition extends Common
                                         break;
                                     }
                                 }
-
-                                $extendedResult[]               = $parentDefinition;
-
-                                $lastParentDefinitionOrder      = $parentDefinition['defOrder'];
                             }
 
+                            $extendedResult[]               = $parentDefinition;
+
+                            $lastParentDefinitionOrder      = $parentDefinition['defOrder'];
+                        }
+
+                        if(\is_array($result)){
                             foreach($result as $childDefinition){
 
                                 if(!in_array($childDefinition['dafId'], $parentExtendedDefinitionsKeys)){
@@ -160,10 +165,9 @@ class Definition extends Common
                                     $extendedResult[]               = $childDefinition;
                                 }
                             }
-                            
-                            $result = $extendedResult;
-                            
                         }
+                        $result = $extendedResult;
+                        
                     }
                 }
                 
@@ -200,7 +204,7 @@ class Definition extends Common
                 $definitionData['typReferenceTo']           = $fieldData['typReferenceTo'];
 
                 $result = $definitionData;
-
+                
                 $this->setCache($cacheKey, $result, $cacheLifetime);
 
             }

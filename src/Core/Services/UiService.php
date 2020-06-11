@@ -190,6 +190,11 @@ class UiService extends Service {
         return $this->view->get($p_key);
     }
 
+    protected function strAppendViewVar($p_key, $p_value){
+
+        $this->view->strAppend($p_key, $p_value);
+    }
+
     //TITLE
     protected function setTitle($p_title){
 
@@ -323,6 +328,11 @@ class UiService extends Service {
     protected function placeComponent($p_place, $p_instance, $p_params = array()){
         
         $this->setViewVar($p_place, $p_instance->doComponentRender($p_params, $this->getId()));
+    }
+
+    protected function appendComponent($p_place, $p_instance, $p_params = array()){
+        
+        $this->strAppendViewVar($p_place, $p_instance->doComponentRender($p_params, $this->getId()));
     }
 
     public function doPageRender($p_action, $p_params, $p_inherited = false){

@@ -97,9 +97,12 @@ Vue.component("___tag_", {
 
       this.$set(this.images, this.imageSelectedIndex, this.imageSelectedName);
       
-      var values = _.values(this.images);
+      _.each(_.values(this.images), function(value, key, list){
 
-      $('#field_' + this.$attrs.id).val(values);
+        console.log($('option[value=' + value + ']'));
+
+        $('option[value=' + value + ']').attr('selected','selected');
+      });
     },
     onSelectedFile: function (event){
       var _self   = this;

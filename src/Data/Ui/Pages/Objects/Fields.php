@@ -287,9 +287,18 @@ class Fields extends AppCrud {
 
     protected function getTypesKeyNames(){
 
-        $tableDataSource                           = new \Nubesys\Data\DataSource\DataSourceAdapters\Table($this->getDI());
+        $result                         = array();
 
-        return                                     $tableDataSource->rawQuery("SELECT typId AS 'value', typId AS 'label' FROM data_types");
+        $tableDataSource                = new \Nubesys\Data\DataSource\DataSourceAdapters\Table($this->getDI());
+
+        $queryResult                    = $tableDataSource->rawQuery("SELECT typId AS 'value', typId AS 'label' FROM data_types");
+
+        foreach($queryResult as $row){
+
+            $result[]                   = $this->toObject($row);
+        }
+
+        return $result;
     }
 
     protected function saveObjectsData($p_data){

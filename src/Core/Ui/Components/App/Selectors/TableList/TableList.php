@@ -19,7 +19,7 @@ class TableList extends VueUiComponent {
         $this->setJsDataVar("hiddenFields", $this->getHiddenFields($this->getLocal("fields")));
         $this->setJsDataVar("linksFields", $this->getLinksFields($this->getLocal("fields")));
         $this->setJsDataVar("actionsFields", $this->getActionsFields($this->getLocal("fields")));
-
+        
         $this->setJsDataVar("data", $this->getLocal("data"));
 
         $this->setJsDataVar("paginator", $this->getLocal("paginator"));

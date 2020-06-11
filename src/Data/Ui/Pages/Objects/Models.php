@@ -52,7 +52,7 @@ class Models extends AppCrud {
         $result['modParent']['typId']                                   = 'options';
         $result['modParent']['flgId']                                   = 'data';
         $result['modParent']['defOrder']                                = 2;
-        $result['modParent']['defIsName']                               = true;
+        $result['modParent']['defIsName']                               = false;
         $result['modParent']['defIsImage']                              = false;
         $result['modParent']['defDafDefaultValue']                      = 'root';
         $result['modParent']['defDafIndexOptions']                      = new \stdClass();
@@ -86,10 +86,10 @@ class Models extends AppCrud {
         $result['modType']['defDafIndexOptions']                    = new \stdClass();
         $result['modType']['defDafTypOptions']                      = new \stdClass();
         $result['modType']['defDafTypOptions']->data                    = array();
-        $result['modType']['defDafTypOptions']->data[]                  = array('label'=>'OBJETO','value'=>'OBJECT');
-        $result['modType']['defDafTypOptions']->data[]                  = array('label'=>'RELACION','value'=>'RELATION');
-        $result['modType']['defDafTypOptions']->data[]                  = array('label'=>'COLECCION','value'=>'COLECTION');
-        $result['modType']['defDafTypOptions']->data[]                  = array('label'=>'TABLA','value'=>'TABLE');
+        $result['modType']['defDafTypOptions']->data[]                  = $this->toObject(array('label'=>'OBJETO','value'=>'OBJECT'));
+        $result['modType']['defDafTypOptions']->data[]                  = $this->toObject(array('label'=>'RELACION','value'=>'RELATION'));
+        $result['modType']['defDafTypOptions']->data[]                  = $this->toObject(array('label'=>'COLECCION','value'=>'COLECTION'));
+        $result['modType']['defDafTypOptions']->data[]                  = $this->toObject(array('label'=>'TABLA','value'=>'TABLE'));
         $result['modType']['defDafUiOptions']                       = new \stdClass();
         $result['modType']['defDafUiOptions']->help                = '';
         $result['modType']['defDafUiOptions']->icon                = 'caret right';
@@ -117,12 +117,12 @@ class Models extends AppCrud {
         $result['modIdStrategy']['defDafIndexOptions']              = new \stdClass();
         $result['modIdStrategy']['defDafTypOptions']                = new \stdClass();
         $result['modIdStrategy']['defDafTypOptions']->data              = array();
-        $result['modIdStrategy']['defDafTypOptions']->data[]            = array('label'=>'UUID','value'=>'UUID');
-        $result['modIdStrategy']['defDafTypOptions']->data[]            = array('label'=>'SLUG','value'=>'SLUG');
-        $result['modIdStrategy']['defDafTypOptions']->data[]            = array('label'=>'CUSTOM (_id)','value'=>'CUSTOM');
-        $result['modIdStrategy']['defDafTypOptions']->data[]            = array('label'=>'SLUG con Prefijo','value'=>'SLUGPREFIX');
-        $result['modIdStrategy']['defDafTypOptions']->data[]            = array('label'=>'Auto Numerico','value'=>'AUTOINCREMENT');
-        $result['modIdStrategy']['defDafTypOptions']->data[]            = array('label'=>'BASE 36','value'=>'BASE36');
+        $result['modIdStrategy']['defDafTypOptions']->data[]            = $this->toObject(array('label'=>'UUID','value'=>'UUID'));
+        $result['modIdStrategy']['defDafTypOptions']->data[]            = $this->toObject(array('label'=>'SLUG','value'=>'SLUG'));
+        $result['modIdStrategy']['defDafTypOptions']->data[]            = $this->toObject(array('label'=>'CUSTOM (_id)','value'=>'CUSTOM'));
+        $result['modIdStrategy']['defDafTypOptions']->data[]            = $this->toObject(array('label'=>'SLUG con Prefijo','value'=>'SLUGPREFIX'));
+        $result['modIdStrategy']['defDafTypOptions']->data[]            = $this->toObject(array('label'=>'Auto Numerico','value'=>'AUTOINCREMENT'));
+        $result['modIdStrategy']['defDafTypOptions']->data[]            = $this->toObject(array('label'=>'BASE 36','value'=>'BASE36'));
         $result['modIdStrategy']['defDafUiOptions']                 = new \stdClass();
         $result['modIdStrategy']['defDafUiOptions']->help          = '';
         $result['modIdStrategy']['defDafUiOptions']->icon          = 'caret right';
@@ -150,11 +150,11 @@ class Models extends AppCrud {
         $result['modPartitionMode']['defDafIndexOptions']           = new \stdClass();
         $result['modPartitionMode']['defDafTypOptions']             = new \stdClass();
         $result['modPartitionMode']['defDafTypOptions']->data            = array();
-        $result['modPartitionMode']['defDafTypOptions']->data[]          = array('label'=>'Ninguno','value'=>'NONE');
-        $result['modPartitionMode']['defDafTypOptions']->data[]          = array('label'=>'Por Trimestres','value'=>'Y4');
-        $result['modPartitionMode']['defDafTypOptions']->data[]          = array('label'=>'Por Meses','value'=>'Y12');
-        $result['modPartitionMode']['defDafTypOptions']->data[]          = array('label'=>'Por Semanas','value'=>'Y53');
-        $result['modPartitionMode']['defDafTypOptions']->data[]          = array('label'=>'Cada 3 Dias','value'=>'Y122');
+        $result['modPartitionMode']['defDafTypOptions']->data[]          = $this->toObject(array('label'=>'Ninguno','value'=>'NONE'));
+        $result['modPartitionMode']['defDafTypOptions']->data[]          = $this->toObject(array('label'=>'Por Trimestres','value'=>'Y4'));
+        $result['modPartitionMode']['defDafTypOptions']->data[]          = $this->toObject(array('label'=>'Por Meses','value'=>'Y12'));
+        $result['modPartitionMode']['defDafTypOptions']->data[]          = $this->toObject(array('label'=>'Por Semanas','value'=>'Y53'));
+        $result['modPartitionMode']['defDafTypOptions']->data[]          = $this->toObject(array('label'=>'Cada 3 Dias','value'=>'Y122'));
         $result['modPartitionMode']['defDafUiOptions']              = new \stdClass();
         $result['modPartitionMode']['defDafUiOptions']->help        = '';
         $result['modPartitionMode']['defDafUiOptions']->icon        = 'caret right';
@@ -344,9 +344,18 @@ class Models extends AppCrud {
 
     protected function getModelsKeyNames(){
 
-        $tableDataSource                           = new \Nubesys\Data\DataSource\DataSourceAdapters\Table($this->getDI());
+        $result                         = array();
 
-        return                                     $tableDataSource->rawQuery("(SELECT 'root' AS 'label', 'root' AS 'value') UNION ALL (SELECT modId AS 'value', modId AS 'label' FROM data_models WHERE modType = 'OBJECT')");
+        $tableDataSource                = new \Nubesys\Data\DataSource\DataSourceAdapters\Table($this->getDI());
+
+        $queryResult                    = $tableDataSource->rawQuery("(SELECT 'root' AS 'label', 'root' AS 'value') UNION ALL (SELECT modId AS 'value', modId AS 'label' FROM data_models WHERE modType = 'OBJECT')");
+
+        foreach($queryResult as $row){
+
+            $result[]                   = $this->toObject($row);
+        }
+
+        return $result;
     }
 
     protected function getObjectsData(){

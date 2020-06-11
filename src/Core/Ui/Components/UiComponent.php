@@ -119,8 +119,6 @@ class UiComponent extends Common {
 
             return $this->getScope($globalScopeKey)->getDot($p_key);
         }
-
-        
     }
 
     protected function allLocal(){

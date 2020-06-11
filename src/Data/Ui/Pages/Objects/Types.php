@@ -136,11 +136,11 @@ class Types extends AppCrud {
         $result['typSaveAs']['defDafDefaultValue']                    = 'STRING';
         $result['typSaveAs']['defDafTypOptions']                      = new \stdClass();
         $result['typSaveAs']['defDafTypOptions']->data                    = array();
-        $result['typSaveAs']['defDafTypOptions']->data[]                  = array('label'=>'NUMBER','value'=>'NUMBER');
-        $result['typSaveAs']['defDafTypOptions']->data[]                  = array('label'=>'STRING','value'=>'STRING');
-        $result['typSaveAs']['defDafTypOptions']->data[]                  = array('label'=>'BOOLEAN','value'=>'BOOLEAN');
-        $result['typSaveAs']['defDafTypOptions']->data[]                  = array('label'=>'JSON','value'=>'JSON');
-        $result['typSaveAs']['defDafTypOptions']->data[]                  = array('label'=>'SERIALIZE','value'=>'SERIALIZE');
+        $result['typSaveAs']['defDafTypOptions']->data[]                  = $this->toObject(array('label'=>'NUMBER','value'=>'NUMBER'));
+        $result['typSaveAs']['defDafTypOptions']->data[]                  = $this->toObject(array('label'=>'STRING','value'=>'STRING'));
+        $result['typSaveAs']['defDafTypOptions']->data[]                  = $this->toObject(array('label'=>'BOOLEAN','value'=>'BOOLEAN'));
+        $result['typSaveAs']['defDafTypOptions']->data[]                  = $this->toObject(array('label'=>'JSON','value'=>'JSON'));
+        $result['typSaveAs']['defDafTypOptions']->data[]                  = $this->toObject(array('label'=>'SERIALIZE','value'=>'SERIALIZE'));
         $result['typSaveAs']['defDafUiOptions']                       = new \stdClass();
         $result['typSaveAs']['defDafUiOptions']->help                = '';
         $result['typSaveAs']['defDafUiOptions']->icon                = 'caret right';
@@ -168,12 +168,12 @@ class Types extends AppCrud {
         $result['typReferenceTo']['defDafDefaultValue']                    = 'NONE';
         $result['typReferenceTo']['defDafTypOptions']                      = new \stdClass();
         $result['typReferenceTo']['defDafTypOptions']->data                    = array();
-        $result['typReferenceTo']['defDafTypOptions']->data[]                  = array('label'=>'NONE','value'=>'NONE');
-        $result['typReferenceTo']['defDafTypOptions']->data[]                  = array('label'=>'OBJECT','value'=>'OBJECT');
-        $result['typReferenceTo']['defDafTypOptions']->data[]                  = array('label'=>'COLLECTION','value'=>'COLLECTION');
-        $result['typReferenceTo']['defDafTypOptions']->data[]                  = array('label'=>'RELATION','value'=>'RELATION');
-        $result['typReferenceTo']['defDafTypOptions']->data[]                  = array('label'=>'VERTEX','value'=>'VERTEX');
-        $result['typReferenceTo']['defDafTypOptions']->data[]                  = array('label'=>'MODEL','value'=>'MODEL');
+        $result['typReferenceTo']['defDafTypOptions']->data[]                  = $this->toObject(array('label'=>'NONE','value'=>'NONE'));
+        $result['typReferenceTo']['defDafTypOptions']->data[]                  = $this->toObject(array('label'=>'OBJECT','value'=>'OBJECT'));
+        $result['typReferenceTo']['defDafTypOptions']->data[]                  = $this->toObject(array('label'=>'COLLECTION','value'=>'COLLECTION'));
+        $result['typReferenceTo']['defDafTypOptions']->data[]                  = $this->toObject(array('label'=>'RELATION','value'=>'RELATION'));
+        $result['typReferenceTo']['defDafTypOptions']->data[]                  = $this->toObject(array('label'=>'VERTEX','value'=>'VERTEX'));
+        $result['typReferenceTo']['defDafTypOptions']->data[]                  = $this->toObject(array('label'=>'MODEL','value'=>'MODEL'));
         $result['typReferenceTo']['defDafUiOptions']                       = new \stdClass();
         $result['typReferenceTo']['defDafUiOptions']->help                = '';
         $result['typReferenceTo']['defDafUiOptions']->icon                = 'caret right';
@@ -235,9 +235,18 @@ class Types extends AppCrud {
 
     protected function getTypesKeyNames(){
 
-        $tableDataSource                           = new \Nubesys\Data\DataSource\DataSourceAdapters\Table($this->getDI());
+        $result                         = array();
 
-        return                                     $tableDataSource->rawQuery("(SELECT 'root' AS 'label', 'root' AS 'value') UNION ALL (SELECT typId AS 'value', typId AS 'label' FROM data_types)");
+        $tableDataSource                = new \Nubesys\Data\DataSource\DataSourceAdapters\Table($this->getDI());
+
+        $queryResult                    = $tableDataSource->rawQuery("(SELECT 'root' AS 'label', 'root' AS 'value') UNION ALL (SELECT typId AS 'value', typId AS 'label' FROM data_types)");
+
+        foreach($queryResult as $row){
+
+            $result[]                   = $this->toObject($row);
+        }
+
+        return $result;
     }
 
     protected function saveObjectsData($p_data){
