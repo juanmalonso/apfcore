@@ -348,6 +348,7 @@ class Model extends Common
                               {Aditional}
                               `objTime` float unsigned NOT NULL,
                               `objOrder` bigint(20) unsigned NOT NULL DEFAULT '0',
+                              `objState` varchar(255) NOT NULL DEFAULT 'new',
                               `objActive` tinyint(1) NOT NULL DEFAULT '1',
                               `objData` json NOT NULL,
                               `objDateAdd` datetime DEFAULT NULL,

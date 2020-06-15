@@ -772,6 +772,14 @@ class NbsObject extends Common
         return $result;
     }
 
+    public function state($p_model, $p_id, $p_state){
+
+        $stateData                      = array();
+        $atateData['objState']          = $p_state;
+
+        return $this->edit($p_model, $p_id, $stateData);
+    }
+
     public function edit($p_model, $p_id, $p_data){
         
         $result = false;
@@ -807,6 +815,11 @@ class NbsObject extends Common
             if(isset($p_data['objOrder'])){
 
                 $updateData['objOrder']   = $p_data['objOrder'];
+            }
+
+            if(isset($p_data['objState'])){
+
+                $updateData['objState']   = $p_data['objState'];
             }
 
             if(isset($p_data['objActive'])){
@@ -1933,7 +1946,7 @@ class NbsObject extends Common
             
             if(isset($p_data['_id'])){
 
-                $result = $p_data->_id;
+                $result = $p_data['_id'];
             }
         }
 

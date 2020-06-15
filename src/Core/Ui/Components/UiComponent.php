@@ -320,7 +320,7 @@ class UiComponent extends Common {
 
     //RENDER
     public function doComponentRender($p_params, $p_parent, $p_inherited = false){
-
+        
         $this->setParentId($p_parent);
         
         $this->setAllLocals($p_params);

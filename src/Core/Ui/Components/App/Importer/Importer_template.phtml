@@ -1,0 +1,47 @@
+<div>
+    <div class="ui right very wide sidebar" id="importer_sidebar" style="width: 640px; background-color: #ffffff; overflow: hidden;">
+      
+      <div class="ui fluid container" style="border-bottom: 1px solid rgb(221, 221, 221); background-color: white;">
+        <div class="ui secondary menu">
+          
+          <div class="left menu" style="padding-left: 10px;">
+            <div class="item" style="padding-left: 0px; margin-left: 0px;">
+              <div class="ui basic button" v-on:click="doCloseImporterSidebar()">
+                <i class="arrow left icon"></i> cancelar
+              </div>
+            </div>
+          </div>
+
+          <div class="right menu" style="padding-left: 10px;">
+            <div class="item" style="padding-left: 0px; margin-left: 0px;">
+              <div class="ui green disabled button" v-on:click="doImport()" id="importer_aceptar_button">
+                <i class="check icon"></i> aceptar
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="ui fluid container" style="padding: 14px; background-color: white;">
+        
+        <div class="ui top attached tabular menu">
+          <div class="active item " data-tab="upload">Subir Archivo</div>
+          <div class="item" data-tab="json">Pegar Json</div>
+        </div>
+
+        <div class="ui bottom attached active tab segment" data-tab="upload">
+            <form ref="importerForm" id="importerForm" name="importerForm" method="post" enctype="multipart/form-data" v-bind:action="form_action">
+                <input type="file" accept=".csv, .xls, .xlsx, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" name="importer_file" id="importer_file" style="display: none;"  v-on:change="event => onSelectedFile(event)">
+                <div class="ui blue fluid button" id="upload_button" v-on:click="doBrowseFile()">Seleccionar Archivo</div>
+            </form>
+        </div>
+
+        <div class="ui bottom attached tab segment" data-tab="json">
+          JSON
+        </div>
+
+      </div>
+    </div>
+
+</div>

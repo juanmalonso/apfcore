@@ -25,6 +25,16 @@ class DataSource extends Common {
         return $this->adapter->addObjectData($p_data);
     }
 
+    public function importData($p_data){
+
+        return $this->adapter->importObjectsData($p_data);
+    }
+
+    public function setState($p_id, $p_state){
+
+        return $this->adapter->setObjectState($p_id, $p_state);
+    }
+
     //getData(ID) || getData(QueryArray)
     public function getData($p_query = array()){
 

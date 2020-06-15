@@ -50,7 +50,25 @@ class Phalcon extends Common {
 
     public function getFILES(){
         
-        return $this->requestObject->getUploadedFiles();
+        $files      = array();
+
+        foreach($this->requestObject->getUploadedFiles() as $file){
+
+            $fileTmp                        = array();
+
+            $fileTmp['key']                 = $file->getKey();
+            $fileTmp['name']                = $file->getName();
+            $fileTmp['extension']           = $file->getExtension();
+            $fileTmp['type']                = $file->getType();
+            $fileTmp['realType']            = $file->getRealType();
+            $fileTmp['size']                = $file->getSize();
+            $fileTmp['tmpPath']             = $file->getTempName();
+            $fileTmp['error']               = $file->getError();
+
+            $files[$fileTmp['key']]         = $fileTmp;
+        }
+
+        return $files;
     }
 
     public function hasCookie($p_key){

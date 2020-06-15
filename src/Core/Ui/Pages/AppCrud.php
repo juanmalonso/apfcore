@@ -9,12 +9,16 @@ use Nubesys\Core\Ui\Components\Navigation\SideMenu\SideMenu;
 use Nubesys\Core\Ui\Components\App\Top\TopBar\TopBar;
 use Nubesys\Core\Ui\Components\App\Selectors\TableList\TableList;
 use Nubesys\Core\Ui\Components\App\Editors\Form\Form;
+use Nubesys\Core\Ui\Components\App\Importer\Importer;
 
 //DATA SOURCE
 use Nubesys\Data\DataSource\DataSource;
 use Nubesys\Data\DataSource\DataSourceAdapters\Objects as ObjectsDataSource;
 use Nubesys\Data\DataSource\DataSourceAdapters\Table as TableDataSource;
 use Nubesys\Data\DataSource\DataSourceAdapters\Custom as CustomDataSource;
+
+//SPREADSHEET
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class AppCrud extends VueUiService {
 
@@ -41,23 +45,23 @@ class AppCrud extends VueUiService {
         $this->setJsDataVar("model", $this->getLocal("application.dataSources." . $this->getLocal("application.editor.objectsDataSource") . ".options.model"));
         
         //TODO : VER LOGICA Y OPCIONES DE TIPO DE APPLICACION
-        $this->generateSideMenu();
         
         $this->callServiceAction();
-
-        $this->generateTopBar();
     }
 
     //SERVICE ACTIONS
     //LIST SERVICE ACTION
     protected function listAction(){
-
+        $this->generateSideMenu();
         $this->generateSelector();
+        $this->generateTopBar();
     }
 
     //ADD SERVICE ACTION
     protected function addAction(){
         
+        $this->generateSideMenu();
+
         $editorAditionalParams      = array();
 
         if($this->hasPostParam("datasource")){
@@ -105,10 +109,14 @@ class AppCrud extends VueUiService {
         }
 
         $this->generateEditor($editorAditionalParams);
+
+        $this->generateTopBar();
     }
 
     //EDIT SERVICE ACTION
     protected function editAction(){
+
+        $this->generateSideMenu();
         
         $editorAditionalParams      = array();
         
@@ -188,6 +196,54 @@ class AppCrud extends VueUiService {
         }
         
         $this->generateEditor($editorAditionalParams);
+
+        $this->generateTopBar();
+    }
+
+    //ADD SERVICE ACTION
+    protected function importAction(){
+        set_time_limit(0);
+        
+        if($this->hasFilesParam("importer_file")){
+
+            $file = $this->getFilesParam("importer_file");
+
+            if(!$file['error']){
+
+                $inputFileType      = IOFactory::identify($file['tmpPath']);
+
+                $reader             = IOFactory::createReader($inputFileType);
+                $reader->setReadDataOnly(true);
+
+                $spreadsheet        = $reader->load($file['tmpPath']);
+
+                $sheetData          = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);
+                
+                $importData         = array();
+
+                $index              = 2;
+                while($index < count($sheetData)){
+
+                    $importDataRow = array();
+
+                    foreach($sheetData[1] as $column=>$field){
+
+                        $importDataRow[$field] = $sheetData[$index][$column];
+                    }
+
+                    $importData[]   = $importDataRow;
+
+                    $index++;
+                }
+
+                $objectsEditorDataSource        = $this->getDataSource($this->getLocal("application.importer.dataSource"));
+
+                $importDataResult                 = $objectsEditorDataSource->importData($importData);
+            }
+        }
+        
+        header("Location: " . $this->getLocal("application.urlMaps.LIST"));
+        exit();
     }
 
     //CALL SERVICE ACTION
@@ -277,6 +333,20 @@ class AppCrud extends VueUiService {
         }
     }
 
+    //IMPORTER
+    protected function generateImporter(){
+        
+        $objectImporterDataSource                       = $this->getDataSource($this->getLocal("application.selector.dataSource"));
+        
+        $objectImporterParams                           = array();
+        $objectImporterParams['datasource']             = $this->getLocal("application.selector.dataSource");
+        $objectImporterParams['form_action']            = $this->getLocal("application.urlMaps.IMPORT");
+        
+        $objectImporter                                 = new Importer($this->getDI());
+        $this->appendComponent("tools", $objectImporter, $objectImporterParams);
+        
+    }
+
      /*___   ______   _        ______    _____   _______    ____    _____  
     / ____| |  ____| | |      |  ____|  / ____| |__   __|  / __ \  |  __ \ 
     | (___   | |__    | |      | |__    | |         | |    | |  | | | |__) |
@@ -285,6 +355,8 @@ class AppCrud extends VueUiService {
     |_____/  |______| |______| |______|  \_____|    |_|     \____/  |_|  \_\                                                                 
     */
     protected function generateSelector(){
+
+        $this->generateImporter();
         
         //PONER LOGICA SEGUN TIPO DE SELECTOR
         
@@ -1041,6 +1113,7 @@ class AppCrud extends VueUiService {
     protected function generateTopBar(){
         
         $topBar                     = new TopBar($this->getDI());
+
         $this->placeComponent("top", $topBar, $this->getLocal("application.topBar.{$this->action}"));
     }
 

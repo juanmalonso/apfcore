@@ -179,6 +179,13 @@ class Objects extends DataSourceAdapter {
         return $result;
     }
 
+    public function setObjectState($p_id, $p_state){
+
+        //TODO: VALIDACION DE ESTADOS
+
+        return $this->dataEngine->setState($this->options['model'], $p_id, $p_state);
+    }
+
     public function editObjectData($p_id, $p_data){
 
         if(isset($this->options['toSaveDefaultValues'])){
@@ -193,7 +200,7 @@ class Objects extends DataSourceAdapter {
     }
 
     public function addObjectData($p_data){
-
+        
         if(isset($this->options['toSaveDefaultValues'])){
 
             foreach($this->options['toSaveDefaultValues'] as $field=>$value){
@@ -201,8 +208,35 @@ class Objects extends DataSourceAdapter {
                 $p_data[$field]       = $value; 
             }
         }
+
+        if(isset($this->options['toImportDefaultValues'])){
+
+            foreach($this->options['toImportDefaultValues'] as $field=>$value){
+
+                $p_data[$field]       = $value; 
+            }
+        }
+
+        if(isset($this->options['toImportCustomIdField'])){
+
+            $p_data['_id'] = $p_data[$this->options['toImportCustomIdField']];
+        }
         
         return $this->dataEngine->addObject($this->options['model'], $p_data);
+    }
+
+    public function importObjectsData($p_data){
+
+        $result             = array();
+
+        foreach($p_data as $objectData){
+            
+            $result[]       = $this->addObjectData($objectData);
+
+            usleep('50');
+        }
+        
+        return $result;
     }
 
     public function getModelData(){

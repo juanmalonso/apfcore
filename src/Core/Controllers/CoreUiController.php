@@ -28,7 +28,7 @@ class CoreUiController extends Controller
             $params['GET']          = $this->getDI()->get('requestManager')->getGET();
             $params['POST']         = $this->getDI()->get('requestManager')->getPOST();
             $params['FILES']        = $this->getDI()->get('requestManager')->getFILES();
-
+            
             $uiPageActionName       = "mainAction";
             
             if(isset($p_urlparams[3]) && method_exists($uiService, $p_urlparams[3] . "Action")){
