@@ -1,31 +1,25 @@
 {
   "accessControl": true,
-  "title": "CRUD - {var(url:5)}",
-  "navigation": {
-    "user": {
-      "label": "var(session:user_login)",
-      "url": "http://localhost/profile",
-      "avatar": "fun(getSession:user_avatar)"
-    },
-    "items": [
-      {
-        "label": "Inicio",
-        "url": "http://localhost/board/",
-        "icon": "home icon"
-      }
-    ]
-  },
+  "title": "Paises",
   "application": {
     "type": "dataobjectscrud",
     "serviceActions": {
       "default": "list",
-      "paramNum": 6
+      "paramNum": 5
     },
     "dataSources": {
       "objects": {
         "adapter": "objects",
         "options": {
-          "model": "{var(url:5)}"
+          "model": "paises",
+          "customIdField":"iso",
+          "notRenderableFields":[
+            "parent",
+            "fechavig_desde",
+            "fechavig_hasta",
+            "imagenes",
+            "icon"
+          ]
         }
       },
       "fgroups": {
@@ -36,18 +30,19 @@
       }
     },
     "urlMaps": {
-      "LIST": "{var(global:urlbase)}crud/{var(url:5)}/list",
-      "ADD": "{var(global:urlbase)}crud/{var(url:5)}/add",
-      "EDIT": "{var(global:urlbase)}crud/{var(url:5)}/edit/%(data:_id)%",
-      "DELETE": "{var(global:urlbase)}crud/{var(url:5)}/delete/%(data:_id)%",
-      "IMAGE": "{var(global:urlbase)}image/sq60/%(data:imagen.image)%.jpg",
-      "AVATAR": "{var(global:urlbase)}avatar/sq60/%(data:avatar.image)%.jpg"
+      "LIST": "{var(global:urlbase)}paises/list",
+      "ADD": "{var(global:urlbase)}paises/add",
+      "EDIT": "{var(global:urlbase)}paises/edit/%(data:_id)%",
+      "CIUDADES": "{var(global:urlbase)}ciudades/list/pais:%(data:_id)%",
+      "IMPORT": "{var(global:urlbase)}paises/import/",
+      "DELETE": "{var(global:urlbase)}paises/delete/%(data:_id)%",
+      "IMAGE": "{var(global:urlbase)}image/sq60/%(data:imagen.id)%.jpg"
     },
     "topBar": {
       "list": {
         "title": {
           "type": "text",
-          "text": "CRUD - LIST - {var(url:5)}"
+          "text": "Paises - LIST"
         },
         "actions": [
           {
@@ -56,13 +51,26 @@
             "urlMap": "var(local:application.urlMaps.ADD)",
             "style": "green",
             "icon": "plus icon"
+          },
+          {
+            "type": "actions",
+            "label": "importar",
+            "actions": [
+              {
+                "scope": "importer",
+                "name": "doOpenImporterSidebar",
+                "params": {}
+              }
+            ],
+            "style": "blue",
+            "icon": "upload icon"
           }
         ]
       },
       "edit": {
         "title": {
           "type": "text",
-          "text": "CRUD - EDIT - {var(url:5)}"
+          "text": "Paises - EDIT"
         },
         "actions": [
           {
@@ -92,7 +100,7 @@
       "add": {
         "title": {
           "type": "text",
-          "text": "CRUD - EDIT - {var(url:5)}"
+          "text": "Paises - ADD"
         },
         "actions": [
           {
@@ -120,18 +128,29 @@
         ]
       }
     },
+    "importer":{
+      "type": "upload",
+      "dataSource": "objects"
+    },
     "editor": {
       "type": "form",
       "async": false,
       "objectsDataSource": "objects",
       "fgroupsDataSource": "fgroups",
-      "objectToSaveIdParamNum": 7
+      "objectToSaveIdParamNum": 6
     },
     "selector": {
       "type": "tablelist",
       "async": false,
       "dataSource": "objects",
-      "links": [],
+      "links": [
+        {
+          "type": "link",
+          "label": "Ciudades",
+          "style": "teal",
+          "urlMap": "var(local:application.urlMaps.CIUDADES)"
+        }
+      ],
       "actions": [
         {
           "type": "link",

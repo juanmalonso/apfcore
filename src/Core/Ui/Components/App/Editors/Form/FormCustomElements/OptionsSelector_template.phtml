@@ -1,11 +1,7 @@
-<div class="ui field" v-bind:class="{required: $attrs.required}">
-       
-    <select v-if="!isMultiple() && $attrs.editAs == 'FIELD'" class="ui search dropdown" v-bind:class="{disabled: $attrs.readOnly}" v-bind:id="'field_' + $attrs.id" v-bind:name="$attrs.id" v-bind:form="$attrs.forForm">
-          <option v-for="(option, index) in $attrs.options.data" :key="index" v-bind:value="option.value">${option.label}</option>
-    </select>
-    <select v-if="isMultiple() && $attrs.editAs == 'FIELD'" class="ui search dropdown" v-bind:class="{disabled: $attrs.readOnly}" v-bind:id="'field_' + $attrs.id" v-bind:name="$attrs.id + '[]'" multiple="" v-bind:form="$attrs.forForm">
-          <option v-for="(option, index) in $attrs.options.data" :key="index" v-bind:value="option.value">${option.label}</option>
-    </select>
+<div class="ui field" v-bind:class="{required: $attrs.required}"> 
+
+    <select v-if="!isMultiple() && $attrs.editAs == 'FIELD'" class="ui search dropdown" v-bind:class="{disabled: $attrs.readOnly}" v-bind:id="'field_' + $attrs.id" v-bind:name="$attrs.id" v-bind:form="$attrs.forForm"></select>
+    <select v-if="isMultiple() && $attrs.editAs == 'FIELD'" class="ui search dropdown" v-bind:class="{disabled: $attrs.readOnly}" v-bind:id="'field_' + $attrs.id" v-bind:name="$attrs.id + '[]'" multiple="" v-bind:form="$attrs.forForm"></select>
 
     <div v-if="isMultiple() && $attrs.editAs == 'LIST'" class="ui segment" style="overflow: auto; max-height: 300px;">
       <template v-for="(option, index) in $attrs.options.data">

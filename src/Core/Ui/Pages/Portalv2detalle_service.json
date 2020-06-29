@@ -2,14 +2,15 @@
   "accessControl": false,
   "title": "www.NOSVAMOOS.com",
   "destinos":{
-    "linkMap": "{var(global:urlbase)}v2list/destinos:%(data:id)%",
+    "linkMap": "{var(global:urlbase)}v2lista/destino:%(data:id)%",
     "cardImgSrcMap": "{var(global:urlbase)}image/sq360/cparp100x60/%(data:imagen)%.jpg"
   },
   "paquetes":{
-    "linkMap": "{var(global:urlbase)}v2detalle/destinos:%(data:id)%",
+    "linkMap": "{var(global:urlbase)}v2detalle/%(data:id)%",
     "cardImgSrcMap": "{var(global:urlbase)}image/sq360/cparp100x60/%(data:imagen)%.jpg"
   },
   "detalles":{
-    "sliderImgSrcMap": "{var(global:urlbase)}image/org/%(data:imagen)%.jpg"
+    "sliderImgSrcMap": "{var(global:urlbase)}image/org/%(data:imagen)%.jpg",
+    "reservaLinkMap": "{var(global:urlbase)}v2reserva/%(data:id)%"
   }
 }

@@ -405,7 +405,7 @@ class NbsObject extends Common
         
         //ID DEL OBJETO
         $id                         = $this->getIdValue($p_data, $modelData, $modelDefinition);
-
+        
         if($id !== false){
 
             if(!$this->has($p_model, $id)) {
@@ -1555,7 +1555,7 @@ class NbsObject extends Common
     }
 
     private function getIndexableData($p_modelDefinition, $p_modelRelations, $p_data){
-
+        
         $result = array();
 
         foreach($p_data as $key=>$value){

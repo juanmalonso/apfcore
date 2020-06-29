@@ -7,6 +7,6 @@ class OptionsSelector extends VueUiComponent {
 
     public function mainAction(){
         
-        
+        $this->setJsDataVar("items", array());
     }
 }

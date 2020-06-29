@@ -30,6 +30,7 @@ class Portalv2detalle extends PortalPage {
 
         $detalleParams                          = array();
         $detalleParams['sliderImgSrcMap']       = $this->getLocal("detalles.sliderImgSrcMap");
+        $detalleParams['reservaLinkMap']        = $this->getLocal("detalles.reservaLinkMap");
         $detalleParams['data']                  = $this->getContenidoDetalle();
 
         $this->addMainSection($detalle, $detalleParams);

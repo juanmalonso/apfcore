@@ -9,27 +9,9 @@ Vue.component("___tag_", {
     //console.log($('#el_dimmable').dimmer('hide'));
     
     $('.dropdown').dropdown();
-
-    const container = this.$refs.jeditor
-    const options   = {
-        "modes": ['code'],
-        "mode": 'code'
-    }
-
-    this.jeditor = new JSONEditor(container, options);
     
   },
   methods: {
-    doPopupJson: function (label, value){
-      
-      //$('#xSidebar').sidebar('setting', 'transition', 'overlay').sidebar('toggle');
-
-      $("#jsonModalHeader").html(label);
-      
-      this.jeditor.set(value);
-      
-      $('.ui.modal').modal('show');
-    },
     onSelectLinkOption: function (linkIndex, data, event){
 
       optionSelected        = this.linksFields[linkIndex].options[event.target.value];
@@ -103,6 +85,43 @@ Vue.component("___tag_", {
       //console.log("onEndLoadingDimmer", $('#el_dimmable'));
       $('#el_dimmable').dimmer('hide');
     },
+    getImagePath: function (data){
+
+      var set     = false;
+      var result  = this.basepath;
+
+      if(!set && _.has(data, "imagen")){
+
+        result    = result + "imagen/sw160/" + data.imagen.image + ".jpg";
+
+        set       = true;
+      }
+
+      if(!set && _.has(data, "avatar")){
+
+        result    = result + "imagen/sw160/" + data.avatar.image + ".jpg";
+
+        set       = true;
+      }
+
+      return result;
+    },
+    getName: function (data){
+
+      var set     = false;
+      var result  = "";
+
+      _.each(this.tableFields , function (value, key, list){
+
+        if(value.renderType == "LINK"){
+
+          result  = (set) ? result + " " + data[key] : result + data[key];
+          set     = true;
+        }
+      });
+
+      return result;
+    },
     hasImageField: function(){
       var result = false;
       
@@ -118,26 +137,6 @@ Vue.component("___tag_", {
     }
   },
   computed: {
-    colsNum: function () {
-      var result = 1; //numrows column
-
-      if(this.hasImageField()){
-
-        result += 1;
-      }
-
-      result += _.size(this.tableFields);
-
-      if (_.size(this.linksFields) > 0) {
-        result += 1;
-      }
-
-      if (_.size(this.actionsFields) > 0) {
-        result += 1;
-      }
-
-      return result;
-    },
     paginatorPrevPage() {
 
       var result = false;

@@ -19,6 +19,8 @@ class PortalPage extends VueUiService {
     //MAIN ACTION
     public function mainAction(){
 
+        $this->setTitle($this->getLocal("title"));
+
         //DOSIS
         $this->addCssSource("https://fonts.googleapis.com/css?family=Dosis&display=swap");
 
@@ -155,7 +157,7 @@ class PortalPage extends VueUiService {
         return $result;
     }
 
-    public function getTopPaquetes(){
+    public function getTopPaquetes($p_params = array()){
 
         $result             = false;
 
@@ -165,8 +167,18 @@ class PortalPage extends VueUiService {
         $dataSource                     = new DataSource($this->getDI(), new ObjectsDataSource($this->getDI(), $dataSourceOptions));
 
         $query                          = array();
-        $query['page']                  = 1;
-        $query['rows']                  = 16;
+        $query['page']                  = (isset($p_params['page'])) ? $p_params['page'] : 1;
+        $query['rows']                  = (isset($p_params['rows'])) ? $p_params['rows'] : 16;
+
+        if(isset($p_params['filters'])){
+
+            $query['filters']           = $p_params['filters'];
+        }
+        
+        if(isset($p_params['orders'])){
+
+            $query['orders']           = $p_params['orders'];
+        }
         
         $queryResul                     = $dataSource->getData($query);
         
@@ -232,11 +244,11 @@ class PortalPage extends VueUiService {
                 $result[$paqueteDataTmp['id']]          = $paqueteDataTmp;
             }
         }
-
+        
         return $result;
     }
 
-    public function getTopDestinos(){
+    public function getTopDestinos($p_params = array()){
 
         $result             = false;
 
@@ -246,10 +258,23 @@ class PortalPage extends VueUiService {
         $dataSource                     = new DataSource($this->getDI(), new ObjectsDataSource($this->getDI(), $dataSourceOptions));
 
         $query                          = array();
-        $query['page']                  = 1;
-        $query['rows']                  = 8;
+        $query['page']                  = (isset($p_params['page'])) ? $p_params['page'] : 1;
+        $query['rows']                  = (isset($p_params['rows'])) ? $p_params['rows'] : 8;
         $query['filters']               = array();
         $query['filters']['parent']     = array("taxonomy_destinos");
+
+        if(isset($p_params['filters'])){
+
+            foreach($p_params['filters'] as $filter=>$terms){
+
+                $query['filters'][$filter] = $terms;
+            }
+        }
+        
+        if(isset($p_params['orders'])){
+
+            $query['orders']           = $p_params['orders'];
+        }        
         
         $queryResul                     = $dataSource->getData($query);
         

@@ -6,7 +6,7 @@
     "cardImgSrcMap": "{var(global:urlbase)}image/sq360/cparp100x60/%(data:imagen)%.jpg"
   },
   "paquetes":{
-    "linkMap": "{var(global:urlbase)}v2detalle/%(data:id)%",
+    "linkMap": "{var(global:urlbase)}v2detalle/paquete:%(data:id)%",
     "cardImgSrcMap": "{var(global:urlbase)}image/sq360/cparp100x60/%(data:imagen)%.jpg"
   }
 }

@@ -17,21 +17,43 @@ class User extends Common {
     }
 
     public function loginUser($p_login, $p_password){
-
+        
         $result                     = false;
 
         $tableDataSource            = new TableDataSource($this->getDI());
 
-        $objectsDataSourceOptions                  = array();
-        $objectsDataSourceOptions['model']         = "usuario";
+        $queryString                = "";
 
-        $objectsDataSource          = new ObjectsDataSource($this->getDI(), $objectsDataSourceOptions);
-
-        $queryResult                = $tableDataSource->rawQuery("SELECT _id FROM nosvamoos.usuario_objects WHERE JSON_EXTRACT(objData, '$.login') = '" . $p_login . "'");
+        $userTables                 = $this->getDI()->get('config')->main->user->tables->toArray();
         
-        if(\is_array($queryResult)){
+        $tableIndex                 = 0;
+
+        foreach($userTables as $table){
+            
+            $queryString            .=  "SELECT _id, modId FROM " . $table . " WHERE JSON_EXTRACT(objData, '$.login') = '" . $p_login . "'";
+
+            if($tableIndex < count($userTables) - 1){
+
+                $queryString            .=  " UNION ALL ";
+            }else{
+
+                $queryString            .=  ";";
+            }
+
+            $tableIndex ++;
+        }
+        
+        $queryResult                = $tableDataSource->rawQuery($queryString);
+        
+        if(\is_array($queryResult) && count($queryResult) > 0){
 
             $userId                 = $queryResult[0]['_id'];
+            $userModel              = $queryResult[0]['modId'];
+
+            $objectsDataSourceOptions                  = array();
+            $objectsDataSourceOptions['model']         = $userModel;
+
+            $objectsDataSource          = new ObjectsDataSource($this->getDI(), $objectsDataSourceOptions);
 
             $userData               = $objectsDataSource->getData($userId);
             
@@ -78,7 +100,7 @@ class User extends Common {
         $dataSource                         = new DataSource($this->getDI(), new ObjectsDataSource($this->getDI(), $dataSourceOptions));
 
         $roleData                           = $dataSource->getData($p_role);
-
+        
         if(isset($roleData['menus'])){
 
             $rolesMenusData                 = array();

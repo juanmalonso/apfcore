@@ -8,7 +8,9 @@ use Nubesys\Vue\Services\VueUiService;
 use Nubesys\Core\Ui\Components\Navigation\SideMenu\SideMenu;
 use Nubesys\Core\Ui\Components\App\Top\TopBar\TopBar;
 use Nubesys\Core\Ui\Components\App\Selectors\TableList\TableList;
+use Nubesys\Core\Ui\Components\App\Selectors\HorizontalCards\HorizontalCards;
 use Nubesys\Core\Ui\Components\App\Editors\Form\Form;
+use Nubesys\Core\Ui\Components\App\Viewer\Table\TableViewer;
 use Nubesys\Core\Ui\Components\App\Importer\Importer;
 
 //DATA SOURCE
@@ -66,7 +68,7 @@ class AppCrud extends VueUiService {
 
         if($this->hasPostParam("datasource")){
 
-            $toSaveData             = $this->getEditorSaveData($this->allPostParams());
+            $toSaveData             = $this->getEditorAddData($this->allPostParams());
             
             if($toSaveData !== false){
 
@@ -122,7 +124,7 @@ class AppCrud extends VueUiService {
         
         if($this->hasPostParam("datasource")){
             
-            $toEditData             = $this->getEditorSaveData($this->allPostParams());
+            $toEditData             = $this->getEditorEditData($this->allPostParams());
             
             if($toEditData !== false){
 
@@ -178,7 +180,7 @@ class AppCrud extends VueUiService {
                     if($editDataResult !== false){
 
                         //TODO: REDIRECT TO LIST
-
+                        \sleep(1);
                         header("Location: " . $this->getLocal("application.urlMaps.LIST"));
                         exit();
                     }else{
@@ -200,6 +202,18 @@ class AppCrud extends VueUiService {
         $this->generateTopBar();
     }
 
+    //EDIT SERVICE ACTION
+    protected function viewAction(){
+
+        $this->generateSideMenu();
+        
+        $viewerAditionalParams      = array();
+        
+        $this->generateViewer($viewerAditionalParams);
+
+        $this->generateTopBar();
+    }
+
     //ADD SERVICE ACTION
     protected function importAction(){
         set_time_limit(0);
@@ -207,7 +221,7 @@ class AppCrud extends VueUiService {
         if($this->hasFilesParam("importer_file")){
 
             $file = $this->getFilesParam("importer_file");
-
+            
             if(!$file['error']){
 
                 $inputFileType      = IOFactory::identify($file['tmpPath']);
@@ -235,7 +249,7 @@ class AppCrud extends VueUiService {
 
                     $index++;
                 }
-
+                
                 $objectsEditorDataSource        = $this->getDataSource($this->getLocal("application.importer.dataSource"));
 
                 $importDataResult                 = $objectsEditorDataSource->importData($importData);
@@ -290,13 +304,25 @@ class AppCrud extends VueUiService {
                 $objectsSelectorDataSource              = $this->getDataSource($param["datasource"]);
 
                 $dataSourceQuery            = array();
+                $dataSourceQuery['filters'] = (isset($param['filters'])) ? $param['filters'] : array();
                 $dataSourceQuery['page']    = (isset($param["page"])) ? $param["page"] : 1;
                 $dataSourceQuery['rows']    = (isset($param["rows"])) ? $param["rows"] : 10;
 
                 $this->setServiceSuccess($objectsSelectorDataSource->getData($dataSourceQuery));
-            }else{
 
-                $this->setServiceError("Datasource param not Found");    
+            }else if(isset($param["model"])){
+
+                $dataSourceOptions                  = array();
+                $dataSourceOptions['model']         = $param["model"];
+
+                $dataSource                         = new DataSource($this->getDI(), new ObjectsDataSource($this->getDI(), $dataSourceOptions));
+
+                $dataSourceQuery            = array();
+                $dataSourceQuery['filters'] = (isset($param['filters'])) ? $param['filters'] : array();
+                $dataSourceQuery['page']    = (isset($param["page"])) ? $param["page"] : 1;
+                $dataSourceQuery['rows']    = (isset($param["rows"])) ? $param["rows"] : 100;
+                
+                $this->setServiceSuccess($dataSource->getData($dataSourceQuery));
             }
         }else{
 
@@ -358,19 +384,38 @@ class AppCrud extends VueUiService {
 
         $this->generateImporter();
         
-        //PONER LOGICA SEGUN TIPO DE SELECTOR
-        
-        //TABLELIST SELECTOR
-        $objectsSelectorDataSource              = $this->getDataSource($this->getLocal("application.selector.dataSource"));
-        
-        $objectsSelectorParams                  = array();
-        $objectsSelectorParams['datasource']    = $this->getLocal("application.selector.dataSource");
-        $objectsSelectorParams['fields']        = $this->getSelectorFields($objectsSelectorDataSource);
-        $objectsSelectorParams['data']          = $this->getSelectorData($objectsSelectorDataSource);
-        $objectsSelectorParams['paginator']     = $this->getLocal("application.selector.paginator");
-        
-        $objectsSelector                        = new TableList($this->getDI());
-        $this->placeComponent("main", $objectsSelector, $objectsSelectorParams);
+        $selectorType                           = $this->getLocal("application.selector.type");
+
+        if($selectorType == "tablelist"){
+
+            //TABLELIST SELECTOR
+            $objectsSelectorDataSource              = $this->getDataSource($this->getLocal("application.selector.dataSource"));
+            
+            $objectsSelectorParams                  = array();
+            $objectsSelectorParams['datasource']    = $this->getLocal("application.selector.dataSource");
+            $objectsSelectorParams['fields']        = $this->getSelectorFields($objectsSelectorDataSource);
+            $objectsSelectorParams['data']          = $this->getSelectorData($objectsSelectorDataSource);
+            $objectsSelectorParams['paginator']     = $this->getLocal("application.selector.paginator");
+
+
+            
+            $objectsSelector                        = new TableList($this->getDI());
+            $this->placeComponent("main", $objectsSelector, $objectsSelectorParams);
+
+        }else if($selectorType == "hcards"){
+
+            //HCARDS SELECTOR
+            $objectsSelectorDataSource              = $this->getDataSource($this->getLocal("application.selector.dataSource"));
+            
+            $objectsSelectorParams                  = array();
+            $objectsSelectorParams['datasource']    = $this->getLocal("application.selector.dataSource");
+            $objectsSelectorParams['fields']        = $this->getSelectorFields($objectsSelectorDataSource);
+            $objectsSelectorParams['data']          = $this->getSelectorData($objectsSelectorDataSource);
+            $objectsSelectorParams['paginator']     = $this->getLocal("application.selector.paginator");
+            
+            $objectsSelector                        = new HorizontalCards($this->getDI());
+            $this->placeComponent("main", $objectsSelector, $objectsSelectorParams);
+        }
         
     }
 
@@ -396,9 +441,7 @@ class AppCrud extends VueUiService {
         //TODO: FALTAN LOS CAMPOS RELACION
         //TODO: FALTAN LOS CAMPOS TAGS
         //TODO: FALTAN LOS CAMPOS OBJECTSR
-        //TODO: FALTAN LOS CAMPOS OBJECTR
-
-        
+        //TODO: FALTAN LOS CAMPOS OBJECTR        
         
         foreach($p_dataSource->getDataDefinitions() as $field=>$definition){
             
@@ -411,17 +454,21 @@ class AppCrud extends VueUiService {
 
                     $fieldTemp["renderType"]            = "HIDDEN";
                 }else{
-
+                    
                     if($definition["isName"]){
 
                         $fieldTemp["renderType"]        = "LINK";
                         $fieldTemp["urlMap"]            = $this->getLocal("application.urlMaps.EDIT");
 
-                    }else if($definition["isImage"]){
+                    }else if($definition["isImage"] && $definition['typeOptions']->model == "image"){
 
                         $fieldTemp["renderType"]        = "IMAGE";
                         $fieldTemp["imgSrcMap"]         = $this->getLocal("application.urlMaps.IMAGE");;
 
+                    }else if($definition["isImage"] && $definition['typeOptions']->model == "avatar"){
+
+                        $fieldTemp["renderType"]        = "AVATAR";
+                        $fieldTemp["imgSrcMap"]         = $this->getLocal("application.urlMaps.AVATAR");;
                     }else{
 
                         if($definition["type"] == "json"){
@@ -611,6 +658,12 @@ class AppCrud extends VueUiService {
             $result["action" . $actionIndex] = $fieldTemp;
             $actionIndex++;
         }
+
+        ///PRE SELECTOR FIELDS
+        if(method_exists($this, "preProcessSelectorFields")){
+
+            $result         = $this->preProcessSelectorFields($result);
+        }
         
         return $result;
     }
@@ -676,10 +729,10 @@ class AppCrud extends VueUiService {
                         
                         if($definitions[$field]['type'] == "objectr"){
                             
-                            if($value != "" && property_exists($definitions[$field]['typeOptions'], 'model')){
-
+                            if(!empty($value) && property_exists($definitions[$field]['typeOptions'], 'model')){
+                                
                                 $valueIdNames                   = $this->getModelDataIdNames($definitions[$field]['typeOptions']->model, $value);
-
+                                
                                 $data['objects'][$row][$field]  = $valueIdNames;
                             }
                         }
@@ -701,13 +754,47 @@ class AppCrud extends VueUiService {
                                 $data['objects'][$row][$field]  = $valueIdNamesTemp;
                             }
                         }
-                        
                     }
                 }
+                
+                $data['objects'][$row]                          = $this->getSelectorPreProcessDataRow($data['objects'][$row]);
             }
         }
         
         return                      $data;
+    }
+
+    protected function getSelectorPreProcessDataRow($p_row){
+
+        $result             = $p_row;
+
+        if(method_exists($this, "preProcessSelectorDataRow")){
+
+            $result         = $this->preProcessSelectorDataRow($p_row);
+        }
+
+        return $result;
+    }
+
+    ///////////////////////////////////VIEWER/////////////////////////////////////////////
+    //EDITOR
+    protected function generateViewer($p_aditionalParams = array()){
+        
+        //PONER LOGICA SEGUN TIPO DE EDITOR
+
+        //FORM EDITOR
+        $objectsViewerDataSource                = $this->getDataSource($this->getLocal("application.editor.objectsDataSource"));
+
+        $objectsViewerParams                    = array();
+        
+        $objectsViewerParams['datasource']      = $this->getLocal("application.editor.objectsDataSource");
+        $objectsViewerParams['fields']          = $this->getEditorFields($objectsViewerDataSource);
+        $objectsViewerParams['fieldsGroups']    = $this->getEditorFieldsGroups($this->getDataSource($this->getLocal("application.editor.fgroupsDataSource")));
+        $objectsViewerParams['data']            = $this->getEditorData($objectsViewerDataSource);
+        
+        $objectsViewer                          = new TableViewer($this->getDI());
+        $this->placeComponent("main", $objectsViewer, array_merge($objectsViewerParams, $p_aditionalParams));
+        
     }
 
     /*______   _____    _____   _______    ____    _____  
@@ -797,7 +884,7 @@ class AppCrud extends VueUiService {
 
                 if($fieldTemp['type'] == "objectr" || $fieldTemp['type'] == "objectsr"){
 
-                    if(isset($fieldTemp['options']['model'])){
+                    if(isset($fieldTemp['options']['model']) && ( !isset($fieldTemp['options']['isAsync']) || $fieldTemp['options']['isAsync'] == false)){
 
                         
                         $modelDataIdNamesParams                     = array();
@@ -816,12 +903,13 @@ class AppCrud extends VueUiService {
                         }
     
                         $fieldTemp["options"]["data"]           = $fieldTempData;
+                    }
 
-                        $fieldTemp["options"]["multiple"]           = false;
-                        if($fieldTemp['type'] == "objectsr"){
+                    $fieldTemp["options"]["multiple"]           = false;
 
-                            $fieldTemp["options"]["multiple"]       = true;
-                        }
+                    if($fieldTemp['type'] == "objectsr"){
+
+                        $fieldTemp["options"]["multiple"]       = true;
                     }
                 }
 
@@ -945,22 +1033,14 @@ class AppCrud extends VueUiService {
             }
         }
 
-        //PARCHE ELECCIONES FILTERS
-        
-        if($this->hasUrlParam("eleccion")){
+        foreach($p_dataSource->getDataDefinitions() as $field=>$definition){
+            
+            if($this->hasUrlParam($field)){
 
-            $result["eleccion"]     = array($this->getUrlParam("eleccion"));
+                $result[$field]     = array($this->getUrlParam($field));
+            }
         }
 
-        if($this->hasUrlParam("cargo")){
-
-            $result["cargo"]     = array($this->getUrlParam("cargo"));
-        }
-        
-        if($this->hasUrlParam("candidato")){
-
-            $result["candidato"]     = array($this->getUrlParam("candidato"));
-        }
         return $result;
     }
 
@@ -1015,7 +1095,7 @@ class AppCrud extends VueUiService {
     }
 
     //VALIDATE AND ZANITIZE EDITOR DATA
-    protected function getEditorSaveData($p_data){
+    protected function getEditorAddData($p_data){
 
         $result = false;
 
@@ -1039,11 +1119,56 @@ class AppCrud extends VueUiService {
                             $result[$key] = $value;
                         }
                     }
+
+                    $result             = $this->preProccessEditorAddData($result);
                 }
             }
         }
 
         return $result;
+    }
+
+    protected function preProccessEditorAddData($p_row){
+
+        return $p_row;
+    }
+
+    protected function getEditorEditData($p_data){
+
+        $result = false;
+
+        //DATASOURCE VALIDATION
+        if($p_data["datasource"] == $this->getLocal("application.editor.objectsDataSource")){
+
+            //TOKEN PARAM
+            if(isset($p_data["token"])){
+                
+                //VALIDATE TOKEN
+                if($this->validateEditorToken($p_data["token"], $this->getLocal("application.editor.objectsDataSource"))){
+                    
+                    //TODO: VALIDATE DATA
+                    //TODO: SANITIZE DATA
+                    $result             = array();
+
+                    foreach($p_data as $key=>$value){
+
+                        if($key != 'token' && $key != 'datasource'){
+
+                            $result[$key] = $value;
+                        }
+                    }
+
+                    $result             = $this->preProccessEditorEditData($result);
+                }
+            }
+        }
+
+        return $result;
+    }
+
+    protected function preProccessEditorEditData($p_row){
+
+        return $p_row;
     }
 
     //SAVE EDITOR DATA

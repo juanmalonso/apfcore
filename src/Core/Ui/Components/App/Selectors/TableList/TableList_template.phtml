@@ -24,7 +24,7 @@
                         <!-- image -->
                         <th v-if="hasImageField()" style="width:36px;">&nbsp;</th>
                         <!-- fields -->
-                        <th v-if="field.renderType != 'IMAGE'" v-for="(field, fieldIndex) in tableFields" :key="fieldIndex">
+                        <th v-if="field.renderType != 'IMAGE' && field.renderType != 'AVATAR'" v-for="(field, fieldIndex) in tableFields" :key="fieldIndex">
                             ${field.label}
                         </th>
                         <!-- links -->
@@ -42,7 +42,11 @@
                             <img v-if="_.isObject(dataRow.imagen) && dataRow.imagen.id.length > 0" v-bind:src="parseStringBlocks(rowField.imgSrcMap, dataRow)" />
                             <img v-else v-bind:src="basepath + 'image/sq60/image_no-image.jpg'" />
                         </td>
-                        <td v-if="rowField.renderType != 'IMAGE'" v-for="(rowField, fieldIndex) in tableFields" :key="fieldIndex" style="padding: 4px;">
+                        <td v-if="hasImageField() && rowField.renderType == 'AVATAR'" v-for="(rowField, fieldIndex) in tableFields" :key="fieldIndex" style="padding: 4px;">
+                            <img v-if="_.isObject(dataRow.avatar) && dataRow.avatar.id.length > 0" v-bind:src="parseStringBlocks(rowField.imgSrcMap, dataRow)" />
+                            <img v-else v-bind:src="basepath + 'avatar/sq60/avatr_no-avatar.jpg'" />
+                        </td>
+                        <td v-if="rowField.renderType != 'IMAGE' && rowField.renderType != 'AVATAR'" v-for="(rowField, fieldIndex) in tableFields" :key="fieldIndex" style="padding: 4px;">
                             <template v-if="rowField.renderType == 'LINK'">
                                 <a v-bind:href="parseStringBlocks(rowField.urlMap, dataRow)">${dataRow[fieldIndex]}</a>
                             </template>
@@ -52,7 +56,8 @@
                                 </div>
                             </template>
                             <template v-if="rowField.renderType == 'TAG'">
-                                <span v-if="_.isObject(dataRow[fieldIndex]) && _.has(dataRow[fieldIndex], 'name') && dataRow[fieldIndex].name != ''">${dataRow[fieldIndex].name}</span>
+                                <div v-if="_.isObject(dataRow[fieldIndex]) && _.has(dataRow[fieldIndex], 'name') && dataRow[fieldIndex].name != ''" class="ui blue label">${dataRow[fieldIndex].name}</div>
+                                <div v-if="!_.isObject(dataRow[fieldIndex]) && dataRow[fieldIndex] != ''" class="ui blue label">${dataRow[fieldIndex]}</div>
                             </template>
                             <template v-if="rowField.renderType == 'TAGS'">
                                 <div v-if="_.isString(tagValue)" v-for="(tagValue, index) in dataRow[fieldIndex]" :key="index" class="ui blue label" style="margin: 0px 5px 5px 0px;">${tagValue}</div>

@@ -1,0 +1,27 @@
+<div class="ui fluid container main-container">
+    <div id="___id_" class="ui padded grid">
+        <div id="el_dimmable" class="column dimmable dimmed">
+            
+            <div class="ui three cards">
+                
+                <a v-for="(dataRow, rowIndex) in data.objects" :key="rowIndex" class="card" style="max-width: 209px; min-width: 209px;" v-bind:href="parseStringBlocks(linksFields.link0.urlMap, dataRow)">
+                    <div v-if="hasImageField()" class="image">
+                        <img v-bind:src="getImagePath(dataRow)">
+                    </div>
+                    <div class="content">
+                        <div class="header">${getName(dataRow)}</div>
+                    </div>
+                    <div class="content">
+                        
+                            <template v-if="dataRow['modId'] == 'uppacientes'">
+                                <div class="ui blue label">${dataRow['estado_paciente']}</div>
+                            </template>
+                        
+                    </div>
+                </a>
+
+            </div>
+
+        </div>
+    </div>
+</div>

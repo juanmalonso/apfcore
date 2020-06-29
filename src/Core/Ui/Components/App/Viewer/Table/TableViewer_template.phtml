@@ -1,0 +1,54 @@
+<div class="ui fluid container main-container">
+        <div id="___id_" class="ui padded grid">
+            <div class="thirteen wide column">
+                <div class="ui top attached tabular menu" style="padding-left: 14px; padding-right: 14px;">
+                    <template v-for="(groupFields, groupId, index) in fields.main">
+                        <a class="item formtab" v-bind:class="(index == 0) ? 'active' : ''" v-bind:data-tab="groupId">${getGroupName(groupId)}</a>
+                    </template>
+                </div>
+                <template v-for="(groupFields, groupId, index) in fields.main">
+                    <div class="ui bottom attached tab segment" v-bind:class="(index == 0) ? 'active' : ''" v-bind:data-tab="groupId" style="padding: 0px; border-width: 0px; margin-top: -1px;">
+                        
+                        <table class="ui celled striped selectable table">
+                            
+                            <tbody>
+
+                                <tr v-for="(field, fieldIndex) in groupFields" :key="fieldIndex">
+                                    <td style="width: 280px;vertical-align: top;">
+                                        
+                                        <div class="ui large label" style="background-color: transparent;">
+                                            <i v-bind:class="field.icon + ' icon'"></i> ${field.label}
+                                        </div>
+
+                                    </td>
+                                    <td>
+                                    <template v-if="field.component == 'image-selector'">
+                                        <img class="ui small image" v-bind:src="basepath + 'image/sq150/' + objectData[fieldIndex] + '.jpg'">
+                                    </template>
+                                    <template v-if="field.component == 'avatar-selector'">
+                                        <img class="ui small image" v-bind:src="basepath + 'avatar/sq150/' + objectData[fieldIndex] + '.jpg'">
+                                    </template>
+                                    <template v-if="field.component == undefined">
+                                        <template v-if="field.type == 'text' || field.type == 'integer' || field.type == 'datetime'">
+                                            ${objectData[fieldIndex]}
+                                        </template>
+                                        
+                                    </template>
+                                    </td>
+                                </tr>
+
+                            </tbody>
+                        </table>
+                        
+                    </div>
+
+                </template>
+            </div>
+
+            <div class="three wide column" style="padding-left: 0px;padding-top: 53px;">
+                
+                <!-- table -->
+            </div>
+        </div>
+    
+</div>

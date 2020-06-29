@@ -31,6 +31,11 @@ Vue.component("___tag_", {
       
     });
   },
-  methods: {},
+  methods: {
+    doReservar: function (){
+
+      window.location = this.parseStringBlocks(this.reservaLinkMap, this.data);
+    }
+  },
   template: "#___tag_-template"
 });

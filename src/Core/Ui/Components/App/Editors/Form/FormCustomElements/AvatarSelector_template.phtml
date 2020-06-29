@@ -39,8 +39,8 @@
         
         <div class="ui top attached tabular menu">
           <div class="active item imageSelectorTab" data-tab="upload">Subir Imagen</div>
-          <div class="item imageSelectorTab" data-tab="gallery">Seleccionar de la Galería</div>
-          <div class="item imageSelectorTab" data-tab="download">Descargar</div>
+          <!-- <div class="item imageSelectorTab" data-tab="gallery">Seleccionar de la Galería</div> -->
+          <div class="item imageSelectorTab" data-tab="camera">Usar Camara </div>
         </div>
 
         <div class="ui bottom attached active tab segment" data-tab="upload">
@@ -130,14 +130,14 @@
             </tbody>
           </table>
         </div>
-
+        <!--
         <div class="ui bottom attached tab segment" data-tab="gallery" v-bind:id="'gallery_' + $attrs.id">
           <div v-for="(image, index) in galleryData" :key="index" class="ui icon massive basic button galleryButton" v-bind:id="'gallery_button_' + image._id" v-bind:style="'min-width: 100px; min-height: 100px;padding-top: 38px; margin: 10px; background-image: url(\''+ basepath +'avatar\/sq100\/' + image._id + '.jpg\');'" v-on:click="doGallerySelectImage(image._id)">
             <i class="check icon"></i>
           </div>
-        </div>
+        </div> -->
 
-        <div class="ui bottom attached tab segment" data-tab="download">
+        <div class="ui bottom attached tab segment" data-tab="camera">
           TEST
         </div>
 

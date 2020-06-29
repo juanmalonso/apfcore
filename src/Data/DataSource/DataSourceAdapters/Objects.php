@@ -134,45 +134,48 @@ class Objects extends DataSourceAdapter {
 
     public function getDataIdNames($p_query){
         $result                 = false;
-
+        
         $nameField              = $this->getNameField();
         $imageField             = $this->getImageField();
 
-        if($this->options['model'] == "image"){
+        if($this->options['model'] == "image" || $this->options['model'] == "avatar"){
 
             $imageField         = "_id";
         }
 
         if(\is_array($p_query)){
-
+            
             $queryResult = $this->getData($p_query);
-
+            
             $result             = array();
-            $result['page']     = $queryResult['page'];
-            $result['rows']     = $queryResult['rows'];
-            $result['totals']   = $queryResult['totals'];
-            $result['pages']    = $queryResult['pages'];
+            $result['page']     = (isset($queryResult['page'])) ? $queryResult['page'] : 1;
+            $result['rows']     = (isset($queryResult['rows'])) ? $queryResult['rows'] : 100;
+            $result['totals']   = (isset($queryResult['totals'])) ? $queryResult['totals'] : 1;
+            $result['pages']    = (isset($queryResult['pages'])) ? $queryResult['pages'] : 1;
             $result['objects']  = array();
 
-            foreach($queryResult['objects'] as $object){
+            if(isset($queryResult['objects'])){
                 
-                $objectTmp              = array();
-                $objectTmp['id']        = $object['_id'];
-                $objectTmp['name']      = $object[$nameField];
-                $objectTmp['image']     = (isset($object[$imageField])) ? $object[$imageField]: "";
-                $objectTmp['icon']      = (isset($object['icon'])) ? $object['icon'] : "";
+                foreach($queryResult['objects'] as $object){
+                    
+                    $objectTmp              = array();
+                    $objectTmp['id']        = $object['_id'];
+                    $objectTmp['name']      = $object[$nameField];
+                    $objectTmp['image']     = (isset($object[$imageField])) ? $object[$imageField]: "";
+                    $objectTmp['icon']      = (isset($object['icon'])) ? $object['icon'] : "";
 
-                $result['objects'][]           = $objectTmp;
+                    $result['objects'][]           = $objectTmp;
+                }
             }
 
         }else{
-
+            
             $queryResult = $this->getData($p_query);
             
             $result             = array();
             $result['id']       = $queryResult['_id'];
             $result['name']     = $queryResult[$nameField];
-            $result['image']    = (isset($object[$imageField])) ? $object[$imageField]: "";
+            $result['image']    = (isset($queryResult[$imageField])) ? $queryResult[$imageField]: "";
             $result['icon']     = (isset($queryResult['icon'])) ? $queryResult['icon'] : "";
         }
         
@@ -217,9 +220,9 @@ class Objects extends DataSourceAdapter {
             }
         }
 
-        if(isset($this->options['toImportCustomIdField'])){
+        if(isset($this->options['customIdField'])){
 
-            $p_data['_id'] = $p_data[$this->options['toImportCustomIdField']];
+            $p_data['_id'] = $p_data[$this->options['customIdField']];
         }
         
         return $this->dataEngine->addObject($this->options['model'], $p_data);
