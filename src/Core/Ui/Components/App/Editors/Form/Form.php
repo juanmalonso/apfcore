@@ -20,6 +20,7 @@ class Form extends VueUiComponent {
         $this->setJsDataVar("token", $this->getLocal("token"));
         $this->setJsDataVar("datasource", $this->getLocal("datasource"));
         $this->setJsDataVar("fields", $this->getLocal("fields"));
+        $this->setJsDataVar("tempField", new \stdClass());
         $this->setJsDataVar("fieldsGroups", $this->getLocal("fieldsGroups"));
         $this->setJsDataVar("objectData", $this->getLocal("data"));
         
@@ -29,7 +30,7 @@ class Form extends VueUiComponent {
             $this->setJsDataVar("message", $this->getLocal("message"));
         }
 
-
+        $this->placeVueCustomElement("hidden-box");
         $this->placeVueCustomElement("text-box");
         $this->placeVueCustomElement("password-box");
         $this->placeVueCustomElement("number-box");

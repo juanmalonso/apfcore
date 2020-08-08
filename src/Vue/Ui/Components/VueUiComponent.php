@@ -22,6 +22,7 @@ class VueUiComponent extends UiComponent {
         
         $this->setJsDataVar("id", $this->getId());
         $this->setJsDataVar("basepath", $this->getDI()->get('config')->main->url->base);
+        $this->setJsDataVar("appid", $this->getDI()->get('config')->main->id);
         $this->setJsDataVar("serviceId", $this->serviceId);
         
         $this->setJsDataVar("path", $this->getUrlClassPath());

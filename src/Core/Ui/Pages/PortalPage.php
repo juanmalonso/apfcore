@@ -200,7 +200,7 @@ class PortalPage extends VueUiService {
                     $paqueteDataTmp['preciodesde']      = false;
 
                     $paqueteDataTmp['precio']           = "";
-
+                    
                     foreach($paqueteData['variaciones']->tabla as $variacion){
                         
                         if($paqueteDataTmp['precio'] == ""){
@@ -259,9 +259,10 @@ class PortalPage extends VueUiService {
 
         $query                          = array();
         $query['page']                  = (isset($p_params['page'])) ? $p_params['page'] : 1;
-        $query['rows']                  = (isset($p_params['rows'])) ? $p_params['rows'] : 8;
+        $query['rows']                  = (isset($p_params['rows'])) ? $p_params['rows'] : 12;
         $query['filters']               = array();
-        $query['filters']['parent']     = array("taxonomy_destinos");
+        //$query['filters']['parent']     = array("taxonomy_destinos");
+        $query['filters']['parent']     = array("taxonomy_categorias");
 
         if(isset($p_params['filters'])){
 

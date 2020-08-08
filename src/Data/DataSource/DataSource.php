@@ -30,6 +30,11 @@ class DataSource extends Common {
         return $this->adapter->importObjectsData($p_data);
     }
 
+    public function reindexData(){
+
+        return $this->adapter->reindexData();
+    }
+
     public function setState($p_id, $p_state){
 
         return $this->adapter->setObjectState($p_id, $p_state);
@@ -54,5 +59,10 @@ class DataSource extends Common {
     public function getDataDefinitions(){
 
         return $this->adapter->getDataDefinitions();
+    }
+
+    public function getDataFieldDefinitions($p_field){
+
+        return $this->adapter->getDataFieldDefinitions($p_field);
     }
 }

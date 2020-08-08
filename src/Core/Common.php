@@ -55,12 +55,12 @@ class Common extends Injectable
 
     //COMMON CACHE MANAGMENT
     protected function hasCache($p_key){
-
+        
         return $this->getDI()->get('cache')->has($p_key);
     }
 
     protected function getCache($p_key, $p_default = null){
-
+        
         return $this->getDI()->get('cache')->get($p_key, $p_default);
     }
 

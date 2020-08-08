@@ -93,7 +93,7 @@ class User extends Common {
     }
 
     private function getUserRoleData($p_role){
-
+        
         $dataSourceOptions                  = array();
         $dataSourceOptions['model']         = "roles";
 
@@ -109,7 +109,7 @@ class User extends Common {
 
                 $rolesMenusData[$menu]      = $this->getRoleMenuData($menu);
             }
-
+            
             $roleData['menus']              = $rolesMenusData;
         }
         
@@ -172,6 +172,7 @@ class User extends Common {
         $result['description']              = $menuItemData['description'];
         $result['icon']                     = $menuItemData['icon'];
         $result['path']                     = $menuItemData['path'];
+        $result['order']                    = $menuItemData['objOrder'];
 
         return $result;
     }

@@ -90,16 +90,16 @@ Vue.component("___tag_", {
       var set     = false;
       var result  = this.basepath;
 
-      if(!set && _.has(data, "imagen")){
+      if(!set && _.has(data, "avatar")){
 
-        result    = result + "imagen/sw160/" + data.imagen.image + ".jpg";
+        result    = result + "avatar/sw160/" + data.avatar.image + ".jpg";
 
         set       = true;
       }
 
-      if(!set && _.has(data, "avatar")){
+      if(!set && _.has(data, "imagen")){
 
-        result    = result + "imagen/sw160/" + data.avatar.image + ".jpg";
+        result    = result + "imagen/sw160/" + data.imagen.image + ".jpg";
 
         set       = true;
       }
@@ -132,9 +132,36 @@ Vue.component("___tag_", {
           result = true;
         }
       });
-      //console.log(result);
+      
       return result;
-    }
+    },
+    hasStateField: function(){
+      var result = false;
+      
+      _.each(this.tableFields , function (value, key, list){
+
+        if(!result && (value.renderType == "STATE")){
+
+          result = true;
+        }
+      });
+      
+      return result;
+    },
+    getStateField: function (){
+
+      var result = false;
+      
+      _.each(this.tableFields , function (value, key, list){
+
+        if(!result && (value.renderType == "STATE")){
+
+          result = key;
+        }
+      });
+      
+      return result;
+    },
   },
   computed: {
     paginatorPrevPage() {

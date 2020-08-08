@@ -3,9 +3,12 @@
             <form id="form1" name="form1" class="ui large form" method="post" v-on:submit.prevent="doLogin">
                 <div class="ui left aligned segment" style="background-color: rgba(255,255,255,0.8);">
 
-                    <div class="header"><h3>LOGIN</h3></div>
+                    <!-- <div class="header"><h3>LOGIN</h3></div> -->
 
                     <div class="ui segments">
+                        <div class="ui left center segment" style="background-color: rgba(255,255,255,0.8); text-align: center;">
+                            <img v-bind:src="basepath + 'web/images/' + appid + '_logo.png'" style="max-width: 150px;" />
+                        </div>
                         <div class="ui left aligned segment" style="background-color: rgba(255,255,255,0.8);">
                             <div class="ui left icon input" style="width: 100%;">
                                 <input type="text" id="login" name="login" placeholder="Usuario">

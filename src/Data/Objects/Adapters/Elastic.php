@@ -184,7 +184,7 @@ class Elastic extends Common
         $result = false;
 
         $query = new \Elastica\Query();
-
+        
         $query->setFrom(($p_page*$p_rows)-$p_rows);
         $query->setSize($p_rows);
 
@@ -193,8 +193,9 @@ class Elastic extends Common
         //$queryString    = new \Elastica\Query\SimpleQueryString();
 
         $queryString->setFields($p_fields);
+        
         $queryString->setQuery($p_keyword);
-        //$queryString->setDefaultOperator("OR");
+        $queryString->setDefaultOperator("OR");
 
         //AND
         $queryAND       = new \Elastica\Query\BoolQuery();
@@ -214,11 +215,21 @@ class Elastic extends Common
             foreach ($p_filters as $term=>$values){
 
                 if(is_array($values) && count($values) > 0){
-
+                    
                     $queryAND->addFilter(new \Elastica\Query\Terms($term, $values));
                 }
             }
         }
+
+        //RANGE
+        /*
+        $queryRange     = new \Elastica\Query\Range();
+        $queryRange->addField("objDateAdd", array(
+            "gte" => "2020-06-10 10:11:59",
+            "lte" => "2021-06-05 10:11:59"
+        ));
+        $queryAND->addFilter($queryRange);
+        */
 
         $queryMain      = new \Elastica\Query\BoolQuery();
         $queryMain->addMust($queryAND);
@@ -320,8 +331,13 @@ class Elastic extends Common
         }
 
         $query->setQuery($queryMain);
-
+        /*var_dump(json_encode($query->getQuery()->toArray()));
+        echo "<hr>";
+        exit();*/
         $resultSet = $p_type->search($query);
+
+        //var_dump(json_encode($resultSet->getQuery()->toArray()));
+        //echo "<hr>";
 
         $result = array();
         $result['totals'] = $resultSet->getTotalHits();
@@ -359,7 +375,9 @@ class Elastic extends Common
                 $errorData['error']     = $esResult->getError();
                 $errorData['fullerror'] = $esResult->getFullError();
 
-                $this->logError("Elastic Result Error " . $esResult->getErrorMessage,"Elastic", $errorData);
+                var_dump($errorData);exit();
+
+                //$this->logError("Elastic Result Error " . $esResult->getErrorMessage,"Elastic", $errorData);
             }
 
             $p_type->getIndex()->refresh();
@@ -373,6 +391,7 @@ class Elastic extends Common
             $exceptionData['trace']     = $e->getTraceAsString();
             $exceptionData['doc']     = $doc->getData();
             
+            var_dump($exceptionData);exit();
             //$this->logError("Elastic ResponseException " . $e->getMessage(),"Elastic", $exceptionData);
 
         }catch (\Elastica\Exception\JSONParseException $e){
@@ -382,6 +401,7 @@ class Elastic extends Common
             $exceptionData['trace']     = $e->getTraceAsString();
             $exceptionData['doc']     = $doc->getData();
             
+            var_dump($exceptionData);exit();
             //$this->logError("Elastic JSONParseException " . $e->getMessage(),"Elastic", $exceptionData);
         }catch (\Elastica\Exception\ElasticsearchException $e){
 
@@ -391,6 +411,7 @@ class Elastic extends Common
             $exceptionData['trace']     = $e->getTraceAsString();
             $exceptionData['doc']     = $doc->getData();
             
+            var_dump($exceptionData);exit();
             //$this->logError("Elastic ElasticsearchException " . $e->getMessage(),"Elastic",$exceptionData);
         }
 
@@ -408,7 +429,7 @@ class Elastic extends Common
         $bulk->setType($p_type);
 
         foreach ($p_data as $_id=>$data){
-
+            
             $bulk->addDocument(new \Elastica\Document($_id, $data));
         }
         
@@ -427,7 +448,9 @@ class Elastic extends Common
                 $errorData['error']     = $esBulkResult->getError();
                 $errorData['fullerror'] = $esBulkResult->getFullError();
 
-                $this->logError("Elastic Bulk Result Error " . $esBulkResult->getErrorMessage,"Elastic", $errorData);
+                var_dump($errorData);exit();
+
+                //$this->logError("Elastic Bulk Result Error " . $esBulkResult->getErrorMessage,"Elastic", $errorData);
             }
 
             $p_type->getIndex()->refresh();
@@ -438,7 +461,9 @@ class Elastic extends Common
             $exceptionData['failures']  = $e->getFailures();
             $exceptionData['trace']     = $e->getTraceAsString();
 
-            $this->logError("Elastic Bulk Exception " . $e->getMessage(),"Elastic", $exceptionData);
+            var_dump($exceptionData);exit();
+
+            //$this->logError("Elastic Bulk Exception " . $e->getMessage(),"Elastic", $exceptionData);
 
         }catch (\Elastica\Exception\ResponseException $e){
 
@@ -448,7 +473,9 @@ class Elastic extends Common
             $exceptionData['response']  = $e->getResponse();
             $exceptionData['trace']     = $e->getTraceAsString();
 
-            $this->logError("Elastic Exception " . $e->getMessage(),"Elastic", $exceptionData);
+            var_dump($exceptionData);exit();
+
+            //$this->logError("Elastic Exception " . $e->getMessage(),"Elastic", $exceptionData);
 
         }catch (\Elastica\Exception\JSONParseException $e){
 
@@ -456,7 +483,9 @@ class Elastic extends Common
             $exceptionData['name']      = $e->getMessage();
             $exceptionData['trace']     = $e->getTraceAsString();
 
-            $this->logError("Elastic Exception " . $e->getMessage(),"Elastic", $exceptionData);
+            var_dump($exceptionData);exit();
+
+            //$this->logError("Elastic Exception " . $e->getMessage(),"Elastic", $exceptionData);
         }catch (\Elastica\Exception\ElasticsearchException $e){
 
             $exceptionData              = array();
@@ -464,7 +493,9 @@ class Elastic extends Common
             $exceptionData['error']     = $e->getError();
             $exceptionData['trace']     = $e->getTraceAsString();
 
-            $this->logError("Elastic Exception " . $e->getMessage(),"Elastic",$exceptionData);
+            var_dump($exceptionData);exit();
+
+            //$this->logError("Elastic Exception " . $e->getMessage(),"Elastic",$exceptionData);
         }
 
         return $result;

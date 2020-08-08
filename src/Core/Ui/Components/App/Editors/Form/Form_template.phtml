@@ -2,14 +2,23 @@
         <form ref="selectorForm" v-bind:id="id + '_form'" name="___id__form" method="post" enctype="multipart/form-data">
             <input type="hidden" id="datasource" name="datasource" v-bind:value="datasource" />
             <input type="hidden" id="token" name="token" v-bind:value="token" />
+            <input v-if="hasStates()" type="hidden" id="stateData" name="stateData" />
         </form>
         <div id="___id_" class="ui padded grid">
             <div class="thirteen wide column">
+
+                <template v-for="(groupFields, groupId, index) in fields.info">
+                    <template v-for="(field, fieldIndex) in groupFields">
+                        <ElementHiddenBox v-bind:forForm="id + '_form'" v-bind:id="field.id" v-bind:editAs="field.editAs" v-bind:label="field.label" v-bind:data="objectData" v-bind:default="field.default" v-bind:help="field.help" v-bind:info="field.info" v-bind:required="field.required" v-bind:readOnly="field.readOnly" v-bind:validation="getFieldValidationOptions(field.options)" v-bind:file="getFieldFileOptions(field.options)" v-bind:options="getFieldOptions(field.options)"></ElementHiddenBox>
+                    </template>
+                </template>
+
                 <div class="ui top attached tabular menu" style="padding-left: 14px; padding-right: 14px;">
                     <template v-for="(groupFields, groupId, index) in fields.main">
                         <a class="item formtab" v-bind:class="(index == 0) ? 'active' : ''" v-bind:data-tab="groupId">${getGroupName(groupId)}</a>
                     </template>
                 </div>
+                
                 <template v-for="(groupFields, groupId, index) in fields.main">
                     <div class="ui bottom attached tab segment" v-bind:class="(index == 0) ? 'active' : ''" v-bind:data-tab="groupId" style="padding: 0px; border-width: 0px; margin-top: -1px;">
                         
@@ -36,6 +45,7 @@
                                         <ElementAvatarSelector v-bind:id="field.id" v-bind:forForm="id + '_form'" v-bind:editAs="field.editAs" v-bind:label="field.label" v-bind:data="objectData" v-bind:default="field.default" v-bind:help="field.help" v-bind:info="field.info" v-bind:required="field.required" v-bind:readOnly="field.readOnly" v-bind:validation="getFieldValidationOptions(field.options)" v-bind:file="getFieldFileOptions(field.options)" v-bind:options="getFieldOptions(field.options)"></ElementAvatarSelector>
                                     </template>
                                     <template v-if="field.component == undefined">
+                                        
                                         <ElementTextBox v-if="field.type == 'text'" v-bind:forForm="id + '_form'" v-bind:id="field.id" v-bind:editAs="field.editAs" v-bind:label="field.label" v-bind:data="objectData" v-bind:default="field.default" v-bind:help="field.help" v-bind:info="field.info" v-bind:required="field.required" v-bind:readOnly="field.readOnly" v-bind:validation="getFieldValidationOptions(field.options)" v-bind:file="getFieldFileOptions(field.options)" v-bind:options="getFieldOptions(field.options)"></ElementTextBox>
                                         <ElementPasswordBox v-if="field.type == 'password'" v-bind:forForm="id + '_form'" v-bind:id="field.id" v-bind:editAs="field.editAs" v-bind:label="field.label" v-bind:data="objectData" v-bind:default="field.default" v-bind:help="field.help" v-bind:info="field.info" v-bind:required="field.required" v-bind:readOnly="field.readOnly" v-bind:validation="getFieldValidationOptions(field.options)" v-bind:file="getFieldFileOptions(field.options)" v-bind:options="getFieldOptions(field.options)"></ElementPasswordBox>
                                         <ElementNumberBox v-if="field.type == 'integer'" v-bind:forForm="id + '_form'" v-bind:id="field.id" v-bind:editAs="field.editAs" v-bind:label="field.label" v-bind:data="objectData" v-bind:default="field.default" v-bind:help="field.help" v-bind:info="field.info" v-bind:required="field.required" v-bind:readOnly="field.readOnly" v-bind:validation="getFieldValidationOptions(field.options)" v-bind:file="getFieldFileOptions(field.options)" v-bind:options="getFieldOptions(field.options)"></ElementNumberBox>
@@ -48,6 +58,7 @@
                                         <ElementSchemaForm v-if="field.type == 'subform'" v-bind:forForm="id + '_form'" v-bind:id="field.id" v-bind:editAs="field.editAs" v-bind:label="field.label" v-bind:data="objectData" v-bind:default="field.default" v-bind:help="field.help" v-bind:info="field.info" v-bind:required="field.required" v-bind:readOnly="field.readOnly" v-bind:validation="getFieldValidationOptions(field.options)" v-bind:file="getFieldFileOptions(field.options)" v-bind:options="getFieldOptions(field.options)"></ElementSchemaForm>
                                         <ElementTagsBox v-if="field.type == 'tags'" v-bind:forForm="id + '_form'" v-bind:editAs="field.editAs" v-bind:id="field.id" v-bind:label="field.label" v-bind:data="objectData" v-bind:default="field.default" v-bind:help="field.help" v-bind:info="field.info" v-bind:required="field.required" v-bind:readOnly="field.readOnly" v-bind:validation="getFieldValidationOptions(field.options)" v-bind:file="getFieldFileOptions(field.options)" v-bind:options="getFieldOptions(field.options)"></ElementTagsBox>
                                         <ElementDateBox v-if="field.type == 'datetime'" v-bind:forForm="id + '_form'" v-bind:editAs="field.editAs" v-bind:id="field.id" v-bind:label="field.label" v-bind:data="objectData" v-bind:default="field.default" v-bind:help="field.help" v-bind:info="field.info" v-bind:required="field.required" v-bind:readOnly="field.readOnly" v-bind:validation="getFieldValidationOptions(field.options)" v-bind:file="getFieldFileOptions(field.options)" v-bind:options="getFieldOptions(field.options)"></ElementDateBox>
+                                        
                                     </template>
                                     </td>
                                 </tr>
@@ -61,6 +72,66 @@
             </div>
 
             <div class="three wide column" style="padding-left: 0px;padding-top: 53px;">
+
+                <template v-if="hasStates() && _.size(getStateActions()) > 0" >
+
+                    <div v-for="(stateAction, stateActionIndex) in getStateActions()" class="ui modal" v-bind:id="stateAction.toState + '_action_modal'">
+                        <div class="header">
+                            ${stateAction.label}
+                            <!-- ${stateAction.toState}
+                            ${stateAction.toStateInputData} -->
+                        </div>
+                        <div class="content">
+
+                            <table class="ui celled striped selectable table">
+
+                                <tbody>
+                                <template v-for="(toStateInputDataField, toStateInputDataFieldIndex) in stateAction.toStateInputData">
+                                    <tr v-if="toStateInputDataField.data_field == field.id" v-for="(field, fieldIndex) in getToStateActionFields(stateAction.toState)" :key="fieldIndex">
+                                        <td style="width: 280px;vertical-align: top;">
+                                            
+                                            <div class="ui large label" style="background-color: transparent;">
+                                                <i v-bind:class="field.icon + ' icon'"></i> ${field.label}
+                                            </div>
+                                            
+                                            <div v-if="field.help != ''" class="ui icon basic mini help button right floated helpPopup" v-bind:data-html="field.help" data-position="right center" data-variation="very wide">
+                                                <i class="help blue icon"></i>
+                                            </div>
+                                        </td>
+                                        <td>
+
+                                            <ElementTextBox v-if="field.type == 'text'" v-bind:toStateAction="stateAction.toState" v-bind:id="toStateInputDataFieldIndex" v-bind:editAs="field.editAs" v-bind:label="field.label" v-bind:data="{}" v-bind:default="field.default" v-bind:help="field.help" v-bind:info="field.info" v-bind:required="field.required" v-bind:readOnly="field.readOnly" v-bind:validation="getFieldValidationOptions(field.options)" v-bind:file="getFieldFileOptions(field.options)" v-bind:options="getFieldOptions(field.options)"></ElementTextBox>
+                                            <ElementOptionsSelector v-if="field.type == 'objectr'" v-bind:toStateAction="stateAction.toState" v-bind:id="toStateInputDataFieldIndex" v-bind:editAs="field.editAs" v-bind:label="field.label" v-bind:data="{}" v-bind:default="field.default" v-bind:help="field.help" v-bind:info="field.info" v-bind:required="field.required" v-bind:readOnly="field.readOnly" v-bind:validation="getFieldValidationOptions(field.options)" v-bind:file="getFieldFileOptions(field.options)" v-bind:options="getFieldOptions(field.options)"></ElementOptionsSelector>
+                                        
+                                        </td>
+                                    </tr>
+                                </template>
+                                </tbody>
+                            </table>
+
+                        </div>
+                        <div class="actions">
+                            <div class="ui black deny button">
+                            Cancelar
+                            </div>
+                            <div class="ui positive right labeled icon approve button">
+                            Aceptar
+                            <i class="checkmark icon"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <table class="ui celled striped loaded selectable table">
+                        <thead>
+                            <tr v-for="(stateAction, stateActionIndex) in getStateActions()" :key="stateActionIndex">
+                                <th>
+                                    <div v-if="stateAction.type == 'toState'" v-bind:class="'ui fluid ' + getStateStyle(stateAction.toState) + ' button'" v-on:click="doStateAction(stateAction)">${stateAction.label}</div>
+                                    <div v-if="stateAction.type == 'link'" v-bind:class="'ui fluid ' + stateAction.style + ' button'" v-on:click="doStateAction(stateAction)">${stateAction.label}</div>
+                                </th>
+                            </tr>
+                        </thead>
+                    </table>
+                </template>
                 
                 <template v-for="(groupFields, groupId, index) in fields.side">
                     <table v-for="(field, fieldIndex) in groupFields" :key="fieldIndex" class="ui celled striped loaded selectable table">

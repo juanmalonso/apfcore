@@ -32,7 +32,7 @@
     </div>
 </div>
  
-<div class="ui container" style="margin-top: 40px;">
+<div class="ui container" style="margin-top: 40px; padding-bottom: 28px;">
     <div class="ui grid">
         <div class="row">
             <div class="eleven wide column">
@@ -76,10 +76,20 @@
             <div class="eleven wide column">
                 <div class="ui medium header" style="font-family: 'Dosis', sans-serif; letter-spacing: 2px; text-align: left; margin-top: 2px;color:#4A4A4A;">Precios</div>
                 <table class="ui celled table">
-                    <tr v-for="(rowData, rowIndex) in data.variaciones.tabla" :key="index">
-                        <td>${rowData.col1}</td>
-                        <td>${data.moneda} ${rowData.col2}</td>
-                    </tr>
+                    <thead>
+                        <tr>
+                            <th>${data.variaciones.textcol1}</th>
+                            <th>${data.variaciones.textcol2}</th>
+                            <th v-if="hasCol3()">${data.variaciones.textcol3}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="(rowData, rowIndex) in data.variaciones.tabla" :key="rowIndex">
+                            <td>${rowData.col1}</td>
+                            <td>${data.moneda} ${rowData.col2}</td>
+                            <td v-if="hasCol3()">${data.moneda} ${rowData.col3}</td>
+                        </tr>
+                    </tbody>
                 </table>
             </div>
         </div>

@@ -8,5 +8,8 @@ class ReservaForm extends VueUiComponent {
     public function mainAction(){
         
         $this->setJsDataVar("data", $this->getLocal("data"));
+        $this->setJsDataVar("token", $this->getLocal("token"));
+
+        
     }
 }

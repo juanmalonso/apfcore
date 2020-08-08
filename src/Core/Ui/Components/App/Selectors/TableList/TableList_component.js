@@ -103,6 +103,31 @@ Vue.component("___tag_", {
       //console.log("onEndLoadingDimmer", $('#el_dimmable'));
       $('#el_dimmable').dimmer('hide');
     },
+    doRowService: function (params, event) {
+      
+      var rowServiceParams = {
+        "service":params.service,
+        "_id": params.id,
+        "nombre":params.nombre,
+        "apellido":params.apellido,
+        "accesstoken":params.accesstoken,
+        "email":params.email,
+        "eleccion":params.eleccion,
+        "loading":true,
+        "successcbk": this.onRowServiceSuccess,
+        "errorcbk": this.onRowServiceError,
+      }
+
+      this.doService("doLoadRowService", rowServiceParams, {}, event);
+    },
+    onRowServiceSuccess: function (response, data) {
+
+      console.log("onRowServiceSuccess", data);
+    },
+    onRowServiceError: function (response, message) {
+
+      console.log("onRowServiceError", response, message);
+    },
     hasImageField: function(){
       var result = false;
       

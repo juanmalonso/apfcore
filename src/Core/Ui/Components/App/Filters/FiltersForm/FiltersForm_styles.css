@@ -1,0 +1,7 @@
+#___id_ {
+}
+
+.jsoneditor-menu, .jsoneditor-undo, .jsoneditor-redo, .jsoneditor-modes, .jsoneditor-search {
+
+    display: none;
+}

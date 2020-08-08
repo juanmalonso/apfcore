@@ -432,12 +432,37 @@ class NbsObject extends Common
                 $insertData['objPage1000']      = \Nubesys\Core\Utils\Utils::getPageSequence($this->getDI(), $p_model . '_page1000', 1000);
                 $insertData['objPage10000']     = \Nubesys\Core\Utils\Utils::getPageSequence($this->getDI(), $p_model . '_page10000', 10000);
 
-                
+                //STATES
                 if(is_object($modelData['modStatesOptions']) && property_exists($modelData['modStatesOptions'], "stateable")){
 
                     if($modelData['modStatesOptions']->stateable == true){
 
-                        $insertData['objState'] = $p_data['state'];
+                        $state                  = "new";
+
+                        if(isset($p_data['objState'])){
+
+                            $insertData['objState'] = $p_data['objState'];
+                            $state                  = $p_data['objState'];
+                        }else{
+
+                            if(property_exists($modelData['modStatesOptions'], "defaultState")){
+
+                                $insertData['objState'] = $modelData['modStatesOptions']->defaultState;
+                                $state                  = $insertData['objState'];
+                            }
+                        }
+
+                        $stateDataTmp                   = array();
+                        $stateDataTmp['state']          = $insertData['objState'];
+                        $stateDataTmp['date']           = $insertData['objDateAdd'];
+                        $stateDataTmp['user']           = "";
+                        $stateDataTmp['data']           = (isset($p_data['stateData']) && is_object($p_data['stateData'])) ? $p_data['stateData'] : new \stdClass();
+
+                        $stateDataLogs                  = array();
+                        $stateDataLogs[]                = $stateDataTmp;
+
+                        $insertData['objStatesLog']     = $stateDataLogs;
+                        
                     }
                 }
 
@@ -450,7 +475,7 @@ class NbsObject extends Common
 
                     $insertData['objActive'] = true;
                 }
-
+                
                 $indexData = $insertData;
 
                 //INSERT IN OBJECT TABLE
@@ -514,6 +539,11 @@ class NbsObject extends Common
                 } else {
 
                     $insertData['objData'] = json_encode(new \stdClass());
+                }
+
+                if(isset($insertData['objStatesLog'])){
+
+                    $insertData['objStatesLog'] = json_encode($insertData['objStatesLog'], JSON_UNESCAPED_UNICODE);
                 }
                 
                 $tableName = $this->model->getModelObjectsTableName($p_model, $modelData['modType']);
@@ -639,7 +669,7 @@ class NbsObject extends Common
                     foreach ($modelDefinition as $modelField) {
 
                         $fieldId = $modelField['dafId'];
-                        var_dump($data);exit();
+                        
                         if (property_exists($data, $fieldId)) {
 
                             $_dataTemp[$fieldId] = $data->$fieldId;
@@ -799,9 +829,9 @@ class NbsObject extends Common
         $modelRelations         = $this->model->getRelations($p_model, 'IN');
 
         $objectData             = $this->get($p_model, $p_id);
-
+        
         if($objectData){
-
+            
             $indexOldData                   = \Nubesys\Core\Utils\Struct::toArray($objectData);
 
             $updateData['objDateUpdated']   = \Nubesys\Core\Utils\Utils::getDateTime($this->getDI());
@@ -817,9 +847,60 @@ class NbsObject extends Common
                 $updateData['objOrder']   = $p_data['objOrder'];
             }
 
-            if(isset($p_data['objState'])){
+            //STATES
+            if(is_object($modelData['modStatesOptions']) && property_exists($modelData['modStatesOptions'], "stateable")){
 
-                $updateData['objState']   = $p_data['objState'];
+                if($modelData['modStatesOptions']->stateable == true){
+
+                    $state                  = "new";
+
+                    if(isset($p_data['objState'])){
+
+                        $updateData['objState'] = $p_data['objState'];
+                        $state                  = $p_data['objState'];
+                    }else{
+
+                        if(property_exists($modelData['modStatesOptions'], "defaultState")){
+
+                            $updateData['objState'] = $modelData['modStatesOptions']->defaultState;
+                            $state                  = $updateData['objState'];
+                        }
+                    }
+
+                    $stateDataTmp                       = array();
+                    $stateDataTmp['state']              = $updateData['objState'];
+                    $stateDataTmp['date']               = $updateData['objDateUpdated'];
+                    $stateDataTmp['user']               = "";
+
+                    if(isset($p_data['stateData'])){
+                    
+                        if(is_object($p_data['stateData'])){
+
+                            $stateDataTmp['data']           = json_decode($p_data['stateData']);
+                        }
+
+                        if(is_string($p_data['stateData'])){
+
+                            $stateDataTmp['data']           = json_decode($p_data['stateData']);
+                        }
+
+                    }else{
+
+                        $stateDataTmp['data']           = new \stdClass();
+                    }
+                    
+                    
+                    if(isset($objectData['objStatesLog'])){
+
+                        $objectData['objStatesLog'][]   = $stateDataTmp;
+
+                        $updateData['objStatesLog']     = $objectData['objStatesLog'];
+
+                    }else{
+
+                        $updateData['objStatesLog']     = array($stateDataTmp);
+                    }
+                }
             }
 
             if(isset($p_data['objActive'])){
@@ -881,6 +962,11 @@ class NbsObject extends Common
                     }
 
                     
+                }
+
+                if(isset($updateData['objStatesLog'])){
+
+                    $updateData['objStatesLog'] = json_encode($updateData['objStatesLog'], JSON_UNESCAPED_UNICODE);
                 }
                 
                 $updateData['objData'] = json_encode(array_replace((array)$objectData['objData'],(array)$_dataTemp),JSON_UNESCAPED_UNICODE);
@@ -1194,7 +1280,7 @@ class NbsObject extends Common
 
                                 $fields                 = $p_query['fields'];
                             }
-
+                            
                             $facets                     = array();
                             if(isset($p_query['facets'])){
 
@@ -1278,7 +1364,7 @@ class NbsObject extends Common
     }
 
     private function indexBulkAdd($p_modelData, $p_modelDefinition, $p_modelRelations, $p_data){
-
+        
         $result = false;
 
         $client = $this->elastic->setClient();
@@ -1298,16 +1384,16 @@ class NbsObject extends Common
                     if($index !== false){
 
                         $mapping = $this->getMapping($p_modelData, $p_modelDefinition, $p_modelRelations);
-
+                        
                         $documents = array();
-
+                        
                         foreach($p_data as $doc){
 
                             $documents[$doc['_id']] = $this->getIndexableData($p_modelDefinition, $p_modelRelations, $doc);
                         }
-
+                        
                         $type = $this->getType($index, $typeName, $mapping);
-
+                        
                         if($type !== false) {
 
                             $result = $this->elastic->addBulk($client, $index, $type, $documents);
@@ -1410,9 +1496,12 @@ class NbsObject extends Common
 
         if (property_exists($p_modelData['modIndexOptions'], 'analysis')) {
 
-            $indexArgs['analysis'] = $p_modelData['modIndexOptions']->analysis;
+            $indexArgs['analysis'] = \Nubesys\Core\Utils\Struct::extendFieldValues($indexArgs['analysis'], $p_modelData['modIndexOptions']->analysis);
+
+            //$indexArgs['analysis'] = $p_modelData['modIndexOptions']->analysis;
         }
         
+        //var_dump($indexArgs);exit();
         return $this->elastic->setIndex($p_indexName, $indexArgs);
     }
 
@@ -1479,20 +1568,22 @@ class NbsObject extends Common
 
                             if($definition['typId'] == 'objectr'){
 
-                                $fullTextPropertyName       = $propertyName . "_flltxt";
+                                $fullTextPropertyName               = $propertyName . "_flltxt";
 
-                                $fullTextPropertyMapping        = new \stdClass();
-                                $fullTextPropertyMapping->type  = "text";
+                                $fullTextPropertyMapping            = new \stdClass();
+                                $fullTextPropertyMapping->type      = "text";
+                                //$fullTextPropertyMapping->analizer  = "nbs_analyzer";
 
                                 $datamapping->properties->$fullTextPropertyName = $fullTextPropertyMapping;
                             }
 
                             if($definition['typId'] == 'objectsr'){
 
-                                $fullTextPropertyName       = $propertyName . "_flltxt";
+                                $fullTextPropertyName               = $propertyName . "_flltxt";
 
-                                $fullTextPropertyMapping        = new \stdClass();
-                                $fullTextPropertyMapping->type  = "text";
+                                $fullTextPropertyMapping            = new \stdClass();
+                                $fullTextPropertyMapping->type      = "text";
+                                //$fullTextPropertyMapping->analizer  = "nbs_analyzer";
 
                                 $datamapping->properties->$fullTextPropertyName = $fullTextPropertyMapping;
                             }
@@ -1593,7 +1684,16 @@ class NbsObject extends Common
 
                                     $fullTextPropertyName               = $propertyName . "_flltxt";
                                     
-                                    $_dataTemp[$fullTextPropertyName]   = $this->name($definition['defDafTypOptions']->model, $p_data['objData'][$propertyName]);
+                                    $id                                 = $p_data['objData'][$propertyName];
+
+                                    if(is_string($id) && $id != "[]"){
+
+                                        $_dataTemp[$fullTextPropertyName]   = $this->name($definition['defDafTypOptions']->model, $id);
+                                    }else{
+
+                                        $_dataTemp[$fullTextPropertyName]   = $propertyName;
+                                    }
+                                    
                                 }
 
                                 $_dataTemp[$propertyName] = (array)$p_data['objData'][$propertyName];
@@ -1603,12 +1703,24 @@ class NbsObject extends Common
                                 if(isset($definition['defDafTypOptions']) && property_exists($definition['defDafTypOptions'],'model')){
 
                                     $fullTextPropertyName               = $propertyName . "_flltxt";
+                                    
+                                    $_flltxtDataTemp                    = "";
 
-                                    $_flltxtDataTemp = "";
+                                    $index                              = 0;
 
-                                    foreach ($p_data['objData'][$propertyName] as $id){
+                                    if(is_array($p_data['objData'][$propertyName])){
 
-                                        $_flltxtDataTemp .= " " . $this->name($definition['defDafTypOptions']->model, $id);
+                                        foreach ($p_data['objData'][$propertyName] as $id){
+
+                                            $_flltxtDataTemp .= $this->name($definition['defDafTypOptions']->model, $id);
+    
+                                            if($index < count($p_data['objData'][$propertyName]) - 1){
+    
+                                                $_flltxtDataTemp .= " ";
+                                            }
+    
+                                            $index++;
+                                        }
                                     }
 
                                     $_dataTemp[$fullTextPropertyName]   = $_flltxtDataTemp;
@@ -1628,7 +1740,7 @@ class NbsObject extends Common
                 }
             }
         }
-
+        
         $result['objData'] = $_dataTemp;
 
         $_relTemp = array();
@@ -1692,6 +1804,15 @@ class NbsObject extends Common
                         $selectResult['objData'] = new \stdClass();
                     }
 
+                    if (isset($selectResult['objStatesLog'])) {
+    
+                        $selectResult['objStatesLog'] = json_decode($selectResult['objStatesLog']);
+
+                    } else {
+    
+                        $selectResult['objStatesLog'] = array();
+                    }
+
                     foreach ($modelRelations as $modelRelation) {
 
                         $fieldId = 'rel_' . $modelRelation['modId'];
@@ -1720,10 +1841,10 @@ class NbsObject extends Common
     public function name($p_model, $p_id){
         
         $result = $p_id;
-
+        
         $cacheKey       = 'data_object_name_' . $p_id;
         $cacheLifetime  = 3600;
-
+        
         if($this->hasCache($cacheKey)){
 
             $result = $this->getCache($cacheKey, "");
@@ -1814,7 +1935,7 @@ class NbsObject extends Common
         //TODO: Falta orders y todo lo demas para hacer similar al elasticsearch
 
         $selectResult = $this->database->select($tableName,$selectOptions);
-
+        
         if($selectResult){
 
             foreach($selectResult as $object){
@@ -1826,6 +1947,15 @@ class NbsObject extends Common
                 }else{
 
                     $object['objData'] = new \stdClass();
+                }
+
+                if(isset($object['objStatesLog'])){
+
+                    $object['objStatesLog'] = json_decode($object['objStatesLog']);
+
+                }else{
+
+                    $object['objStatesLog'] = array();
                 }
 
                 $result[] = $object;

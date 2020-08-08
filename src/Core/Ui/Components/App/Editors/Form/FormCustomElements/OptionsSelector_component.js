@@ -27,7 +27,7 @@ Vue.component("___tag_", {
       $('.ui.checkbox').checkbox();
       $('.ui.radio.checkbox').checkbox();
 
-      _.each(value, function (value, key, list) {
+      _.each(selected, function (value, key, list) {
 
         $("input[value='" + value + "']").parent().checkbox('check');
       });
@@ -148,7 +148,7 @@ Vue.component("___tag_", {
           successcbk: _self.onFilterDataSuccess,
           errorcbk: _self.onFilterDataError
         }
-
+        console.log("DATA", JSON.stringify(options));
         _self.doService("doLoadData", options);
       } else {
 

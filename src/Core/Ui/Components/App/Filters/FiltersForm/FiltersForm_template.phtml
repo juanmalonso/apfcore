@@ -1,0 +1,59 @@
+<div class="ui fluid container main-container">
+    <form class="ui form" ref="filtersForm" id="filtersForm" name="filtersForm">
+    <div id="___id_" class="ui padded grid">
+
+        <div class="row">
+
+            <div class="twelve wide column">
+                <div v-if="_.size(filters) > 0" class="fields">
+                    <template v-if="hasDropdownFilters()">
+                        <div v-if="filter.type == 'dropdown'" v-for="(filter, filterIndex) in filters" :key="filterIndex" class="field" style="min-width: 12.5%!important;">
+
+                            <select v-if="!filter.multiple" class="ui search dropdown" v-bind:id="'filter_' + filter.id" v-bind:name="'filter_' + filter.id"></select>
+                            <select v-if="filter.multiple" class="ui search dropdown" v-bind:id="'filter_' + filter.id" v-bind:name="'filter_' + filter.id + '[]'" multiple=""></select>
+
+                        </div>
+
+                        <div class="ui field">
+                            <div class="ui icon button" v-on:click="doFilter()">
+                                <i class="filter icon"></i> Filtrar
+                            </div>
+                        </div>
+                    </template>
+
+                    <template v-if="filter.type == 'togglebuttons'" v-for="(filter, filterIndex) in filters">
+
+                        <div  class="ui buttons">
+                            
+                            <div v-for="(data, dataIndex) in filter.data" :key="dataIndex" v-on:click="doToggleFilter(filter, data.value)" class="ui button" v-bind:id="'filter_' + filter.id + '_' + data.value">${data.label}</div>
+                        </div>
+                    </template>
+                    
+                    
+                    
+
+                </div>
+            </div>
+
+            <div class="four wide column">
+                    <div class="fields">
+                        <div class="ui eleven wide field" style="min-width: 12.5%!important;">
+
+                            <div class="ui input">
+                                <input type="text" id="keyword" name="keyword" placeholder="Buscar..." v-bind:value="keyword" v-on:keyup.enter="doFilter()">
+                            </div>
+
+                        </div>
+
+                        <div class="ui five wide field">
+                            <div class="ui fluid icon button" v-on:click="doFilter()">
+                                <i class="search icon"></i> Buscar
+                            </div>
+                        </div>
+                        
+                    </div>
+            </div>
+        </div>
+    </div>
+    </form>
+</div>

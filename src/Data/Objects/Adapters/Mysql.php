@@ -211,7 +211,7 @@ class Mysql extends Common
         //TODO: CREAR Exception NubesysMySQL
 
         $query = "SELECT " . $fields . " FROM " . $p_table . "" . $conditions ."" . $order . "" . $rows . "" . $offset . ";";
-
+        
         $resultSet = $this->getDI()->get('datadb')->fetchOne($query, \Pdo::FETCH_ASSOC, $params);
 
         if(is_array($resultSet)){
@@ -271,7 +271,7 @@ class Mysql extends Common
         $result = false;
 
         if(is_array($p_data)){
-
+            
             $result = $this->getDI()->get('datadb')->insertAsDict($p_table, $p_data);
         }
 

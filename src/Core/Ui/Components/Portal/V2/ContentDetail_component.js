@@ -35,6 +35,19 @@ Vue.component("___tag_", {
     doReservar: function (){
 
       window.location = this.parseStringBlocks(this.reservaLinkMap, this.data);
+    },
+    hasCol3: function(){
+      var result = false;
+
+      _.each(this.data['variaciones'].tabla, function (value, key, list) {
+
+        if(value.col3 > 0){
+
+          result = true;
+        }
+      });
+
+      return result;
     }
   },
   template: "#___tag_-template"

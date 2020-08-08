@@ -1,6 +1,6 @@
 {
   "accessControl": true,
-  "title": "Models Manager",
+  "title": "Clientes",
   "navigation": {
     "user": {
       "label": "var(session:user_login)",
@@ -9,39 +9,43 @@
     },
     "items": [
       {
-        "label": "Models",
-        "url": "http://localhost/models/",
-        "icon": "database purple icon"
+        "label": "Paquetes",
+        "url": "http://localhost/paquetes/",
+        "icon": "gifts icon"
       },
       {
-        "label": "Fields",
-        "url": "http://localhost/fields/",
-        "icon": "dot circle purple icon"
+        "label": "Categorias",
+        "url": "http://localhost/categorias/",
+        "icon": "sitemap icon"
       },
       {
-        "label": "F. Groups",
-        "url": "http://localhost/fgroups/",
-        "icon": "sitemap purple icon"
+        "label": "Destinos",
+        "url": "http://localhost/destinos/",
+        "icon": "map icon"
       },
       {
-        "label": "Types",
-        "url": "http://localhost/types/",
-        "icon": "bullseye purple icon"
+        "label": "Servicios",
+        "url": "http://localhost/servicios/",
+        "icon": "tasks icon"
+      },
+      {
+        "label": "Temporadas",
+        "url": "http://localhost/temporadas/",
+        "icon": "cloud sun icon"
       }
     ]
   },
   "application": {
-    "type": "datacustoms",
+    "type": "dataobjectscrud",
     "serviceActions": {
       "default": "list",
       "paramNum": 5
     },
     "dataSources": {
-      "models": {
-        "adapter": "custom",
+      "objects": {
+        "adapter": "objects",
         "options": {
-          "definitions": "fun(getObjectsDefinitions)",
-          "data": "fun(getObjectsData)"
+          "model": "clientes"
         }
       },
       "fgroups": {
@@ -52,24 +56,22 @@
       }
     },
     "urlMaps": {
-      "LIST": "{var(global:urlbase)}models/list",
-      "ADD": "{var(global:urlbase)}models/add/",
-      "EDIT": "{var(global:urlbase)}models/edit/%(data:modId)%",
-      "DEFINITIONS": "{var(global:urlbase)}definitions/list/modId:%(data:modId)%",
-      "CRUD": "{var(global:urlbase)}crud/%(data:modId)%/list/",
-      "REINDEX": "{var(global:urlbase)}reindex/form/modId:%(data:modId)%",
-      "RELATION": "{var(global:urlbase)}relations/edit/%(data:modId)%"
+      "LIST": "{var(global:urlbase)}clientes/list",
+      "ADD": "{var(global:urlbase)}clientes/add",
+      "EDIT": "{var(global:urlbase)}clientes/edit/%(data:_id)%",
+      "DELETE": "{var(global:urlbase)}clientes/delete/%(data:_id)%",
+      "IMAGE": "{var(global:urlbase)}image/sq60/gray/%(data:imagen.id)%.jpg"
     },
     "topBar": {
       "list": {
         "title": {
           "type": "text",
-          "text": "var(local:title)"
+          "text": "Clientes - LIST"
         },
         "actions": [
           {
             "type": "link",
-            "label": "add model",
+            "label": "nuevo",
             "urlMap": "var(local:application.urlMaps.ADD)",
             "style": "green",
             "icon": "plus icon"
@@ -79,7 +81,7 @@
       "edit": {
         "title": {
           "type": "text",
-          "text": "{var(local:title)} - EDIT"
+          "text": "Clientes - EDIT"
         },
         "actions": [
           {
@@ -109,7 +111,7 @@
       "add": {
         "title": {
           "type": "text",
-          "text": "{var(local:title)} - ADD"
+          "text": "Clientes - ADD"
         },
         "actions": [
           {
@@ -140,58 +142,15 @@
     "editor": {
       "type": "form",
       "async": false,
-      "objectsDataSource": "models",
+      "objectsDataSource": "objects",
       "fgroupsDataSource": "fgroups",
-      "objectsSaveMethod": "saveObjectsData",
-      "objectsEditMethod": "editObjectsData",
-      "objectToSaveIdMethod": "getObjectToSaveId",
-      "objectGetMethod": "getObjectData"
+      "objectToSaveIdParamNum": 6
     },
     "selector": {
       "type": "tablelist",
       "async": false,
-      "dataSource": "models",
-      "links": [
-        {
-          "type": "selector",
-          "label": "Opciones",
-          "options": [
-            {
-              "type": "link",
-              "label": "Definicion de Datos",
-              "urlMap": "var(local:application.urlMaps.DEFINITIONS)"
-            },
-            {
-              "type": "link",
-              "label": "Administrar Datos",
-              "urlMap": "var(local:application.urlMaps.CRUD)"
-            },
-            {
-              "type": "actions",
-              "label": "Reindexar Datos",
-              "actions":[
-                {
-                  "scope":"_service",
-                  "name":"doReindexData",
-                  "params":{
-                      "model":"%(data:modId)%"
-                  }
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "type": "link",
-          "label": "Relation Definition",
-          "style": "teal",
-          "urlMap": "var(local:application.urlMaps.RELATION)",
-          "condition": {
-            "type": "jsexpression",
-            "expression": "'%(data:modType)%' == 'RELATION'"
-          }
-        }
-      ],
+      "dataSource": "objects",
+      "links": [],
       "actions": [
         {
           "type": "link",

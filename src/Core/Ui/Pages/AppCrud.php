@@ -12,6 +12,7 @@ use Nubesys\Core\Ui\Components\App\Selectors\HorizontalCards\HorizontalCards;
 use Nubesys\Core\Ui\Components\App\Editors\Form\Form;
 use Nubesys\Core\Ui\Components\App\Viewer\Table\TableViewer;
 use Nubesys\Core\Ui\Components\App\Importer\Importer;
+use Nubesys\Core\Ui\Components\App\Filters\FiltersForm\FiltersForm;
 
 //DATA SOURCE
 use Nubesys\Data\DataSource\DataSource;
@@ -373,16 +374,175 @@ class AppCrud extends VueUiService {
         
     }
 
-     /*___   ______   _        ______    _____   _______    ____    _____  
+    //FILTERS
+    protected function generateFilters(){
+
+        //TODO: MEGA FILTER (PASAR COMO PARAMETRO LOS FIELDS)
+        //TODO: FILTERS TOGGLE BUTTONS (PHILS)
+        //TODO: CHECKBOS FILTERS (SWITCHER)
+        //TODO: DATE RANGE
+        //TODO: TAB FILTERS (SELE PASA POR PARAMETRO EL FIELD y LAS OPCIONES (UNICO))
+        //TODO: TAB STATUS FILTERS
+
+        $objectsFiltersDataSource               = $this->getDataSource($this->getLocal("application.selector.dataSource"));
+        
+        $objectsFiltersParams                   = array();
+        $objectsFiltersParams['datasource']     = $this->getLocal("application.selector.dataSource");
+        $objectsFiltersParams['filters']        = $this->getFiltersFields($objectsFiltersDataSource);
+
+        $objectsFiltersParams['keyword']        = "*";
+        if($this->hasUrlParam("keyword")){
+
+            $objectsFiltersParams['keyword']    = $this->getUrlParam("keyword");
+        }
+        
+        $objectsFilters                     = new FiltersForm($this->getDI());
+        $this->appendComponent("tools", $objectsFilters, $objectsFiltersParams);
+    }
+
+    protected function getFiltersFields($p_dataSource){
+
+        $result                         = array();
+
+        $disableAllFilters              = false;
+
+        if($this->hasLocal("application.selector.disableAllFilters")){
+
+            $disableAllFilters          = $this->getLocal("application.selector.disableAllFilters");
+        }
+
+        if(!$disableAllFilters){
+
+            //TODO: FILTROS SEGUN RELACIONES
+            //TODO: FILTROS DE TAGS
+            //TODO: FILTROS DE objActive
+            //TODO: FILTROS DE objState
+            //TODO: FILTROS DE objDateAdd
+            
+            foreach($p_dataSource->getDataDefinitions() as $field=>$definition){
+
+                $disabledFilters                        = array();
+
+                if($this->hasLocal("application.selector.disabledFilters")){
+
+                    $disabledFilters          = $this->getLocal("application.selector.disabledFilters");
+                }
+
+                if(!in_array($field, $disabledFilters)){
+
+                    if($definition["uiOptions"]->filterable && $definition['isRelation'] == false){
+                        
+                        $filterTemp                     = array();
+
+                        $filterTemp['id']               = $field;
+                        
+                        if($definition['type'] == "options"){
+                            
+                            $filterTemp['type']             = "dropdown";
+                            $filterTemp['multiple']         = false;
+                            $filterTemp['label']            = $definition["uiOptions"]->label;
+                            $filterTemp['icon']             = $definition["uiOptions"]->icon;
+                            $filterTemp['data']             = array();
+                            
+                            if(property_exists($definition['typeOptions'], 'data')){
+
+                                foreach($definition['typeOptions']->data as $option){
+                                    
+                                    $optionTemp             = array();
+                                    $optionTemp['value']    = $option->value;
+                                    $optionTemp['label']    = $option->label;
+                                    $optionTemp['icon']     = (property_exists($option, 'icon')) ? $option->icon : "";
+                                    $optionTemp['image']    = (property_exists($option, 'image')) ? $option->image : "";
+
+                                    $filterTemp['data'][]   = $optionTemp;
+                                }
+                            }
+
+                            if(property_exists($definition['typeOptions'], 'multiple') && $definition['typeOptions']->multiple == true){
+
+                                $filterTemp['multiple']         = true;
+                            }
+
+                            if($this->hasUrlParam($field)){
+
+                                $filterTemp['selected']     = (array)$this->getUrlParam($field);
+                            }
+                            
+                            $result[$field] = $filterTemp;
+                        }
+                        
+                        if($definition['type'] == "objectr" || $definition['type'] == "objectsr"){
+
+                            //TODO: USAR EL NOMBRE DEL MODEL como LABEL
+                            $filterTemp['type']             = "dropdown";
+                            $filterTemp['multiple']         = true;
+                            $filterTemp['label']            = $definition["uiOptions"]->label;
+                            $filterTemp['icon']             = $definition["uiOptions"]->icon;
+                            $filterTemp['data']             = array();
+                            
+                            if(property_exists($definition['typeOptions'], 'model')){
+                                
+                                $modelDataIdNamesParams                     = array();
+                                if(property_exists($definition['typeOptions'], 'hardfilters')){
+
+                                    $modelDataIdNamesParams['hardfilters']  = (array)$definition['typeOptions']->hardfilters;
+                                }
+
+                                $modelDataIdNames                       = $this->getModelDataIdNames($definition['typeOptions']->model, $modelDataIdNamesParams);
+                                
+                                foreach($modelDataIdNames['objects'] as $object){
+                                    
+                                    $optionTemp             = array();
+                                    $optionTemp['value']    = $object['id'];
+                                    $optionTemp['label']    = $object['name'];
+                                    $optionTemp['icon']     = (isset($object['icon'])) ? $object['icon'] : "";
+                                    $optionTemp['image']    = (isset($object['image'])) ? $object['image'] : "";
+
+                                    $filterTemp['data'][]   = $optionTemp;
+                                }
+                                
+                            }
+                            
+                            if($this->hasUrlParam($field)){
+
+                                $filterTemp['selected']     = (array)$this->getUrlParam($field);
+                            }
+                            
+                            $result[$field] = $filterTemp;
+                        }
+                    }
+                }
+            }
+        }
+
+        ///CUSTOM ADITIONAL FILTERS METHOD
+        if(method_exists($this, "getCustomAditionalFilters")){
+
+            $result         = $this->getCustomAditionalFilters($result);
+        }
+
+        if($this->hasLocal("application.selector.customAditionalFilters")){
+
+            $result         = array_merge($result, $this->getLocal("application.selector.customAditionalFilters"));
+        }
+        
+        return $result;
+    }
+
+     /*
+     ___   ______   _        ______    _____   _______    ____    _____  
     / ____| |  ____| | |      |  ____|  / ____| |__   __|  / __ \  |  __ \ 
     | (___   | |__    | |      | |__    | |         | |    | |  | | | |__) |
     \___ \  |  __|   | |      |  __|   | |         | |    | |  | | |  _  / 
     ____) | | |____  | |____  | |____  | |____     | |    | |__| | | | \ \ 
-    |_____/  |______| |______| |______|  \_____|    |_|     \____/  |_|  \_\                                                                 
+    |_____/  |______| |______| |______|  \_____|    |_|     \____/  |_|  \_\
+
     */
     protected function generateSelector(){
-
+        
         $this->generateImporter();
+        
+        $this->generateFilters();
         
         $selectorType                           = $this->getLocal("application.selector.type");
 
@@ -397,8 +557,6 @@ class AppCrud extends VueUiService {
             $objectsSelectorParams['data']          = $this->getSelectorData($objectsSelectorDataSource);
             $objectsSelectorParams['paginator']     = $this->getLocal("application.selector.paginator");
 
-
-            
             $objectsSelector                        = new TableList($this->getDI());
             $this->placeComponent("main", $objectsSelector, $objectsSelectorParams);
 
@@ -416,7 +574,7 @@ class AppCrud extends VueUiService {
             $objectsSelector                        = new HorizontalCards($this->getDI());
             $this->placeComponent("main", $objectsSelector, $objectsSelectorParams);
         }
-        
+        //exit();
     }
 
     //SELECTOR FIELDS
@@ -436,6 +594,7 @@ class AppCrud extends VueUiService {
         $field                      = array();
         $field["renderType"]        = "HIDDEN";
         $result["rownum"]           = $field;
+
         
         //TODO: FALTAN LOS CAMPOS BASE
         //TODO: FALTAN LOS CAMPOS RELACION
@@ -463,12 +622,17 @@ class AppCrud extends VueUiService {
                     }else if($definition["isImage"] && $definition['typeOptions']->model == "image"){
 
                         $fieldTemp["renderType"]        = "IMAGE";
-                        $fieldTemp["imgSrcMap"]         = $this->getLocal("application.urlMaps.IMAGE");;
+                        $fieldTemp["imgSrcMap"]         = $this->getLocal("application.urlMaps.IMAGE");
 
                     }else if($definition["isImage"] && $definition['typeOptions']->model == "avatar"){
 
                         $fieldTemp["renderType"]        = "AVATAR";
-                        $fieldTemp["imgSrcMap"]         = $this->getLocal("application.urlMaps.AVATAR");;
+                        $fieldTemp["imgSrcMap"]         = $this->getLocal("application.urlMaps.AVATAR");
+
+                    }else if($definition["isState"] && $field == "objState"){
+
+                        $fieldTemp["renderType"]        = "STATE";
+
                     }else{
 
                         if($definition["type"] == "json"){
@@ -483,7 +647,7 @@ class AppCrud extends VueUiService {
 
                         if($definition['type'] == "options"){
 
-                            $fieldTemp["renderType"]            = "TAG";
+                            //$fieldTemp["renderType"]            = "TAG";
 
                             if(property_exists($definition['typeOptions'], 'multiple') && $definition['typeOptions']->multiple == true){
 
@@ -670,14 +834,35 @@ class AppCrud extends VueUiService {
 
     //SELECTOR DATOS
     protected function getSelectorData($p_dataSource){
+
+        $definitions                        = $p_dataSource->getDataDefinitions();
         
         $dataSourceQuery                    = array();
         $dataSourceQuery['page']            = ($this->hasUrlParam("page")) ? $this->getUrlParam("page") : 1;
         $dataSourceQuery['rows']            = ($this->hasUrlParam("rows")) ? $this->getUrlParam("rows") : 10;
 
-        $data                       = $p_dataSource->getData($dataSourceQuery);
+        foreach($definitions as $definition){
+
+            if($definition['uiOptions']->filterable == true){
+
+                if($this->hasUrlParam($definition['id'])){
+
+                    if(!isset($dataSourceQuery['filters'])){
+
+                        $dataSourceQuery['filters']         = array();
+                    }
+
+                    $dataSourceQuery['filters'][$definition['id']]           = (array)$this->getUrlParam($definition['id']);
+                }
+            }
+        }
+
+        if($this->hasUrlParam('keyword')){
+
+            $dataSourceQuery['keyword']     = $this->getUrlParam('keyword');
+        }
         
-        $definitions                = $p_dataSource->getDataDefinitions();
+        $data                               = $p_dataSource->getData($dataSourceQuery);
         
         if(isset($data['objects']) && is_array($data['objects'])){
 
@@ -752,6 +937,43 @@ class AppCrud extends VueUiService {
                                 }
 
                                 $data['objects'][$row][$field]  = $valueIdNamesTemp;
+                            }
+                        }
+                        
+                        if(!empty($value) && $definitions[$field]['isState'] == true){
+                            
+                            $modelData                          = $p_dataSource->getModelData();
+
+                            if(property_exists($modelData['statesOptions'], 'stateable') && $modelData['statesOptions']->stateable == true){
+
+                                
+                                $stateIdNames                   = array();
+
+                                $stateIdNames['id']             = $value;
+                                $stateIdNames['name']           = $value;
+                                $stateIdNames['style']          = "blue";
+                                $stateIdNames['image']          = "";
+                                $stateIdNames['icon']           = "";
+
+
+                                if(property_exists($modelData['statesOptions'], 'states')){
+
+                                    foreach($modelData['statesOptions']->states as $state){
+                                        
+                                        if($state->id == $value){
+
+                                            $stateIdNames['id']     = $state->id;
+                                            $stateIdNames['name']   = $state->name;
+                                            $stateIdNames['style']  = $state->style;
+                                            $stateIdNames['image']  = "";
+                                            $stateIdNames['icon']   = ""; 
+
+                                            break;
+                                        }
+                                    }
+                                }
+
+                                $data['objects'][$row][$field]  = $stateIdNames;
                             }
                         }
                     }
@@ -833,10 +1055,12 @@ class AppCrud extends VueUiService {
         //TODO : VER SI HACE FALTA LOGICA DISTINTA SEGUN TIPO DE EDITOR
 
         //TODO : VER LOGICA DE LAYOUT DE FORMULARIOS Y EDITORES
-        $result             = array();
-        $result['main']     = array();
-        $result['info']     = array();
-        $result['side']     = array();
+        $result                         = array();
+        $result['statesActionFields']   = array(); 
+        $result['hidden']               = array();
+        $result['main']                 = array();
+        $result['info']                 = array();
+        $result['side']                 = array();
 
         //FALTAN CARACTERISTICAS SEGUN MODEL (SHOW ID, SHOW NUM ROWS, SHOW DATEADD, SHOW DATE MODIFF, SHOW USER, ACTIVATABLE, DROPABLE,ETC)
 
@@ -844,12 +1068,7 @@ class AppCrud extends VueUiService {
         
         //VER LOS CAMAPOR ESPECIALES ORDER, STATUS, ACTIVATABLE ETC
         //TODO: FALTAN LOS CAMPOS BASE
-        //TODO: FALTAN LOS CAMPOS RELACION
-        //TODO: FALTAN LOS CAMPOS TAGS
-        //TODO: FALTAN LOS CAMPOS OBJECTSR
-        //TODO: FALTAN LOS CAMPOS OBJECTR
         
-
         foreach($p_dataSource->getDataDefinitions() as $field=>$definition){
             
             $fieldTemp                  = array();
@@ -864,18 +1083,164 @@ class AppCrud extends VueUiService {
             $fieldTemp["hidden"]        = $definition["uiOptions"]->hidden;
             $fieldTemp["required"]      = $definition["uiOptions"]->required;
             $fieldTemp["readOnly"]      = $definition["uiOptions"]->readOnly;
-            $fieldTemp["formplace"]     = (property_exists($definition["uiOptions"], "formPlace")) ? $definition["uiOptions"]->formPlace : "main" ;
-            $fieldTemp["editAs"]        = (property_exists($definition["uiOptions"], "editAs")) ? $definition["uiOptions"]->editAs : "FIELD" ;
-            $fieldTemp["component"]     = (property_exists($definition["uiOptions"], "component")) ? $definition["uiOptions"]->component : null ;
 
-            $fieldTemp["options"]       = array();
-            $fieldTemp["options"]["validation"]  = $definition["validationOptions"];
-            $fieldTemp["options"]["file"]        = $definition["attachFileOptions"];
+            //FIELD OPTIONS
+            $fieldTemp["options"]                   = array();
+            $fieldTemp["options"]["validation"]     = $definition["validationOptions"];
+            $fieldTemp["options"]["file"]           = $definition["attachFileOptions"];
 
             foreach($definition["typeOptions"] as $option=>$value){
 
-                $fieldTemp["options"][$option]   = $value; 
+                $fieldTemp["options"][$option]      = $value; 
             }
+
+            //STATE
+            if($definition["isState"]){
+
+
+
+                $fieldTemp["formplace"]             = (property_exists($definition["uiOptions"], "formPlace")) ? $definition["uiOptions"]->formPlace : "info" ;
+                $fieldTemp["editAs"]                = (property_exists($definition["uiOptions"], "editAs")) ? $definition["uiOptions"]->editAs : "HIDDEN" ;
+
+                $modelData                          = $p_dataSource->getModelData();
+
+                if(property_exists($modelData['statesOptions'], 'stateable') && $modelData['statesOptions']->stateable == true){
+
+                    if(property_exists($modelData['statesOptions'], 'states')){
+
+                        $toStateActionsTemp                 = array();
+                        
+                        foreach($modelData['statesOptions']->states as $stateIndex=>$state){
+                            
+                            //TODO: MEJORAR SOLO PASANDO LOS CAMPOS DEL ESTADO ACTUAL
+                            
+                            if(property_exists($state, 'toStateActions')){
+
+                                $toStateActionsTemp = array();
+                                
+                                foreach($state->toStateActions as $toStateAction){
+                                    
+                                    if(property_exists($toStateAction, 'conditions')){
+
+                                        $isValidAction = false;
+
+                                        foreach($toStateAction->conditions as $condition){
+
+                                            //ROLES
+                                            if($condition->type == "roles"){
+
+                                                if(count(array_intersect($condition->roles, $this->getUserRoles())) > 0){
+
+                                                    $isValidAction = true;
+                                                    break;
+                                                }
+                                            }
+                                        }
+
+                                        if($isValidAction){
+
+                                            $toStateActionsTemp[] = $toStateAction;
+                                        }
+                                    }else{
+
+                                        $toStateActionsTemp[] = $toStateAction;
+                                    }
+
+                                    $toStateActionLabel         = $toStateAction->label;
+                                    $toStateActionType          = $toStateAction->type;
+                                    $toStateActionState         = (property_exists($toStateAction, 'toState')) ? $toStateAction->toState : null;
+
+                                    if(!isset($result["statesActionFields"][$toStateActionState])){
+
+                                        $result["statesActionFields"][$toStateActionState]  = array();
+                                    }
+
+                                    if(property_exists($toStateAction, 'toStateInputData')){
+
+                                        $inputDataOrder = 1;
+                                        foreach($toStateAction->toStateInputData as $inputData){
+
+                                            $inputDataDefinition                            = $p_dataSource->getDataFieldDefinitions($inputData->data_field);
+
+                                            $inputDataFieldTemp                             = array();
+                                            $inputDataFieldTemp['id']                       = $inputDataDefinition["dafId"];
+                                            $inputDataFieldTemp['type']                     = $inputDataDefinition["typId"];
+                                            $inputDataFieldTemp['group']                    = "data";
+                                            $inputDataFieldTemp['order']                    = $inputDataOrder;
+                                            $inputDataFieldTemp['default']                  = $inputDataDefinition["dafDefaultValue"];
+                                            $inputDataFieldTemp["help"]                     = $inputDataDefinition["dafUiOptions"]->help;
+                                            $inputDataFieldTemp["info"]                     = $inputDataDefinition["dafUiOptions"]->info;
+                                            $inputDataFieldTemp["hidden"]                   = $inputDataDefinition["dafUiOptions"]->hidden;
+                                            $inputDataFieldTemp["required"]                 = $inputDataDefinition["dafUiOptions"]->required;
+                                            $inputDataFieldTemp["readOnly"]                 = $inputDataDefinition["dafUiOptions"]->readOnly;
+
+                                            $inputDataFieldTemp["options"]                  = array();
+                                            $inputDataFieldTemp["options"]["validation"]    = $inputDataDefinition["dafTypValidationOptions"];
+                                            $inputDataFieldTemp["options"]["file"]          = $inputDataDefinition["dafAttachFileOptions"];
+
+                                            foreach($inputDataDefinition["dafTypOptions"] as $option=>$value){
+                                                
+                                                $inputDataFieldTemp["options"][$option]     = $value; 
+                                            }
+
+                                            $inputDataFieldTemp["formplace"]                = "statesActionFields" ;
+                                            $inputDataFieldTemp["editAs"]                   = "FIELD" ;
+                                            $inputDataFieldTemp["component"]                = (property_exists($inputDataDefinition["dafUiOptions"], "component")) ? $inputDataDefinition["dafUiOptions"]->component : null ;
+                                            $inputDataFieldTemp["label"]                    = $inputDataDefinition["dafUiOptions"]->label;
+                                            $inputDataFieldTemp["icon"]                     = $inputDataDefinition["dafUiOptions"]->icon;
+
+                                            if($inputDataFieldTemp['type'] == "objectr" || $inputDataFieldTemp['type'] == "objectsr"){
+
+
+                                                if(isset($inputDataFieldTemp['options']['model'])){
+
+                                                    $modelDataIdNamesParams                 = array();
+                                                    if(isset($inputDataFieldTemp['options']['hardfilters'])){
+
+                                                        $modelDataIdNamesParams['hardfilters']  = $inputDataFieldTemp['options']['hardfilters'];
+                                                    }
+
+                                                    $modelDataIdNames                       = $this->getModelDataIdNames($inputDataFieldTemp['options']['model'], $modelDataIdNamesParams);
+                                                    
+                                                    $inputDataFieldTempData                 = array();
+                                
+                                                    foreach($modelDataIdNames['objects'] as $object){
+                                
+                                                        $inputDataFieldTempData[]           = array('label' => $object['name'], 'value' => $object['id'], 'image' => $object['image'], 'icon' => $object['icon']);
+                                                    }
+                                
+                                                    $inputDataFieldTemp["options"]["data"]  = $fieldTempData;
+                                                }
+                                            }
+
+                                            $inputDataFieldTemp["options"]["multiple"]      = false;
+
+                                            if($inputDataFieldTemp['type'] == "objectsr"){
+
+                                                $inputDataFieldTemp["options"]["multiple"]       = true;
+                                            }
+
+                                            $result["statesActionFields"][$toStateActionState][$inputDataFieldTemp['id']]      = $inputDataFieldTemp;
+                                            $inputDataOrder++;
+                                        }
+                                    }
+                                }
+                            }
+
+                            $modelData['statesOptions']->states[$stateIndex]->toStateActions = $toStateActionsTemp;
+                        }                        
+
+                        $fieldTemp["options"]["states"] = $modelData['statesOptions']->states;
+                    }
+                }
+                
+            }else{
+
+                $fieldTemp["formplace"]     = (property_exists($definition["uiOptions"], "formPlace")) ? $definition["uiOptions"]->formPlace : "main" ;
+                $fieldTemp["editAs"]        = (property_exists($definition["uiOptions"], "editAs")) ? $definition["uiOptions"]->editAs : "FIELD" ;
+            }
+            
+            $fieldTemp["component"]     = (property_exists($definition["uiOptions"], "component")) ? $definition["uiOptions"]->component : null ;
 
             if(!$definition["isRelation"]){
 
@@ -959,22 +1324,24 @@ class AppCrud extends VueUiService {
 
         $dataSourceOptions              = array();
         $dataSourceOptions['model']     = $p_model;
-
+        
         if(\is_array($p_params)){
-
-            //TODO : Si hace falta recivir por parametro adicionales para el query
+            
+            //TODO : Si hace falta recibir por parametro adicionales para el query
             if(isset($p_params['hardfilters'])){
 
                 $dataSourceOptions["hardfilters"] = (array)$p_params['hardfilters'];
             }
-
+            
             $dataSource                     = new DataSource($this->getDI(), new ObjectsDataSource($this->getDI(), $dataSourceOptions));
-
+            
             $query                          = array();
             $query['page']                  = 1;
             $query['rows']                  = 1000;
 
             $result                         = $dataSource->getDataIdNames($query);
+            
+            
         }else{
             
             
@@ -1120,17 +1487,15 @@ class AppCrud extends VueUiService {
                         }
                     }
 
-                    $result             = $this->preProccessEditorAddData($result);
+                    if(method_exists($this, "preProccessEditorAddData")){
+
+                        $result         = $this->preProccessEditorAddData($result);
+                    }
                 }
             }
         }
 
         return $result;
-    }
-
-    protected function preProccessEditorAddData($p_row){
-
-        return $p_row;
     }
 
     protected function getEditorEditData($p_data){
@@ -1158,17 +1523,15 @@ class AppCrud extends VueUiService {
                         }
                     }
 
-                    $result             = $this->preProccessEditorEditData($result);
+                    if(method_exists($this, "preProccessEditorEditData")){
+
+                        $result         = $this->preProccessEditorEditData($result);
+                    }
                 }
             }
         }
 
         return $result;
-    }
-
-    protected function preProccessEditorEditData($p_row){
-
-        return $p_row;
     }
 
     //SAVE EDITOR DATA
@@ -1215,6 +1578,7 @@ class AppCrud extends VueUiService {
                                     $itemTmp['label']       = $item['name'];
                                     $itemTmp['icon']        = $item['icon'];
                                     $itemTmp['url']         = $this->getDI()->get('config')->main->url->base . $item['path'];
+                                    $itemTmp['order']       = $item['order'];
 
                                     $items[$item['id']]     = $itemTmp;
                                 }
@@ -1232,6 +1596,19 @@ class AppCrud extends VueUiService {
             $sideMenu                   = new SideMenu($this->getDI());
             $this->placeComponent("side", $sideMenu, $sideMenuParams);
         }
+    }
+
+    protected function getUserRoles(){
+        $result = false;
+
+        if($this->hasSession("user_loged") && $this->getSession("user_loged") == true){
+
+            $userData               = $this->getSession("user_data");
+            
+            $result                 = array_merge(array($userData['role']['id']), array_keys($userData['roles']));
+        }
+
+        return $result;
     }
 
     //TOP BAR
@@ -1262,6 +1639,9 @@ class AppCrud extends VueUiService {
 
                     header("Location: " . $loginurl);
                     exit();
+                }else{
+                    
+                    $this->setGlobal("user_id", $this->getSession("user_data")['id']);
                 }
             }else{
                 

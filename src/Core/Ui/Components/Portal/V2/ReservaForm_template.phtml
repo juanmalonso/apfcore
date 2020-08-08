@@ -1,5 +1,4 @@
-<div>
- 
+
 <div class="ui fluid container" style="margin-top: 40px; background-color: #f5f5f5;">
     <div class="ui container" style="padding-bottom: 28px;">
         <div class="ui grid">
@@ -8,22 +7,38 @@
 
                     <div class="ui segment">
                         <div class="ui medium header" style="font-family: 'Dosis', sans-serif; letter-spacing: 2px; text-align: left; margin-top: 2px;color:#4A4A4A;">Datos Personales</div>
-                        <form class="ui form" name="reservaform" id="reservaform" action="" method="post" enctype="multipart/form-data">
-                            <div class="six wide field">
-                                <label style="font-family: 'Dosis', sans-serif; letter-spacing: 2px;">Nombres</label>
-                                <input type="text" />
-                            </div>
-                            <div class="six wide field">
+                        <form class="ui form" name="reserva_form" id="reserva_form" action="" method="post" enctype="multipart/form-data">
+                            <input type="hidden" name="reserva_token" id="reserva_token" v-bind:value="token" />
+                            <div class="ui fields">
+                                <div class="eight wide field">
+                                    <label style="font-family: 'Dosis', sans-serif; letter-spacing: 2px;">Nombres</label>
+                                    <input type="text" name="reserva_nombres" id="reserva_nombres" />
+                                </div>
+                                <div class="eight wide field">
                                 <label style="font-family: 'Dosis', sans-serif; letter-spacing: 2px;">Apellidos</label>
-                                <input type="text" />
+                                    <input type="text" name="reserva_apellidos" id="reserva_apellidos" />
+                                </div>
                             </div>
-                            <div class="six wide field">
-                                <label style="font-family: 'Dosis', sans-serif; letter-spacing: 2px;">email</label>
-                                <input type="text" />
+                            <div class="ui fields">
+                                <div class="eight wide field">
+                                    <label style="font-family: 'Dosis', sans-serif; letter-spacing: 2px;">email</label>
+                                    <input type="text" name="reserva_email" id="reserva_email" />
+                                </div>
+                                <div class="eight wide field">
+                                    <label style="font-family: 'Dosis', sans-serif; letter-spacing: 2px;">Telefono</label>
+                                    <input type="text" name="reserva_telefono" id="reserva_telefono" />
+                                </div>
                             </div>
-                            <div class="six wide field">
-                                <label style="font-family: 'Dosis', sans-serif; letter-spacing: 2px;">Telefono</label>
-                                <input type="text" />
+                            <div class="ui fields">
+                                <div class="five wide field">
+                                    <div class="g-recaptcha" data-sitekey="6Ld5jKwZAAAAANsVCnzG-3VFJYCYKMTfKp9eexb7"></div>
+                                </div>
+                            </div>
+                            <div class="ui fields">
+                                <div class="sixteen wide field">
+                                    <label style="font-family: 'Dosis', sans-serif; letter-spacing: 2px;">Mensaje</label>
+                                    <textarea name="reserva_message" id="reserva_message" rows="3" ></textarea>
+                                </div>
                             </div>
                         </form>
                     </div>
@@ -51,5 +66,4 @@
             </div>
         </div>
     </div>
-</div>
 </div>

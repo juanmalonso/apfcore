@@ -57,7 +57,9 @@
                             </template>
                             <template v-if="rowField.renderType == 'TAG'">
                                 <div v-if="_.isObject(dataRow[fieldIndex]) && _.has(dataRow[fieldIndex], 'name') && dataRow[fieldIndex].name != ''" class="ui blue label">${dataRow[fieldIndex].name}</div>
-                                <div v-if="!_.isObject(dataRow[fieldIndex]) && dataRow[fieldIndex] != ''" class="ui blue label">${dataRow[fieldIndex]}</div>
+                            </template>
+                            <template v-if="rowField.renderType == 'STATE'">
+                                <div v-if="_.isObject(dataRow[fieldIndex]) && _.has(dataRow[fieldIndex], 'name') && dataRow[fieldIndex].name != ''" v-bind:class="'ui ' + dataRow[fieldIndex].style + ' label'">${dataRow[fieldIndex].name}</div>
                             </template>
                             <template v-if="rowField.renderType == 'TAGS'">
                                 <div v-if="_.isString(tagValue)" v-for="(tagValue, index) in dataRow[fieldIndex]" :key="index" class="ui blue label" style="margin: 0px 5px 5px 0px;">${tagValue}</div>
@@ -67,7 +69,12 @@
                                 <img v-if="_.isObject(tagValue) && _.has(tagValue, 'image')" v-for="(tagValue, index) in dataRow[fieldIndex]" :key="index" v-bind:src="doGetImageUrl(tagValue.id)" style="margin: 5px;" />
                             </template>
                             <template v-if="rowField.renderType == 'VALUE'">
-                                ${dataRow[fieldIndex]}
+                                <template v-if="_.isObject(dataRow[fieldIndex]) && _.has(dataRow[fieldIndex],'name')">
+                                    ${dataRow[fieldIndex].name}
+                                </template>
+                                <template v-else>
+                                    ${dataRow[fieldIndex]}
+                                </template>
                             </template>
                         </td>
                         <td v-if="_.size(linksFields) > 0" style="padding: 2px;">

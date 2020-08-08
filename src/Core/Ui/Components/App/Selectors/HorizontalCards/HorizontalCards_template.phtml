@@ -13,9 +13,9 @@
                     </div>
                     <div class="content">
                         
-                            <template v-if="dataRow['modId'] == 'uppacientes'">
-                                <div class="ui blue label">${dataRow['estado_paciente']}</div>
-                            </template>
+                        <template v-if="hasStateField()">
+                            <div v-if="_.isObject(dataRow[getStateField()]) && _.has(dataRow[getStateField()], 'name') && dataRow[getStateField()].name != ''" v-bind:class="'ui ' + dataRow[getStateField()].style + ' label'">${dataRow[getStateField()].name}</div>
+                        </template>
                         
                     </div>
                 </a>

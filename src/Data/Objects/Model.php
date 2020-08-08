@@ -214,7 +214,7 @@ class Model extends Common
     }
 
     public function add($p_data, $p_table = true){
-
+        
         $result = $this->database->insert('data_models', $p_data);
 
         if($p_table) {
@@ -223,7 +223,7 @@ class Model extends Common
 
                 if(isset($p_data['modType'])){
 
-                    $result = $this->createModelTable($p_data['modId'], $p_data['modType'], $p_data['modPartitionMode']);
+                    $result = $this->createModelTable($p_data['modId'], $p_data['modType'], $p_data['modPartitionMode'], \Nubesys\Core\Utils\Struct::toArray(\Nubesys\Core\Utils\Struct::encodeFieldValue($p_data['modStatesOptions'])));
                 }
             }
         }
@@ -330,7 +330,7 @@ class Model extends Common
         return $result;
     }
 
-    private function createModelTable($p_model, $p_type, $p_partition){
+    private function createModelTable($p_model, $p_type, $p_partition, $p_states = array()){
 
         $result = true;
 
@@ -338,9 +338,10 @@ class Model extends Common
 
         if(!$this->database->isTableExist($tableName)){
 
-            $primarySQL = "`_id`,`objPartitionIndex`";
-            $partitionSQL = "";
-            $aditionalSQL = "";
+            $primarySQL     = "`_id`,`objPartitionIndex`";
+            $stateSQL       = "";
+            $partitionSQL   = "";
+            $aditionalSQL   = "";
 
             $createSQL = "CREATE TABLE `{TableName}` (
                               `_id` varchar(255) NOT NULL,
@@ -348,9 +349,9 @@ class Model extends Common
                               {Aditional}
                               `objTime` float unsigned NOT NULL,
                               `objOrder` bigint(20) unsigned NOT NULL DEFAULT '0',
-                              `objState` varchar(255) NOT NULL DEFAULT 'new',
                               `objActive` tinyint(1) NOT NULL DEFAULT '1',
                               `objData` json NOT NULL,
+                              {States}
                               `objDateAdd` datetime DEFAULT NULL,
                               `objUserAdd` varchar(255) DEFAULT NULL,
                               `objDateUpdated` datetime DEFAULT NULL,
@@ -393,6 +394,12 @@ class Model extends Common
                 }
             }
 
+            if(isset($p_states['stateable']) && $p_states['stateable'] == true){
+
+                $stateSQL = "`objState` varchar(255) DEFAULT 'new',
+                            `objStatesLog` json NOT NULL,";
+            }
+
             if($p_type != 'OBJECT'){
 
                 switch ($p_type){
@@ -417,6 +424,7 @@ class Model extends Common
 
             $createSQL = str_replace("{TableName}",$tableName, $createSQL);
             $createSQL = str_replace("{Aditional}",$aditionalSQL, $createSQL);
+            $createSQL = str_replace("{States}",$stateSQL, $createSQL);
             $createSQL = str_replace("{Primary}",$primarySQL, $createSQL);
             $createSQL = str_replace("{Partitions}",$partitionSQL, $createSQL);
 
@@ -424,7 +432,7 @@ class Model extends Common
 
                 $this->createModelTable($p_model, 'OBJECT', $p_partition);
             }
-
+            
             return $this->database->execute($createSQL);
         }
 

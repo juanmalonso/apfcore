@@ -262,6 +262,7 @@ class Relations extends AppCrud {
             $definitionsRow["order"]                            = $definition['defOrder'];
             $definitionsRow["isName"]                           = $definition['defIsName'];
             $definitionsRow["isImage"]                          = $definition['defIsImage'];
+            $definitionsRow["isState"]                          = false;
             $definitionsRow["isRelation"]                       = false;
             $definitionsRow["uiOptions"]                        = $definition['defDafUiOptions'];
             $definitionsRow["indexOptions"]                     = $definition['defDafIndexOptions'];

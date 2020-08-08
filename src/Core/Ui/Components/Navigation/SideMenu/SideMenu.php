@@ -9,7 +9,7 @@ class SideMenu extends VueUiComponent {
         
         if($this->hasLocal('items')){
 
-            $this->setJsDataVar("items", $this->getLocal('items'));
+            $this->setJsDataVar("items", $this->sortItems($this->getLocal('items')));
         }else{
 
             $this->setJsDataVar("items",[]);
@@ -22,5 +22,17 @@ class SideMenu extends VueUiComponent {
             
             $this->setJsDataVar("user",false);
         }
+    }
+
+    function sortItems($p_items){
+
+        $itemsTmp = $p_items;
+
+        usort($itemsTmp, function($a, $b) {
+            
+            return $a['order'] <=> $b['order'];
+        });
+        
+        return $itemsTmp;
     }
 }

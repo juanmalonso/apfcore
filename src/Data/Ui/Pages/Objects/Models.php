@@ -4,6 +4,9 @@ namespace Nubesys\Data\Ui\Pages\Objects;
 
 use Nubesys\Core\Ui\Pages\AppCrud;
 
+use Nubesys\Data\DataSource\DataSource;
+use Nubesys\Data\DataSource\DataSourceAdapters\Objects as ObjectsDataSource;
+
 class Models extends AppCrud {
 
     //MAIN ACTION
@@ -296,10 +299,6 @@ class Models extends AppCrud {
         $result['modStatesOptions']['defIsName']                    = false;
         $result['modStatesOptions']['defIsImage']                   = false;
         $result['modStatesOptions']['defDafDefaultValue']           = new \stdClass();
-        $result['modStatesOptions']['defDafDefaultValue']->stateable         = false;
-        $result['modStatesOptions']['defDafDefaultValue']->states            = array();
-        $result['modStatesOptions']['defDafDefaultValue']->stateInit         = '';
-        $result['modStatesOptions']['defDafDefaultValue']->statesFlow        = new \stdClass();
         $result['modStatesOptions']['defDafIndexOptions']           = new \stdClass();
         $result['modStatesOptions']['defDafTypOptions']             = new \stdClass();
         $result['modStatesOptions']['defDafUiOptions']              = new \stdClass();
@@ -330,6 +329,7 @@ class Models extends AppCrud {
             $definitionsRow["isName"]                           = $definition['defIsName'];
             $definitionsRow["isImage"]                          = $definition['defIsImage'];
             $definitionsRow["isRelation"]                       = false;
+            $definitionsRow["isState"]                          = false;
             $definitionsRow["uiOptions"]                        = $definition['defDafUiOptions'];
             $definitionsRow["indexOptions"]                     = $definition['defDafIndexOptions'];
             $definitionsRow['typeOptions']                      = $definition['defDafTypOptions'];
@@ -389,5 +389,26 @@ class Models extends AppCrud {
         $dataEngine             = new \Nubesys\Data\Objects\DataEngine($this->getDI());
 
         return $dataEngine->editModel($p_id, $p_data);
+    }
+
+    public function reindexDataService(){
+
+        if($this->hasJsonParam()){
+
+            $param      = $this->getJsonParam();
+
+            if(isset($param["model"])){
+
+                $dataSourceOptions                  = array();
+                $dataSourceOptions['model']         = $param["model"];
+
+                $dataSource                         = new DataSource($this->getDI(), new ObjectsDataSource($this->getDI(), $dataSourceOptions));
+                
+                $this->setServiceSuccess($dataSource->reindexData());
+            }
+        }else{
+
+            $this->setServiceError("Invalid Params");
+        }
     }
 }

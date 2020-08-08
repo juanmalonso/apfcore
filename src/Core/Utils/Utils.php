@@ -386,4 +386,16 @@ class Utils
 
         return $result;
     }
+
+    //TODO V1, agregar opciones de pin exadecimal o base 36
+    public static function generatePIN($digits = 4){
+        $i = 0; //counter
+        $pin = ""; //our default pin is blank.
+        while($i < $digits){
+            //generate a random number between 0 and 9.
+            $pin .= self::decToBase(mt_rand(0, 34),36);
+            $i++;
+        }
+        return strtoupper($pin);
+    }
 }

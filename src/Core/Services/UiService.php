@@ -38,6 +38,7 @@ class UiService extends Service {
         //INITIAL GLOBAL VARS
         $this->setGlobal("serviceId", $this->getId());
         $this->setGlobal("urlbase", $this->getDI()->get('config')->main->url->base);
+        $this->setGlobal("appid", $this->getDI()->get('config')->main->id);
 
         //INITIALS VIEW VARS
         $this->setViewVar("id", $this->getId());

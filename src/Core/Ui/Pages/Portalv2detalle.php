@@ -21,9 +21,17 @@ class Portalv2detalle extends PortalPage {
         parent::mainAction();
 
         //SWIPER
-        $this->addCssSource("https://unpkg.com/swiper/css/swiper.min.css");
-        $this->addJsSource("https://unpkg.com/swiper/js/swiper.min.js");
-        
+        /*$this->addCssSource("https://unpkg.com/swiper/css/swiper.min.css");
+        $this->addJsSource("https://unpkg.com/swiper/js/swiper.min.js");*/
+
+        //$this->addCssSource("https://unpkg.com/swiper/swiper-bundle.css");
+        $this->addCssSource("https://unpkg.com/swiper/swiper-bundle.min.css");
+        //$this->addCssSource("https://cdn.jsdelivr.net/npm/swiper@6.1.1/swiper-bundle.min.css");
+
+        //$this->addJsSource("https://unpkg.com/swiper/swiper-bundle.js");
+        $this->addJsSource("https://unpkg.com/swiper/swiper-bundle.min.js");
+        //$this->addJsSource("https://cdn.jsdelivr.net/npm/swiper@6.1.1/swiper-bundle.cjs.min.js");
+
         $this->setTitle($this->getLocal("title"));
         
         $detalle                                = new ContentDetail($this->getDI());
@@ -32,7 +40,7 @@ class Portalv2detalle extends PortalPage {
         $detalleParams['sliderImgSrcMap']       = $this->getLocal("detalles.sliderImgSrcMap");
         $detalleParams['reservaLinkMap']        = $this->getLocal("detalles.reservaLinkMap");
         $detalleParams['data']                  = $this->getContenidoDetalle();
-
+        
         $this->addMainSection($detalle, $detalleParams);
         
     }
