@@ -24,15 +24,23 @@ class Portalv2 extends PortalPage {
 
         $this->generateSlider();
 
-        //DESTINOS
-        $destinos                       = new ImageCards($this->getDI());
+        //EXPERIENCIAS
+        $query                          = array();
+        $query['rows']                  = 8;
+        $query['filters']               = array();
+        $query['filters']['parent']     = array("taxonomy_experiencias");
 
-        $destinosParams                 = array();
-        $destinosParams['urlLinkMap']   = $this->getLocal("destinos.linkMap");
-        $destinosParams['imgSrcMap']    = $this->getLocal("destinos.cardImgSrcMap");
-        $destinosParams['data']         = $this->getTopDestinos();
+        $experiencias                           = new ImageCards($this->getDI());
 
-        $this->addMainSection($destinos, $destinosParams);
+        $experienciasParams                     = array();
+        $experienciasParams['title']            = "Experiencias";
+        $experienciasParams['urlLinkMap']       = $this->getLocal("experiencias.linkMap");
+        $experienciasParams['bigImgSrcMap']     = $this->getLocal("experiencias.cardBigImgSrcMap");
+        $experienciasParams['smallImgSrcMap']   = $this->getLocal("experiencias.cardSmallImgSrcMap");
+        $experienciasParams['data']             = $this->getTopTaxonomies($query);
+        $experienciasParams['size']             = "big";
+
+        $this->addMainSection($experiencias, $experienciasParams);
 
         //PAQUETES
         $paquetes                       = new ContentCards($this->getDI());
@@ -43,7 +51,26 @@ class Portalv2 extends PortalPage {
         $paquetesParams['data']         = $this->getTopPaquetes();
 
         $this->addMainSection($paquetes, $paquetesParams);
-        
+
+        //DESTINOS
+        $query                          = array();
+        $query['filters']               = array();
+        $query['filters']['parent']     = array("taxonomy_destinos");
+
+        $destinos                       = new ImageCards($this->getDI());
+
+        $destinosParams                     = array();
+        $destinosParams['title']            = "Destinos";
+        $destinosParams['urlLinkMap']       = $this->getLocal("destinos.linkMap");
+        $destinosParams['bigImgSrcMap']     = $this->getLocal("destinos.cardBigImgSrcMap");
+        $destinosParams['smallImgSrcMap']   = $this->getLocal("destinos.cardSmallImgSrcMap");
+        $destinosParams['data']             = $this->getTopTaxonomies($query);
+        $destinosParams['size']             = "big";
+
+        //$this->addMainSection($destinos, $destinosParams);
+
+        //ROBOTS
+        $this->addMetaTag("robots", "index, follow");     
     }
 
     protected function generateSlider(){

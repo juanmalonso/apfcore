@@ -63,8 +63,10 @@ class Portalv2reserva extends PortalPage {
                     $saveExpedienteResult               = $this->addExpediente($expedienteData);
 
                     if($saveExpedienteResult !== false){
-
-                        $messageText                    = "Los datos fueron recibidos correctamente, en breve un agente se pondra en contacto con usted!!";
+                        
+                        $messageIcon                    = "check circle outline green";
+                        $messageTitle                   = "¡VAMOOS!";
+                        $messageText                    = "Tu solicitud fue enviada con éxito.<br /> En la brevedad un Asesor de Viajes se pondrá en contacto con Usted.";
 
                         $clienteFullName                = $clienteData['reserva_nombres'] . " " . $clienteData['reserva_apellidos'];
 
@@ -74,28 +76,34 @@ class Portalv2reserva extends PortalPage {
                                                                 <strong>Mensage</strong>: " . $expedienteData['message'] . "<br />";
 
                         //SEND EMAIL TO ADMIN
-                        $this->sendEmail("Nueva reserva en www.NOSVAMOOS.com", "manialonso@gmail.com", "Portal NOSVAMOOS", "manialonso@gmail.com", "Sales Team", $toSalesNotificationEmailTemplate);
+                        //$this->sendEmail("Nueva reserva en www.NOSVAMOOS.com", "manialonso@gmail.com", "Portal NOSVAMOOS", "manialonso@gmail.com", "Sales Team", $toSalesNotificationEmailTemplate);
 
                         $toClientNotificationEmailTemplate      = "<strong>Gracias por su reserva!!</strong><hr />
                                                                     En la brevedad posible, uno de nuestros agentes se pondrá en contacto con usted!";
 
                         //SEND TANKYOUEMAIL TO USER
-                        $this->sendEmail("Tu reserva en www.NOSVAMOOS.com", "manialonso@gmail.com", "Portal NOSVAMOOS", $clienteData['reserva_email'], $clienteFullName, $toClientNotificationEmailTemplate);
+                        //$this->sendEmail("Tu reserva en www.NOSVAMOOS.com", "manialonso@gmail.com", "Portal NOSVAMOOS", $clienteData['reserva_email'], $clienteFullName, $toClientNotificationEmailTemplate);
 
                     }
 
                 }else {
                     
-                    $messageText                        = "No se pudieron enviar los datos!";
+                    $messageIcon                    = "times circle outline red";
+                    $messageTitle                   = "¡OPS!";
+                    $messageText                    = "No se pudieron enviar los datos!";
                 }
             }else{
 
+                $messageIcon                        = "times circle outline red";
+                $messageTitle                       = "¡OPS!";
                 $messageText                        = "No se pudieron enviar los datos!";
             }
 
             $message                                = new Message($this->getDI());
 
             $messageParams                          = array();
+            $messageParams['title']                 = $messageTitle;
+            $messageParams['icon']                  = $messageIcon;
             $messageParams['message']               = $messageText;
             
             $this->addMainSection($message, $messageParams);
@@ -111,6 +119,9 @@ class Portalv2reserva extends PortalPage {
 
             $this->addMainSection($reserva, $reservaParams);
         }
+
+        //ROBOTS
+        $this->addMetaTag("robots", "noindex, nofollow");  
     }
 
     private function sendEmail($p_subject, $p_fromEmail, $p_fromName, $p_toEmail, $p_toName, $p_template){

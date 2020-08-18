@@ -32,7 +32,7 @@ class Portalv2detalle extends PortalPage {
         $this->addJsSource("https://unpkg.com/swiper/swiper-bundle.min.js");
         //$this->addJsSource("https://cdn.jsdelivr.net/npm/swiper@6.1.1/swiper-bundle.cjs.min.js");
 
-        $this->setTitle($this->getLocal("title"));
+        
         
         $detalle                                = new ContentDetail($this->getDI());
 
@@ -42,6 +42,34 @@ class Portalv2detalle extends PortalPage {
         $detalleParams['data']                  = $this->getContenidoDetalle();
         
         $this->addMainSection($detalle, $detalleParams);
-        
+
+        //DESCRIPTION METATAG
+        $this->addMetaTag("description", $detalleParams['data']['description']);
+
+        $keywords                               = $detalleParams['data']['etiquetas'];
+
+        //categorias
+        foreach($detalleParams['data']['categorias'] as $categoria){
+
+            $keywords[]                         = $categoria['name'];
+        } 
+
+        //servicios
+        foreach($detalleParams['data']['servicios'] as $servicio){
+
+            $keywords[]                         = $servicio['name'];
+        }
+
+        $keywords[]                             = $detalleParams['data']['destino']['name'];
+
+        $this->addMetaTag("keywords", \implode(", ", $keywords));
+        $this->addMetaTag("author", "Nosvamoos S.A.");
+        $this->addMetaTag("copyright", "Nosvamoos S.A. 2020");
+
+        //ROBOTS
+        $this->addMetaTag("robots", "index, nofollow");  
+
+        //TITLE TAG
+        $this->setTitle($detalleParams['data']['label'] . " - " . $this->getLocal("title"));
     }
 }

@@ -40,6 +40,12 @@
                 <div style="font-family: 'Dosis', sans-serif; letter-spacing: 0px; text-align: justify; margin-top: 2px; color: #4A4A4A; font-size: 18px;">
                 ${data.description}
                 </div>
+                <div style="font-family: 'Dosis', sans-serif; letter-spacing: 0px; text-align: lrft; margin-top: 2px;">
+                    <div v-for="(etiquetaData, etiquetaIndex) in data.etiquetas" :key="etiquetaIndex" class="ui basic tiny label" style="margin: 10px 10px 0px;">
+                        <i style="color: #BF125D;"></i>
+                        ${etiquetaData}
+                    </div>
+                </div>
             </div>
             <div class="four wide column">
                 <div class="ui segment" style="margin-top: -110px; z-index: 100;">
@@ -51,7 +57,7 @@
                         <span style="color: #E81F76; font-weight: bold;">${data.moneda} ${data.precio}</span> 
                     </div>
                     <div style="font-family: 'Dosis', sans-serif; letter-spacing: 0px; text-align: left; color: #4A4A4A; margin-bottom: 10PX;">
-                        <div class="ui basic fluid button" style="border: 0px solid rgba(255, 255, 255, 0) !important; background-color: #F7BE00; font-weight: bold; color: #ffffff; font-family: 'Dosis', sans-serif; letter-spacing: 2px;" v-on:click="doReservar()">Reservar Ahora</div>                         
+                        <div class="ui basic fluid button" style="border: 0px solid rgba(255, 255, 255, 0) !important; background-color: #F7BE00; font-weight: bold; color: #ffffff; font-family: 'Dosis', sans-serif; letter-spacing: 2px;" v-on:click="doReservar()">Solicitar Presupuesto</div>                         
                     </div>
                     <div style="font-family: 'Dosis', sans-serif; letter-spacing: 0px; text-align: left; color:#4A4A4A;">
                         <span>Hasta 16 cuotas!</span>

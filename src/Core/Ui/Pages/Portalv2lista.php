@@ -27,6 +27,12 @@ class Portalv2lista extends PortalPage {
         $paquetesParams['urlLinkMap']   = $this->getLocal("paquetes.linkMap");
         $paquetesParams['imgSrcMap']    = $this->getLocal("paquetes.cardImgSrcMap");
 
+        $keyword                        = "*";
+        if($this->hasUrlParam("keyword")){
+
+            $keyword                    = $this->getUrlParam("keyword");
+        }
+
         $filters                        = array();
 
         //DESTINOS FILTER
@@ -42,6 +48,8 @@ class Portalv2lista extends PortalPage {
         //ECETERA FILTER
 
         $query                          = array();
+        $query['keyword']               = $keyword;
+
         if(count($filters) > 0){
 
             $query['filters']           = $filters;
@@ -50,6 +58,9 @@ class Portalv2lista extends PortalPage {
         $paquetesParams['data']         = $this->getTopPaquetes($query);
 
         $this->addMainSection($paquetes, $paquetesParams);
+
+        //ROBOTS
+        $this->addMetaTag("robots", "index, follow");  
         
     }
 }

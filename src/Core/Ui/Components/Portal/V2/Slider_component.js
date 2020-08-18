@@ -6,6 +6,12 @@ Vue.component("___tag_", {
   mounted: function() {
     var _self = this;
   },
-  methods: {},
+  methods: {
+    doSearch: function(){
+      keyword = $("#keyword").val();
+
+      window.location = this.basepath + "v2lista/keyword:" + keyword;
+    }
+  },
   template: "#___tag_-template"
 });

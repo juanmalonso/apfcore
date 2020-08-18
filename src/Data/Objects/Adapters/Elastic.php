@@ -192,7 +192,7 @@ class Elastic extends Common
         $queryString    = new \Elastica\Query\QueryString();
         //$queryString    = new \Elastica\Query\SimpleQueryString();
 
-        $queryString->setFields($p_fields);
+        //$queryString->setFields($p_fields);
         
         $queryString->setQuery($p_keyword);
         $queryString->setDefaultOperator("OR");
@@ -200,6 +200,19 @@ class Elastic extends Common
         //AND
         $queryAND       = new \Elastica\Query\BoolQuery();
         $queryAND->addMust($queryString);
+
+        if(isset($p_filters['ranges'])){
+
+            foreach ($p_filters['ranges'] as $field=>$ranges){
+
+                $queryRangeTmp     = new \Elastica\Query\Range();
+                $queryRangeTmp->addField("objDateAdd", array(
+                    "gte" => $ranges[0],
+                    "lte" => $ranges[1]
+                ));
+                $queryAND->addFilter($queryRangeTmp);
+            }
+        }
 
         if(isset($p_filters['and'])){
 
@@ -221,8 +234,7 @@ class Elastic extends Common
             }
         }
 
-        //RANGE
-        /*
+        /*        
         $queryRange     = new \Elastica\Query\Range();
         $queryRange->addField("objDateAdd", array(
             "gte" => "2020-06-10 10:11:59",

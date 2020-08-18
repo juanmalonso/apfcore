@@ -11,6 +11,7 @@ use Nubesys\Core\Ui\Components\App\Selectors\TableList\TableList;
 use Nubesys\Core\Ui\Components\App\Selectors\HorizontalCards\HorizontalCards;
 use Nubesys\Core\Ui\Components\App\Editors\Form\Form;
 use Nubesys\Core\Ui\Components\App\Viewer\Table\TableViewer;
+use Nubesys\Core\Ui\Components\App\Editors\Managers\MasterManager;
 use Nubesys\Core\Ui\Components\App\Importer\Importer;
 use Nubesys\Core\Ui\Components\App\Filters\FiltersForm\FiltersForm;
 
@@ -211,6 +212,18 @@ class AppCrud extends VueUiService {
         $viewerAditionalParams      = array();
         
         $this->generateViewer($viewerAditionalParams);
+
+        $this->generateTopBar();
+    }
+
+    //MANAGER SERVICE ACTION
+    protected function managerAction(){
+
+        $this->generateSideMenu();
+        
+        $managerAditionalParams      = array();
+        
+        $this->generateMasterManager($managerAditionalParams);
 
         $this->generateTopBar();
     }
@@ -528,6 +541,8 @@ class AppCrud extends VueUiService {
         
         return $result;
     }
+
+    
 
      /*
      ___   ______   _        ______    _____   _______    ____    _____  
@@ -1017,6 +1032,183 @@ class AppCrud extends VueUiService {
         $objectsViewer                          = new TableViewer($this->getDI());
         $this->placeComponent("main", $objectsViewer, array_merge($objectsViewerParams, $p_aditionalParams));
         
+    }
+
+    //MASTERMANAGER
+    protected function generateMasterManager($p_aditionalParams = array()){
+
+        //FORM EDITOR
+        $masterManagerDataSource                = $this->getDataSource($this->getLocal("application.manager.objectsDataSource"));
+
+        $masterManagerParams                    = array();
+        
+        $masterManagerParams['datasource']      = $this->getLocal("application.editor.objectsDataSource");
+        
+        /*
+        $masterManagerParams['fields']          = $this->getEditorFields($objectsViewerDataSource);
+        $masterManagerParams['fieldsGroups']    = $this->getEditorFieldsGroups($this->getDataSource($this->getLocal("application.editor.fgroupsDataSource")));
+        */
+
+        $masterManagerParams['data']            = $this->getManagerData($masterManagerDataSource);
+        $masterManagerParams['fields']          = $this->getManagerFields($masterManagerDataSource, $masterManagerParams['data']);
+
+        //$masterManagerParams['actions']         = $this->getManagerActions($masterManagerDataSource, $masterManagerParams['fields'], $masterManagerParams['data']);
+
+        $masterManager                          = new MasterManager($this->getDI());
+        $this->placeComponent("main", $masterManager, array_merge($masterManagerParams, $p_aditionalParams));
+        
+    }
+
+    private function getManagerData($p_dataSource){
+
+        $result                                 = array();
+
+        //SE RECUPERA EL ID SEGUN PARAMETRO URL
+        $objectId                               = false;
+        $paramNum                               = ($this->getLocal("application.serviceActions.paramNum")) + 1;
+        
+        if($this->hasUrlParam($paramNum)){
+
+            if(!strstr(":", $this->getUrlParam($paramNum))){
+
+                $objectId   = $this->getUrlParam($paramNum);
+            }
+        }
+        
+        //SE COMPRUEBA SI NO EXISTE EL METODO MANUAL DE RECUPERACION DE DATOS DEL OBJETO
+        if($this->hasLocal("application.editor.objectGetMethod")){
+
+            $methodName = $this->getLocal("application.editor.objectGetMethod");
+
+            if(method_exists($this, $methodName)){
+
+                //SE RECUPERA DESDE EL METODO MANUAL
+                $result     = $this->$methodName($objectId);
+                
+            }else{
+
+                //TODO: METHOS NOT FOUND
+            }
+        }else{
+
+            if($objectId !== false){
+                
+                //SE RECUPERA DESDE EL DATA SOURCE
+                $result     = $p_dataSource->getData($objectId);
+            }
+        }
+
+        //SE REEMPLASAN LOS DATOS SEGUN PARAMETROS URL
+        foreach($p_dataSource->getDataDefinitions() as $field=>$definition){
+            
+            if($this->hasUrlParam($field)){
+
+                $result[$field]     = array($this->getUrlParam($field));
+            }
+        }
+
+        return $result;
+    }
+
+    protected function getManagerFields($p_dataSource, $p_data){
+        
+        $result                         = array();
+        
+        foreach($p_dataSource->getDataDefinitions() as $field=>$definition){
+            
+            $fieldTemp                  = array();
+
+            $fieldTemp['id']            = $definition["id"];
+            $fieldTemp['type']          = $definition["type"];
+            $fieldTemp['group']         = $definition["group"];
+            $fieldTemp['order']         = $definition["order"];
+            $fieldTemp['default']       = $definition["defaultValue"];
+
+            //UI OPTIONS
+            foreach($definition["uiOptions"] as $option=>$value){
+
+                $fieldTemp[$option]     = $value; 
+            }
+
+            //FILE AND VALIDATIONS OPTIONS
+            $fieldTemp["options"]                   = array();
+            $fieldTemp["options"]["validation"]     = $definition["validationOptions"];
+            $fieldTemp["options"]["file"]           = $definition["attachFileOptions"];
+
+            //OTHER OPTIONS
+            foreach($definition["typeOptions"] as $option=>$value){
+
+                $fieldTemp["options"][$option]      = $value; 
+            }
+
+            //RELATION
+            if(!$definition["isRelation"]){
+
+                $fieldTemp["label"]         = $definition["uiOptions"]->label;
+                $fieldTemp["icon"]          = $definition["uiOptions"]->icon;
+
+                if($fieldTemp['type'] == "objectr" || $fieldTemp['type'] == "objectsr"){
+
+                    if(isset($fieldTemp['options']['model']) && ( !isset($fieldTemp['options']['isAsync']) || $fieldTemp['options']['isAsync'] == false)){
+
+                        $modelDataIdNamesParams                     = array();
+                        if(isset($fieldTemp['options']['hardfilters'])){
+
+                            $modelDataIdNamesParams['hardfilters']  = $fieldTemp['options']['hardfilters'];
+                        }
+
+                        $modelDataIdNames                       = $this->getModelDataIdNames($fieldTemp['options']['model'], $modelDataIdNamesParams);
+                        
+                        $fieldTempData                          = array();
+    
+                        foreach($modelDataIdNames['objects'] as $object){
+    
+                            $fieldTempData[]                    = array('label' => $object['name'], 'value' => $object['id'], 'image' => $object['image'], 'icon' => $object['icon']);
+                        }
+    
+                        $fieldTemp["options"]["data"]           = $fieldTempData;
+                    }
+
+                    $fieldTemp["options"]["multiple"]           = false;
+
+                    if($fieldTemp['type'] == "objectsr"){
+
+                        $fieldTemp["options"]["multiple"]       = true;
+                    }
+                }
+
+            }else{
+
+                $rightModelData                     = $this->getModelData($definition["rightModId"]);
+
+                $fieldTemp["icon"]                  = $rightModelData["uiOptions"]->icon;
+
+                if($definition['cardinality'] == "1:n"){
+
+                    $fieldTemp["label"]                 = $rightModelData["uiOptions"]->pluralName;
+                    $fieldTemp["options"]["multiple"]   = true;
+                }else {
+
+                    $fieldTemp["label"]                 = $rightModelData["uiOptions"]->name;
+                    $fieldTemp["options"]["multiple"]   = false;
+                }
+
+                $modelDataIdNames                       = $this->getModelDataIdNames($definition["rightModId"]);
+                        
+                $fieldTempData                          = array();
+
+                foreach($modelDataIdNames['objects'] as $object){
+
+                    $fieldTempData[]                    = array('label' => $object['name'], 'value' => $object['id'], 'image' => $object['image'], 'icon' => $object['icon']);
+                }
+
+                $fieldTemp["options"]["data"]           = $fieldTempData;
+            }
+
+            $result[$definition["id"]] = $fieldTemp;
+        }
+        
+        return $result;
     }
 
     /*______   _____    _____   _______    ____    _____  

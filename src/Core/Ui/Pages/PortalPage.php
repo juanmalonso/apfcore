@@ -84,8 +84,16 @@ class PortalPage extends VueUiService {
                 $result['destino']          = $this->getTaxonomyIdName($queryResul['destino']);
 
                 //TEMPORADA
-                $result['destino']          = $this->getTaxonomyIdName($queryResul['temporada']);
+                $result['temporada']        = $this->getTaxonomyIdName($queryResul['temporada']);
 
+                //TAGS
+                $result['etiquetas']        = array();
+
+                foreach($queryResul['tags'] as $tag){
+
+
+                    $result['etiquetas'][]  = $tag;
+                }
 
                 //SERVICIOS
                 $result['servicios']        = array();
@@ -179,6 +187,11 @@ class PortalPage extends VueUiService {
 
             $query['orders']           = $p_params['orders'];
         }
+
+        if(isset($p_params['keyword'])){
+
+            $query['keyword']           = $p_params['keyword'];
+        }
         
         $queryResul                     = $dataSource->getData($query);
         
@@ -248,7 +261,7 @@ class PortalPage extends VueUiService {
         return $result;
     }
 
-    public function getTopDestinos($p_params = array()){
+    public function getTopTaxonomies($p_params = array()){
 
         $result             = false;
 
@@ -261,8 +274,6 @@ class PortalPage extends VueUiService {
         $query['page']                  = (isset($p_params['page'])) ? $p_params['page'] : 1;
         $query['rows']                  = (isset($p_params['rows'])) ? $p_params['rows'] : 12;
         $query['filters']               = array();
-        //$query['filters']['parent']     = array("taxonomy_destinos");
-        $query['filters']['parent']     = array("taxonomy_categorias");
 
         if(isset($p_params['filters'])){
 

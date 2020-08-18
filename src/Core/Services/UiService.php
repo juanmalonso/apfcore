@@ -14,6 +14,7 @@ class UiService extends Service {
 
     protected $csssources;
     protected $jssources;
+    protected $metatags;
 
     protected $snippedsk;
 
@@ -27,6 +28,7 @@ class UiService extends Service {
 
         $this->csssources   = new Register();
         $this->jssources    = new Register();
+        $this->metatags    = new Register();
 
         $this->snippedsk    = array();
 
@@ -257,6 +259,28 @@ class UiService extends Service {
         }
     }
 
+    //PAGE META TAGS
+    public function addMetaTag($p_name, $p_content){
+
+        $key = md5($p_name);
+
+        if(!$this->metatags->has($key)){
+
+            $htmlCode = "<meta name=\"" . $p_name . "\" content=\"" . $p_content . "\" />";
+
+            $this->metatags->set($key, $htmlCode);
+        }
+    }
+
+    protected function compileMetaTags(){
+        
+        $this->view->strAppend("metatags", "");
+        foreach($this->metatags->all() as $metatag){
+            
+            $this->view->strAppend("metatags", $metatag);
+        }
+    }
+
     //PAGE SNIPPETS
     protected function addSnippet($p_group, $p_id, $p_type, $p_code){
 
@@ -355,6 +379,9 @@ class UiService extends Service {
 
         //COMPILE JSSOURCES
         $this->compileJsSources();
+
+        //COMPILE METATAGS
+        $this->compileMetaTags();
 
         //RENDER PAGE CSSSNIPPEDS
         $this->compileCssSnippets();

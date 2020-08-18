@@ -1,1 +1,22 @@
-<div class="ui fluid container" style="margin-top: 10px; background-image: url('https://source.unsplash.com/random/1600x900/?travel'); background-repeat: no-repeat; background-position: center center; background-size: cover; min-height: 300px;"></div>
+<div class="ui fluid container" style="margin-top: 10px; background-image: url('https://source.unsplash.com/random/1600x900/?travel'); background-repeat: no-repeat; background-position: center center; background-size: cover; min-height: 300px;">
+    <div class="ui container" style="padding-top: 130px;padding-right: 50px;padding-left: 50px;text-align: -webkit-center;align-content: center;">
+    
+        <div class="ui compact segment" style="border-width: 0px;background-color: rgba(0, 0, 0, 0.5);font-family: Dosis, sans-serif;letter-spacing: 0px;min-width: 360px;">
+            <div class="ui medium header" style="font-family: 'Dosis', sans-serif; letter-spacing: 2px; text-align: left; margin-top: 2px;color:#ffffff;">Encuentra Paquetes</div>
+            <form class="ui form" name="searchform" action="" method="get">
+                <div class="inline fields" style="margin-bottom: 0px;">
+                    <div class="field">
+                        <input type="text" name="keyword" id="keyword" placeholder="Buscar Paquete" style="font-family: Dosis, sans-serif;letter-spacing: 0px;font-weight: bold; min-width: 240px;">
+                    </div>
+                    <div class="field">
+                        <select name="mes" id="mes">
+                            <option value="all">Todos</option>
+                        </select>
+                        <input type="text" name="keyword" id="keyword" placeholder="Buscar Paquete" style="font-family: Dosis, sans-serif;letter-spacing: 0px;font-weight: bold; min-width: 240px;">
+                    </div>
+                    <div class="ui submit button" v-on:click="doSearch()" style="background-color: #EBB500;color: #ffffff;font-family: 'Dosis', sans-serif; letter-spacing: 0px;">Buscar</div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
