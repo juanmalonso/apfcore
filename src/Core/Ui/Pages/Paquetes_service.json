@@ -14,7 +14,7 @@
           "model": "contenidoturismo",
           "notRenderableFields":[
             "intinerario",
-            "mes"
+            "categorias"
           ]
         }
       },

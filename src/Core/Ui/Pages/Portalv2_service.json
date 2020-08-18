@@ -7,7 +7,7 @@
     "cardSmallImgSrcMap": "{var(global:urlbase)}image/sq360/cparp100x30/%(data:imagen)%.jpg"
   },
   "experiencias":{
-    "linkMap": "{var(global:urlbase)}v2lista/destino:%(data:id)%",
+    "linkMap": "{var(global:urlbase)}v2lista/experiencias:%(data:id)%",
     "cardBigImgSrcMap": "{var(global:urlbase)}image/sq360/cparp100x60/%(data:imagen)%.jpg",
     "cardSmallImgSrcMap": "{var(global:urlbase)}image/sq360/cparp100x30/%(data:imagen)%.jpg"
   },

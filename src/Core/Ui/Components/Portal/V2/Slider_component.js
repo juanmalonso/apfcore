@@ -5,6 +5,10 @@ Vue.component("___tag_", {
   },
   mounted: function() {
     var _self = this;
+
+    $('.ui.dropdown').dropdown({
+      placeholder: "auto"
+    })
   },
   methods: {
     doSearch: function(){

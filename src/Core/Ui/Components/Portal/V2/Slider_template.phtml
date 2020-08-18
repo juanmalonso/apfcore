@@ -8,13 +8,33 @@
                     <div class="field">
                         <input type="text" name="keyword" id="keyword" placeholder="Buscar Paquete" style="font-family: Dosis, sans-serif;letter-spacing: 0px;font-weight: bold; min-width: 240px;">
                     </div>
-                    <div class="field">
-                        <select name="mes" id="mes">
+                    <div class="field" style="min-width: 130px;">
+                        <select class="ui search selection fluid dropdown" name="mes" id="mes" placeholder="Mes" style="font-family: Dosis, sans-serif;letter-spacing: 0px; font-weight: bold;">
+                            <option value="">Mes</option>
                             <option value="all">Todos</option>
+                            <option value="ene">Enero</option>
+                            <option value="feb">Febrero</option>
+                            <option value="mar">Marzo</option>
+                            <option value="abr">Abril</option>
+                            <option value="may">Mayo</option>
+                            <option value="jun">Junio</option>
+                            <option value="jul">Julio</option>
+                            <option value="ago">Agosto</option>
+                            <option value="set">Setiembre</option>
+                            <option value="oct">Octubre</option>
+                            <option value="nov">Noviembre</option>
+                            <option value="dic">Diciembre</option>
                         </select>
-                        <input type="text" name="keyword" id="keyword" placeholder="Buscar Paquete" style="font-family: Dosis, sans-serif;letter-spacing: 0px;font-weight: bold; min-width: 240px;">
                     </div>
                     <div class="ui submit button" v-on:click="doSearch()" style="background-color: #EBB500;color: #ffffff;font-family: 'Dosis', sans-serif; letter-spacing: 0px;">Buscar</div>
+                </div>
+                <div class="inline fields" style="margin-top: 20px;">
+                    <div class="field">
+                        <div class="ui toggle checkbox">
+                            <input type="checkbox" id="nacionales" name="nacionales" checked="checked">
+                            <label style="color: #ffffff; font-family: 'Dosis', sans-serif; letter-spacing: 0px; font-weight: bold;">Solo paquetes nacionales</label>
+                        </div>
+                    </div>
                 </div>
             </form>
         </div>
