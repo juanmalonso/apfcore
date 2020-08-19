@@ -1,2 +1,53 @@
 #___id_ {
+
+}
+
+.nvoo-checkbox .label{
+
+    color: rgb(255, 255, 255);
+    font-family: Dosis, sans-serif;
+    letter-spacing: 0px;
+    font-weight: bold;
+}
+
+.ui.toggle.checkbox input:checked~.box:before, .ui.toggle.checkbox input:checked~label:before {
+    background-color: #E81F76!important;
+}
+
+.ui.toggle.checkbox input:focus:checked~.box:before, .ui.toggle.checkbox input:focus:checked~label:before {
+    background-color: #E81F76!important;
+}
+
+.ui.toggle.checkbox .box:before, .ui.toggle.checkbox label:before {
+    background: #898A8D;
+}
+
+.ui.toggle.checkbox .box:hover::before, .ui.toggle.checkbox label:hover::before {
+    background: #898A8D;
+}
+
+.ui.toggle.checkbox input:focus~.box:before, .ui.toggle.checkbox input:focus~label:before {
+    background: #898A8D;
+}
+
+
+.ui.toggle.checkbox .box:after, .ui.toggle.checkbox input:checked~label:after {
+    background-color: #F7BE00;
+}
+
+
+.ui.toggle.checkbox input:checked~.box, .ui.toggle.checkbox input:checked~label {
+    color: rgb(255, 255, 255)!important;
+}
+
+.ui.toggle.checkbox .box, .ui.toggle.checkbox label {
+    color: rgb(255, 255, 255)!important;
+}
+
+.ui.toggle.checkbox input:focus:checked~.box, .ui.toggle.checkbox input:focus:checked~label {
+    color: rgb(255, 255, 255)!important;
+}
+
+.ui.checkbox input:focus~label {
+    color: rgb(255, 255, 255)!important;
 }

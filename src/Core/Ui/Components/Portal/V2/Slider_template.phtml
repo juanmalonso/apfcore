@@ -1,7 +1,7 @@
 <div class="ui fluid container" style="margin-top: 10px; background-image: url('https://source.unsplash.com/random/1600x900/?travel'); background-repeat: no-repeat; background-position: center center; background-size: cover; min-height: 300px;">
-    <div class="ui container" style="padding-top: 130px;padding-right: 50px;padding-left: 50px;text-align: -webkit-center;align-content: center;">
+    <div class="ui container" style="padding-top: 70px;padding-right: 50px;padding-left: 50px;text-align: -webkit-center;align-content: center;">
     
-        <div class="ui compact segment" style="border-width: 0px;background-color: rgba(0, 0, 0, 0.5);font-family: Dosis, sans-serif;letter-spacing: 0px;min-width: 360px;">
+        <div class="ui compact segment" style="border-width: 0px;background-color: rgba(0, 0, 0, 0.7);font-family: Dosis, sans-serif;letter-spacing: 0px;min-width: 360px;">
             <div class="ui medium header" style="font-family: 'Dosis', sans-serif; letter-spacing: 2px; text-align: left; margin-top: 2px;color:#ffffff;">Encuentra Paquetes</div>
             <form class="ui form" name="searchform" action="" method="get">
                 <div class="inline fields" style="margin-bottom: 0px;">
@@ -29,10 +29,10 @@
                     <div class="ui submit button" v-on:click="doSearch()" style="background-color: #EBB500;color: #ffffff;font-family: 'Dosis', sans-serif; letter-spacing: 0px;">Buscar</div>
                 </div>
                 <div class="inline fields" style="margin-top: 20px;">
-                    <div class="field">
-                        <div class="ui toggle checkbox">
-                            <input type="checkbox" id="nacionales" name="nacionales" checked="checked">
-                            <label style="color: #ffffff; font-family: 'Dosis', sans-serif; letter-spacing: 0px; font-weight: bold;">Solo paquetes nacionales</label>
+                    <div class="field nvoo-checkbox">
+                        <div class="ui toggle checkbox" id="togglenacionales" name="togglenacionales">
+                            <input type="checkbox" id="nacionales" name="nacionales">
+                            <label class="label">Solo paquetes nacionales</label>
                         </div>
                     </div>
                 </div>

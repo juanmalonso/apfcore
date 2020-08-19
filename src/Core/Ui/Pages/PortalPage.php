@@ -5,6 +5,7 @@ namespace Nubesys\Core\Ui\Pages;
 use Nubesys\Vue\Services\VueUiService;
 
 //COMPONENTS
+use Nubesys\Core\Ui\Components\Portal\V2\Slider;
 use Nubesys\Core\Ui\Components\Portal\V2\TopBar;
 use Nubesys\Core\Ui\Components\Portal\V2\Footer;
 
@@ -35,6 +36,15 @@ class PortalPage extends VueUiService {
         $topBarParams                   = array();
 
         $this->placeComponent("top", $topBar, $topBarParams);
+    }
+
+    protected function generateSlider($p_params = array()){
+
+        $slider                         = new Slider($this->getDI());
+
+        $sliderParams                   = array();
+
+        $this->placeComponent("slider", $slider, array_merge($sliderParams, $p_params));
     }
 
     protected function generateFooter(){

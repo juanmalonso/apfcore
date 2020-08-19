@@ -8,13 +8,36 @@ Vue.component("___tag_", {
 
     $('.ui.dropdown').dropdown({
       placeholder: "auto"
-    })
+    });
+
+    $('#togglenacionales').checkbox();
   },
   methods: {
     doSearch: function(){
-      keyword = $("#keyword").val();
+      url = this.basepath + "v2lista/";
 
-      window.location = this.basepath + "v2lista/keyword:" + keyword;
+      //KEYWORD
+      keyword = $("#keyword").val();
+      if(keyword != ""){
+
+        url += "keyword:" + keyword + "/";
+      }
+
+      //MES
+      mes = $("#mes").val();
+      if(mes != "" && mes != "all"){
+
+        url += "mes:" + mes + "/";
+      }
+
+      //NACIONALES?
+      nacionales = $("#togglenacionales").checkbox("is checked");
+      if(nacionales){
+
+        url += "paises:PY";
+      }
+
+      window.location = url;
     }
   },
   template: "#___tag_-template"

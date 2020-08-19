@@ -46,6 +46,7 @@ class Portalv2 extends PortalPage {
         $paquetes                       = new ContentCards($this->getDI());
 
         $paquetesParams                 = array();
+        $paquetesParams['title']        = "Paquetes";
         $paquetesParams['urlLinkMap']   = $this->getLocal("paquetes.linkMap");
         $paquetesParams['imgSrcMap']    = $this->getLocal("paquetes.cardImgSrcMap");
         $paquetesParams['data']         = $this->getTopPaquetes();
@@ -71,14 +72,5 @@ class Portalv2 extends PortalPage {
 
         //ROBOTS
         $this->addMetaTag("robots", "index, follow");     
-    }
-
-    protected function generateSlider(){
-
-        $slider                         = new Slider($this->getDI());
-
-        $sliderParams                   = array();
-
-        $this->placeComponent("slider", $slider, $sliderParams);
     }
 }

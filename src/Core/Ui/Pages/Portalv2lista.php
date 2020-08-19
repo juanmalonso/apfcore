@@ -27,13 +27,28 @@ class Portalv2lista extends PortalPage {
         $paquetesParams['urlLinkMap']   = $this->getLocal("paquetes.linkMap");
         $paquetesParams['imgSrcMap']    = $this->getLocal("paquetes.cardImgSrcMap");
 
-        $keyword                        = "*";
+        $sliderParams                   = array();
+        $query                          = array();
+        
+        $filters                        = array();
+        
         if($this->hasUrlParam("keyword")){
 
-            $keyword                    = $this->getUrlParam("keyword");
+            $query['keyword']           = $this->getUrlParam("keyword");
+            $sliderParams['keyword']    = $this->getUrlParam("keyword");
         }
 
-        $filters                        = array();
+        if($this->hasUrlParam("paises")){
+
+            $filters['paises']          = (array)$this->getUrlParam("paises");
+            $sliderParams['paises']     = $this->getUrlParam("paises");
+        }
+
+        if($this->hasUrlParam("mes")){
+
+            $filters['mes']             = $this->getUrlParam("mes");
+            $sliderParams['mes']        = $this->getUrlParam("mes");
+        }
 
         //DESTINOS FILTER
         if($this->hasUrlParam("destino")){
@@ -47,15 +62,13 @@ class Portalv2lista extends PortalPage {
 
         //ECETERA FILTER
 
-        $query                          = array();
-        $query['keyword']               = $keyword;
-
         if(count($filters) > 0){
 
             $query['filters']           = $filters;
         }
 
         $paquetesParams['data']         = $this->getTopPaquetes($query);
+        $paquetesParams['title']        = "Resultados de búsqueda";
 
         $this->addMainSection($paquetes, $paquetesParams);
 
