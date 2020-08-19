@@ -14,7 +14,8 @@
           "model": "contenidoturismo",
           "notRenderableFields":[
             "intinerario",
-            "categorias"
+            "categorias",
+            "ciudad"
           ]
         }
       },
