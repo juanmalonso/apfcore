@@ -71,6 +71,6 @@ class Portalv2 extends PortalPage {
         //$this->addMainSection($destinos, $destinosParams);
 
         //ROBOTS
-        $this->addMetaTag("robots", "index, follow");     
+        $this->addMetaTag("robots", "index, follow");
     }
 }

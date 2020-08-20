@@ -7,6 +7,7 @@ class ContentCards extends VueUiComponent {
 
     public function mainAction(){
         
+        $this->setJsDataVar("title", $this->getLocal("title"));
         $this->setJsDataVar("data", $this->getLocal("data"));
         $this->setJsDataVar("urlLinkMap", $this->getLocal("urlLinkMap"));
         $this->setJsDataVar("imgSrcMap", $this->getLocal("imgSrcMap"));

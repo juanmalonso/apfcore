@@ -26,6 +26,7 @@ class Portalv2lista extends PortalPage {
         $paquetesParams                 = array();
         $paquetesParams['urlLinkMap']   = $this->getLocal("paquetes.linkMap");
         $paquetesParams['imgSrcMap']    = $this->getLocal("paquetes.cardImgSrcMap");
+        $paquetesParams['title']        = "Resultados de búsqueda";
 
         $sliderParams                   = array();
         $query                          = array();
@@ -40,20 +41,45 @@ class Portalv2lista extends PortalPage {
 
         if($this->hasUrlParam("paises")){
 
-            $filters['paises']          = (array)$this->getUrlParam("paises");
+            $filters['pais']            = (array)$this->getUrlParam("paises");
             $sliderParams['paises']     = $this->getUrlParam("paises");
         }
 
         if($this->hasUrlParam("mes")){
 
-            $filters['mes']             = $this->getUrlParam("mes");
+            $filters['mes']             = (array)$this->getUrlParam("mes");
             $sliderParams['mes']        = $this->getUrlParam("mes");
         }
 
+        //CATEGORIAS FILTER
+        /*
+        if($this->hasUrlParam("categorias")){
+
+            $taxonomyIdName             = $this->getTaxonomyIdName($this->getUrlParam("categorias")[0]);
+
+            $filters['experiencias']    = (array)$this->getUrlParam("categorias");
+            $paquetesParams['title']    = "<span style='color:#898A8D'>Destinos / </span>" . $taxonomyIdName['name'];
+        }
+        */
+
         //DESTINOS FILTER
+        /*
         if($this->hasUrlParam("destino")){
 
-            $filters['destino']        = (array)$this->getUrlParam("destino");
+            $taxonomyIdName             = $this->getTaxonomyIdName($this->getUrlParam("destino"));
+
+            $filters['experiencias']    = (array)$this->getUrlParam("experiencias");
+            $paquetesParams['title']    = "<span style='color:#898A8D'>Destinos / </span>" . $taxonomyIdName['name'];
+        }
+        */
+
+        //EXPERIENCIAS FILTER
+        if($this->hasUrlParam("experiencias")){
+
+            $taxonomyIdName             = $this->getTaxonomyIdName($this->getUrlParam("experiencias"));
+
+            $filters['experiencias']    = (array)$this->getUrlParam("experiencias");
+            $paquetesParams['title']    = "<span style='color:#898A8D'>Experiencias / </span>" . $taxonomyIdName['name'];
         }
         
         //CATEGORIAS FILTER
@@ -68,8 +94,8 @@ class Portalv2lista extends PortalPage {
         }
 
         $paquetesParams['data']         = $this->getTopPaquetes($query);
-        $paquetesParams['title']        = "Resultados de búsqueda";
-
+        
+        $this->generateSlider($sliderParams);
         $this->addMainSection($paquetes, $paquetesParams);
 
         //ROBOTS

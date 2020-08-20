@@ -30,6 +30,8 @@ class Portalv2reserva extends PortalPage {
         $this->setTitle($this->getLocal("title"));
 
         $contenidoDetalleData                       = $this->getContenidoDetalle();
+
+        $showExperiencias                           = false;
         
         if($this->hasPostParam("reserva_token")){
 
@@ -76,27 +78,35 @@ class Portalv2reserva extends PortalPage {
                                                                 <strong>Mensage</strong>: " . $expedienteData['message'] . "<br />";
 
                         //SEND EMAIL TO ADMIN
-                        //$this->sendEmail("Nueva reserva en www.NOSVAMOOS.com", "manialonso@gmail.com", "Portal NOSVAMOOS", "manialonso@gmail.com", "Sales Team", $toSalesNotificationEmailTemplate);
+                        $this->sendEmail("Nueva reserva en www.nosvamoos.com", "administrador@nosvamoos.com", "Portal www.nosvamoos.com", "ventas@nosvamoos.com", "Equipo de ventas de www.nosvamoos.com", $toSalesNotificationEmailTemplate);
 
-                        $toClientNotificationEmailTemplate      = "<strong>Gracias por su reserva!!</strong><hr />
-                                                                    En la brevedad posible, uno de nuestros agentes se pondrá en contacto con usted!";
+                        $toClientNotificationEmailTemplate      = "<strong>¡VAMOOS!</strong><hr />
+                                                                    Muchas Gracias por su solicitud.<br />
+                                                                    Este correo se trata de un pedido de presupuesto. El precio de los paquetes y/o servicios están sujetos a disponibilidad.<br />
+                                                                    En la brevedad un Asesor de Viajes se pondrá en contacto con Usted.";
 
                         //SEND TANKYOUEMAIL TO USER
-                        //$this->sendEmail("Tu reserva en www.NOSVAMOOS.com", "manialonso@gmail.com", "Portal NOSVAMOOS", $clienteData['reserva_email'], $clienteFullName, $toClientNotificationEmailTemplate);
+                        $this->sendEmail("Tu reserva en www.nosvamoos.com", "ventas@nosvamoos.com", "Equipo de ventas de www.nosvamoos.com", $clienteData['reserva_email'], $clienteFullName, $toClientNotificationEmailTemplate);
+
+                        $showExperiencias               = true;
 
                     }
 
                 }else {
                     
                     $messageIcon                    = "times circle outline red";
-                    $messageTitle                   = "¡OPS!";
-                    $messageText                    = "No se pudieron enviar los datos!";
+                    $messageTitle                   = "OOPPS!!";
+                    $messageText                    = "Sentimos el inconveniente, pero la página que intentas solicitar no se encuentra disponible en este momento.<br />Por favor vuelve a intentarlo en unos minutos.";
+
+                    $showExperiencias               = true;
                 }
             }else{
 
-                $messageIcon                        = "times circle outline red";
-                $messageTitle                       = "¡OPS!";
-                $messageText                        = "No se pudieron enviar los datos!";
+                $messageIcon                    = "times circle outline red";
+                $messageTitle                   = "OOPPS!!";
+                $messageText                    = "Sentimos el inconveniente, pero la página que intentas solicitar no se encuentra disponible en este momento.<br />Por favor vuelve a intentarlo en unos minutos.";
+
+                $showExperiencias                   = true;
             }
 
             $message                                = new Message($this->getDI());
@@ -120,64 +130,29 @@ class Portalv2reserva extends PortalPage {
             $this->addMainSection($reserva, $reservaParams);
         }
 
-        //ROBOTS
-        $this->addMetaTag("robots", "noindex, nofollow");  
-    }
+        if($showExperiencias){
 
-    private function sendEmail($p_subject, $p_fromEmail, $p_fromName, $p_toEmail, $p_toName, $p_template){
-        $result                 = true;
+            //EXPERIENCIAS
+            $query                          = array();
+            $query['rows']                  = 8;
+            $query['filters']               = array();
+            $query['filters']['parent']     = array("taxonomy_experiencias");
 
-        $curl                   = curl_init();
+            $experiencias                           = new ImageCards($this->getDI());
 
-        $data                   = new  \stdClass();
+            $experienciasParams                     = array();
+            $experienciasParams['title']            = "Experiencias";
+            $experienciasParams['urlLinkMap']       = $this->getLocal("experiencias.linkMap");
+            $experienciasParams['bigImgSrcMap']     = $this->getLocal("experiencias.cardBigImgSrcMap");
+            $experienciasParams['smallImgSrcMap']   = $this->getLocal("experiencias.cardSmallImgSrcMap");
+            $experienciasParams['data']             = $this->getTopTaxonomies($query);
+            $experienciasParams['size']             = "big";
 
-        $data->sender           = new  \stdClass();
-        $data->sender->name     = $p_fromName;
-        $data->sender->email    = $p_fromEmail;
-
-        $data->to               = array();
-        $toTmp                  = new  \stdClass();
-        $toTmp->name            = $p_toName;
-        $toTmp->email           = $p_toEmail;
-        $data->to[]             = $toTmp;
-
-        $data->htmlContent      = $p_template;
-        $data->subject          = $p_subject;
-
-
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => "https://api.sendinblue.com/v3/smtp/email",
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => "",
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => "POST",
-            CURLOPT_POSTFIELDS => json_encode($data),
-            CURLOPT_HTTPHEADER => array(
-                "accept: application/json",
-                "api-key: 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",
-                "content-type: application/json"
-            ),
-        ));
-
-        $response = curl_exec($curl);
-        $err = curl_error($curl);
-        curl_close($curl);
-
-        /*/
-        var_dump($response);
-        var_dump($err);
-        exit();
-        //*/
-
-        if ($err) {
-            $result = false;
-        } else {
-            $result = true;
+            $this->addMainSection($experiencias, $experienciasParams);
         }
 
-        return $result;
+        //ROBOTS
+        $this->addMetaTag("robots", "noindex, nofollow");  
     }
 
     protected function getReservaToken($p_id){

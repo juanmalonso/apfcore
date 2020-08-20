@@ -53,7 +53,7 @@ class PortalPage extends VueUiService {
 
         $footerParams                   = array();
         
-        $this->placeComponent("bottom", $footer, $footerParams);
+        $this->appendComponent("bottom", $footer, $footerParams);
     }
 
     protected function addMainSection($p_component, $p_componentParams){
@@ -85,10 +85,23 @@ class PortalPage extends VueUiService {
                 $result['description']      = $queryResul['description'];
                 $result['imagen']           = $queryResul['imagen'];
                 $result['imagenes']         = $queryResul['imagenes'];
-                $result['observaciones']    = $queryResul['observaciones'];
+                $result['observaciones']    = \nl2br($queryResul['observaciones']);
                 $result['promocion']        = $queryResul['promocion'];
                 $result['travel_period']    = $queryResul['travel_period'];
                 $result['booking_period']   = $queryResul['booking_period'];
+
+                //DIAS
+                
+                $result['dias']             = 0;
+                if(isset($result['travel_period'][0])){
+
+                    $fechaDesde             = new \DateTime($result['travel_period'][0]->fdesde);
+                    $fechaHasta             = new \DateTime($result['travel_period'][0]->fhasta);
+                    $diff                   = $fechaDesde->diff($fechaHasta);
+
+                    $result['dias']         = $diff->days;
+
+                }
                 
                 //DESTINO
                 $result['destino']          = $this->getTaxonomyIdName($queryResul['destino']);
@@ -329,5 +342,61 @@ class PortalPage extends VueUiService {
         $dataSource                     = new DataSource($this->getDI(), new ObjectsDataSource($this->getDI(), $dataSourceOptions));
 
         return                          $dataSource->getDataIdNames($p_taxonomy);
+    }
+
+    protected function sendEmail($p_subject, $p_fromEmail, $p_fromName, $p_toEmail, $p_toName, $p_template){
+        $result                 = true;
+
+        $curl                   = curl_init();
+
+        $data                   = new  \stdClass();
+
+        $data->sender           = new  \stdClass();
+        $data->sender->name     = $p_fromName;
+        $data->sender->email    = $p_fromEmail;
+
+        $data->to               = array();
+        $toTmp                  = new  \stdClass();
+        $toTmp->name            = $p_toName;
+        $toTmp->email           = $p_toEmail;
+        $data->to[]             = $toTmp;
+
+        $data->htmlContent      = $p_template;
+        $data->subject          = $p_subject;
+
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => "https://api.sendinblue.com/v3/smtp/email",
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => "",
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => "POST",
+            CURLOPT_POSTFIELDS => json_encode($data),
+            CURLOPT_HTTPHEADER => array(
+                "accept: application/json",
+                "api-key: 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",
+                "content-type: application/json"
+            ),
+        ));
+
+        $response = curl_exec($curl);
+        $err = curl_error($curl);
+        curl_close($curl);
+
+        /*/
+        var_dump($response);
+        var_dump($err);
+        exit();
+        //*/
+
+        if ($err) {
+            $result = false;
+        } else {
+            $result = true;
+        }
+
+        return $result;
     }
 }

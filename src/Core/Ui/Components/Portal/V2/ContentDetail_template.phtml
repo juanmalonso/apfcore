@@ -50,7 +50,7 @@
             <div class="four wide column">
                 <div class="ui segment" style="margin-top: -110px; z-index: 100;">
                     <div style="font-family: 'Dosis', sans-serif; letter-spacing: 0px; text-align: left; color: #4A4A4A; margin-bottom: 10px; font-weight: 700; font-size: 12px;">
-                        8 Noches      
+                        ${data.dias} Días      
                     </div>
                     <div style="font-family: 'Dosis', sans-serif; letter-spacing: 0px; text-align: left; color: #4A4A4A; margin-bottom: 10px;">
                         <span v-if="data.preciodesde" style="color: #4A4A4A;">Desde</span>
@@ -102,9 +102,7 @@
         <div class="row">
             <div class="eleven wide column">
                 <div class="ui medium header" style="font-family: 'Dosis', sans-serif; letter-spacing: 2px; text-align: left; margin-top: 2px;color:#4A4A4A;">Observaciones</div>
-                <div style="font-family: 'Dosis', sans-serif; letter-spacing: 0px; text-align: justify; margin-top: 2px; color: #4A4A4A; font-size: 12px;">
-                ${data.observaciones}
-                </div>
+                <div style="font-family: 'Dosis', sans-serif; letter-spacing: 0px; text-align: justify; margin-top: 2px; color: #4A4A4A; font-size: 12px;" v-html="data.observaciones"></div>
             </div>
         </div>
     </div>

@@ -6,11 +6,27 @@ Vue.component("___tag_", {
   mounted: function() {
     var _self = this;
 
-    $('.ui.dropdown').dropdown({
+    if(!_.isNull(this.keyword)){
+
+      $("#keyword").val(this.keyword);
+    }
+
+    $('#mes').dropdown({
       placeholder: "auto"
     });
 
+    if(!_.isNull(this.mes)){
+
+      $('#mes').dropdown("set selected", this.mes);
+    }
+
     $('#togglenacionales').checkbox();
+
+    if(!_.isNull(this.paises) && this.paises == "PY"){
+
+      $("#togglenacionales").checkbox("check");
+    }
+
   },
   methods: {
     doSearch: function(){
