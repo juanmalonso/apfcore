@@ -1,0 +1,90 @@
+<div class="ui grid" v-bind:class="(_.size($attrs) > 1) ? '' : 'padded'">
+        <div class="column">
+            <div class="ui basic segment loadingElement" style="padding:0px;">
+
+                <div v-if="hasActions()" class="ui basic right aligned segment" style="padding:0px;">
+                    <template v-for="(action, actionIndex) in actions">
+                        <a v-if="action.type == 'link'" v-bind:class="'ui ' + action.style + ' button'" v-bind:href="parseStringBlocks(action.urlMap, {})">
+                            <i v-bind:class="action.icon"></i> ${action.label}
+                        </a>
+                        <button v-if="action.type == 'actions'" v-bind:class="'ui ' + action.style + ' button'" v-on:click="doComponentAction(action.actions, {}, $event)">
+                            <i v-bind:class="action.icon"></i> ${action.label}
+                        </button>
+                    </template>
+                </div>
+
+                <!-- TABLE SEGMENT -->
+                <div class="ui segment" style="padding:0px;">
+                    <table class="ui celled striped table" style="border: 0px;">
+                        <thead>
+                            <tr>
+                                <!-- rownum -->
+                                <th style="width:36px;">#</th>
+                                <!-- value | tags | fields -->
+                                <th v-if="isFieldRender(field)" v-for="(field, fieldIndex) in fields" :key="fieldIndex">
+                                    ${field.uiOptions.label}
+                                </th>
+                                <th v-if="hasRowLinks()">
+                                    &nbsp;
+                                </th>
+                                <th v-if="hasRowActions()">
+                                    &nbsp;
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(dataRow, rowIndex) in objects" :key="rowIndex">
+                                <td>
+                                ${dataRow['num']}
+                                </td>
+                                <td v-if="isFieldRender(field)" v-for="(field, fieldIndex) in fields" :key="fieldIndex">
+                                
+                                <ElementDataValueCell v-bind:id="rowIndex + '-' + fieldIndex" v-bind:fieldIndex="fieldIndex" v-bind:model="model" v-bind:field="field" v-bind:value="dataRow[fieldIndex]" attrwatcher="value" v-bind:dataRow="dataRow" v-bind:linkAction="linkAction" v-bind:urlMaps="urlMaps"></ElementDataValueCell> 
+                                
+                                </td>
+                                <td v-if="hasRowLinks()">
+                                    <template v-for="(rowLink, linkIndex) in rowLinks">
+                                        <a v-if="rowLink.type == 'link'" v-bind:class="'ui ' + rowLink.style + ' button'" v-bind:href="parseStringBlocks(rowLink.urlMap, dataRow)" style="margin: 2px;">${rowLink.label}</a>
+                                        <a v-if="rowLink.type == 'actions'" v-bind:class="'ui ' + rowLink.style + ' button'" v-on:click="doComponentAction(rowLink.actions, dataRow, $event)" style="margin: 2px;">${rowLink.label}</a>
+                                        <select v-if="rowLink.type == 'selector'" class="ui search links dropdown" style="margin: 2px;" v-on:change="event => onSelectLinkOption(linkIndex, dataRow, event)">
+                                            <option>${rowLink.label}</option>
+                                            <option v-for="(option, optionIndex) in rowLink.options" :key="optionIndex" v-bind:value="optionIndex" >${option.label}</option>
+                                        </select>
+                                    </template>
+                                </td>
+                                <td v-if="hasRowActions()">
+                                    <div class="ui basic buttons">
+                                    <template v-for="(rowAction, linkIndex) in rowActions">
+                                        <a v-if="rowAction.type == 'link'" class="ui icon button" v-bind:href="parseStringBlocks(rowAction.urlMap, dataRow)"><i v-bind:class=" rowAction.style + ' icon'"></i></a>
+                                        <button v-if="rowAction.type == 'actions'" class="ui icon button" v-on:click="doComponentAction(rowAction.actions, dataRow, $event)"><i v-bind:class=" rowAction.style + ' icon'"></i></button>
+                                    </template>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- PAGINATION SEGMENT -->
+                <div v-if="paginatorButtons.length > 1" class="ui segment"  style="padding:0px;">
+                    <table class="ui celled striped table" style="border: 0px;">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <div v-if="pages > 1" class="ui right floated pagination mini menu">
+                                        <a v-if="paginatorPrevPage != false" class="icon item" v-on:click="doGotoPage({'page':paginatorPrevPage,'rows':rows}, $event)"><i class="left chevron icon"></i></a>
+                                        <template v-for="(paginatorItem, paginatorIndex) in paginatorButtons">
+                                            <a v-if="paginatorItem == page" class="active item" style="background-color: #21ba45;font-weight: bold;color: #ffffff;"> ${paginatorItem} </a>
+                                            <a v-if="paginatorItem != page" class="item" v-on:click="doGotoPage({'page':paginatorItem,'rows':rows}, $event)"> ${paginatorItem} </a>
+                                        </template>
+                                        <a v-if="paginatorNextPage != false" class="icon item" v-on:click="doGotoPage({'page':paginatorNextPage,'rows':rows}, $event)"><i class="right chevron icon"></i></a>
+                                    </div>
+                                </th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+                
+            </div>
+        </div>
+    </div>

@@ -1,0 +1,21 @@
+<div class="ui secondary menu module-menu">
+    <div class="left menu">
+        <div class="item">
+            <div class="ui breadcrumb">
+                <div class="active section">${title}</div>
+            </div>    
+        </div>
+    </div>
+    <div class="right menu">
+        
+        <div class="item" v-for="(action, actionIndex) in actions" style="padding-left: 0px; margin-left: 0px;">
+            <a v-if="action.type == 'link'" v-bind:class="'ui ' + action.style + ' button'" v-bind:href="parseStringBlocks(action.urlMap, {})">
+                <i v-bind:class="action.icon"></i> ${action.label}
+            </a>
+            <button v-if="action.type == 'actions'" v-bind:class="'ui ' + action.style + ' button'" v-on:click="doComponentAction(action.actions, {}, $event)">
+                <i v-bind:class="action.icon"></i> ${action.label}
+            </button>
+        </div>
+        
+    </div>
+</div>

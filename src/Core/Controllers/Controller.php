@@ -17,11 +17,11 @@ class Controller extends PhalconController
             switch ($serviceType) {
 
                 case 'api':
-                    $servicePathPartes      = \array_merge(array($urlparams[1], $urlparams[2], "ws"), explode("_", $urlparams[3]));
+                    $servicePathPartes      = \array_merge(array($urlparams[1]),  explode("_", $urlparams[2]), array("ws"), explode("_", $urlparams[3]));
                     break;
 
                 case 'uip':
-                    $servicePathPartes      = \array_merge(array($urlparams[1], $urlparams[2],"ui", "pages"), explode("_", $urlparams[3]));
+                    $servicePathPartes      = \array_merge(array($urlparams[1]), explode("_", $urlparams[2]),array("ui", "pages"), explode("_", $urlparams[3]));
                     break;
 
                 case 'uid':

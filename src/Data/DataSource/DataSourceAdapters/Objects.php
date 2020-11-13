@@ -40,8 +40,38 @@ class Objects extends DataSourceAdapter {
             $result['page']     = (isset($p_query['page'])) ? $p_query['page'] : 1;
             $result['rows']     = (isset($p_query['rows'])) ? $p_query['rows'] : 10;
 
-            $validFilters           = array();
+            $validFilters       = array();
+            $validRanges        = array();
+            $validAggregations  = array();
             //$validSearchFields      = array('_id');
+
+            //HARD FILTERS
+            if(isset($this->options['hardfilters'])){
+
+                if(!isset($p_query['filters'])){
+
+                    $p_query['filters']                     = array();
+                }
+
+                foreach($this->options['hardfilters'] as $field=>$terms){
+
+                    $p_query['filters'][$field]             = $terms; 
+                }
+            }
+
+            //HARD RANGES
+            if(isset($this->options['hardranges'])){
+
+                if(!isset($p_query['ranges'])){
+
+                    $p_query['ranges']                     = array();
+                }
+
+                foreach($this->options['hardranges'] as $field=>$range){
+
+                    $p_query['ranges'][$field]             = $range; 
+                }
+            }
 
             foreach($this->getDataDefinitions() as $definition){
                 
@@ -54,7 +84,13 @@ class Objects extends DataSourceAdapter {
 
                             if(isset($p_query['filters'][$definition['id']])){
 
-                                $validFilters['objData.' . $definition['id']] = (array)$p_query['filters'][$definition['id']];
+                                if( in_array($definition['id'], array('objActive', 'objUserAdd', 'objUserUpdated', 'objErased', 'objUserErased', 'objIndexed', 'objState'))){
+
+                                    $validFilters[$definition['id']] = (array)$p_query['filters'][$definition['id']];
+                                }else{
+
+                                    $validFilters['objData.' . $definition['id']] = (array)$p_query['filters'][$definition['id']];
+                                }
                             }
                         }
                     }
@@ -78,13 +114,35 @@ class Objects extends DataSourceAdapter {
                         }
                     }
                 }
-            }
 
-            if(isset($this->options['hardfilters'])){
+                //RANGES
+                if(isset($p_query['ranges']) && \is_array($p_query['ranges'])){
 
-                foreach($this->options['hardfilters'] as $field=>$terms){
+                    if(isset($p_query['ranges'][$definition['id']])){
 
-                    $validFilters["objData." . $field]       = $terms; 
+                        if(in_array($definition['id'], array('objTime', 'objDateAdd', 'objDateUpdated', 'objDateErased', 'objDateIndexed', 'objPage1000', 'objPage10000'))){
+
+                            $validRanges[$definition['id']] = (array)$p_query['ranges'][$definition['id']];
+                        }else{
+
+                            $validRanges['objData.' . $definition['id']] = (array)$p_query['ranges'][$definition['id']];
+                        }
+                    }
+                }
+
+                //AGGREGATIONS
+                if(isset($p_query['aggregations']) && \is_array($p_query['aggregations'])){
+
+                    if(isset($p_query['aggregations'][$definition['id']])){
+
+                        if(in_array($definition['id'], array('objActive', 'objUserAdd', 'objUserUpdated', 'objErased', 'objUserErased', 'objIndexed', 'objState'))){
+
+                            $validAggregations[$definition['id']] = (array)$p_query['aggregations'][$definition['id']];
+                        }else{
+
+                            $validAggregations['objData.' . $definition['id']] = (array)$p_query['aggregations'][$definition['id']];
+                        }
+                    }
                 }
             }
             
@@ -92,6 +150,8 @@ class Objects extends DataSourceAdapter {
             $searchQuery['rows']        = $result['rows'];
             $searchQuery['page']        = $result['page'];
             $searchQuery['filters']     = $validFilters;
+            $searchQuery['ranges']      = $validRanges;
+            $searchQuery['facets']      = $validAggregations;
             $searchQuery['keyword']     = (count($validSearchFields) > 0) ? ((isset($p_query['keyword'])) ? $p_query['keyword'] : '*') : '*';
             $searchQuery['fields']      = (count($validSearchFields) > 0) ? $validSearchFields : array('*');
             
@@ -99,14 +159,23 @@ class Objects extends DataSourceAdapter {
 
                 $searchQuery['orders']  = $p_query['orders'];
             }
+
+            if(isset($this->options['hardorders'])){
+
+                foreach($this->options['hardorders'] as $field=>$order){
+
+                    $searchQuery['orders'][$field]      = $order; 
+                }
+            }
             
             $searchResult               = $this->dataEngine->searchObjects($this->options['model'], $searchQuery);
             
             if($searchResult != false){
 
                 $result['totals']       = $searchResult['totals'];
-                $result['pages']        = ceil($result['totals']/$result['rows']);
+                $result['pages']        = ($result['rows'] > 0) ? ceil($result['totals']/$result['rows']) : 0;
                 $result['objects']      = array();
+                $result['facets']       = (isset($result['facets'])) ? $searchResult['facets'] : array();
 
                 $rownum = ($result['page'] * $result['rows']) - ($result['rows'] - 1);
 
@@ -126,7 +195,6 @@ class Objects extends DataSourceAdapter {
         }else{
             
             $result = $this->normalizeObjectData($this->dataEngine->getObject($this->options['model'], $p_query));
-            
         }
         
         return $result;

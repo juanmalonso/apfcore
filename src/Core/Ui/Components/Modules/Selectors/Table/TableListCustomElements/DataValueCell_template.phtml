@@ -1,0 +1,29 @@
+<div class="ui basic segment" style="padding: 0px;" v-bind:id="$attrs.id" >
+    <template v-if="renderType == 'NONE'">
+        &nbsp;
+    </template>
+    <template v-if="renderType == 'VALUE'">
+        ${value}
+    </template>
+    <template v-if="renderType == 'LINK'">
+        <a v-bind:href="parseStringBlocks($attrs.urlMaps[$attrs.linkAction], $attrs.dataRow)">${value}</a>
+    </template>
+    <template v-if="renderType == 'STATE'">
+        <div v-bind:class="'ui ' + style + ' label'">${label}</div>
+    </template>
+    <template v-if="renderType == 'IMAGE'">
+        <img v-bind:src="src" />
+    </template>
+    <template v-if="renderType == 'OBJECTIMAGE'">
+        <img class="ui avatar image" v-bind:src="parseStringBlocks($attrs.srcMap, getImageObjectData())" />
+    </template>
+    <template v-if="renderType == 'TEXTTAGS'">
+        <div v-for="(tag, tagIndex) in tags" :key="index" v-bind:class="'ui ' + tag.style + ' label'" style="margin: 0px 5px 5px 0px;">${tag.label}</div>
+    </template>
+    <template v-if="renderType == 'IMAGETAGS'">
+        <span>${value}</span>
+    </template>
+    <template v-if="renderType == 'OBJECTNAME'">
+        <span>${name}</span>
+    </template>
+</div>

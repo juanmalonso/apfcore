@@ -1,0 +1,7 @@
+<div class="ui field" v-bind:class="{required: getUiOption('required')}">
+
+    <select v-if="!isMultiple()" class="ui search dropdown loadingElement" v-bind:class="{disabled: getUiOption('readOnly')}" ref="realField" v-bind:name="field.id" v-bind:form="forForm"></select>
+    <select v-if="isMultiple()" class="ui search dropdown loadingElement" v-bind:class="{disabled: getUiOption('readOnly')}" ref="realField" v-bind:name="field.id + '[]'" multiple="" v-bind:form="forForm"></select>
+
+    <p v-if="getUiOption('info') != ''" style="font-size:.8em">${ getUiOption('info') }</p>
+</div>

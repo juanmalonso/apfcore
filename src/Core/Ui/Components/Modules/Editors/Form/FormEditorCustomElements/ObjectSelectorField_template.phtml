@@ -1,0 +1,7 @@
+<div class="ui field" v-bind:class="{required: getUiOption('required')}">
+    <input type="text" ref="realField" v-bind:name="field.id" v-bind:form="forForm">
+
+    CUSTOM OBJECT SELECTOR
+
+    <p v-if="getUiOption('info') != ''" style="font-size:.8em">${ getUiOption('info') }</p>
+</div>

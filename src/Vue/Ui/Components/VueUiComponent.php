@@ -14,7 +14,7 @@ class VueUiComponent extends UiComponent {
 
         $this->jsdata                   = new \stdClass();
 
-        $this->setTag($this->getId());
+        $this->setTag($this->generateTag());
 
         $this->elementsGlobalVars       = array();
         
@@ -24,12 +24,22 @@ class VueUiComponent extends UiComponent {
         $this->setJsDataVar("basepath", $this->getDI()->get('config')->main->url->base);
         $this->setJsDataVar("appid", $this->getDI()->get('config')->main->id);
         $this->setJsDataVar("serviceId", $this->serviceId);
+        $this->setJsDataVar("dataCache", new \stdClass());
         
         $this->setJsDataVar("path", $this->getUrlClassPath());
         //var_dump();
         //exit();
 
         $this->compileJsDataVar();
+    }
+
+    private function generateTag(){
+
+        $pathPartes     = explode("\\", $this->getClassPath());
+
+        $className      = strtolower(array_pop($pathPartes));
+
+        return          implode("-", array_map(function ($e){ return \Phalcon\Text::uncamelize($e);}, $pathPartes)) . "-" . $className;
     }
 
     //TAG
@@ -103,11 +113,19 @@ class VueUiComponent extends UiComponent {
     }
 
     //CUSTOM ELEMENTS
-    protected function placeVueCustomElement($p_tag, $p_params = array()){
+    protected function placeVueCustomElement($p_tag, $p_classPath = null, $p_params = array()){
         
         $camelizedTag                   = \Phalcon\Text::camelize($p_tag);
+
+        if($p_classPath != null){
+
+            $subElementClassPath        = $p_classPath . "\\" . $camelizedTag;
+        }else{
+
+            $subElementClassPath        = $this->getClassPath() . "CustomElements\\" . $camelizedTag;
+        }
         
-        $subElementClassPath            = $this->getClassPath() . "CustomElements\\" . $camelizedTag;
+        $instance                   = new $subElementClassPath($this->getDI());
         
         if(class_exists($subElementClassPath)){
 

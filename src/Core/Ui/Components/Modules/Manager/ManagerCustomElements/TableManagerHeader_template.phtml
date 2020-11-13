@@ -1,0 +1,20 @@
+<div class="ui basic segment" style="padding: 0px;" v-bind:id="$attrs.id" >
+    <table class="ui celled table" style="margin-top: 0px;">
+        <tbody>
+            <tr  v-if="!field.uiOptions.hidden" v-for="(field, fieldIndex) in fields" :key="fieldIndex">
+                <td style="width:300px; padding-top:2px; padding-bottom:2px;">
+                    <div class="ui large label" style="background-color: transparent;">
+                        <i v-bind:class="field.uiOptions.icon + ' icon'"></i> ${field.uiOptions.label}
+                    </div> 
+                </td>
+                <td style="padding-top:2px; padding-bottom:2px;">
+                <ElementDataValueCell v-bind:id="referenceName + '_' + field.id + '_field'" v-bind:fieldIndex="fieldIndex" v-bind:model="model" v-bind:field="field" v-bind:value="dataRow[fieldIndex]" attrwatcher="value" v-bind:dataRow="dataRow" v-bind:urlMaps="urlMaps"></ElementDataValueCell>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <template>
+        ${registerComponent()}
+    </template>
+</div>
+

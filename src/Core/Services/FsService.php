@@ -9,8 +9,6 @@ class FsService extends Service {
     public function __construct($p_di)
     {
         parent::__construct($p_di);
-
-
     }
 
     //LOCALSCOPE

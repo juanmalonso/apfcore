@@ -84,7 +84,7 @@ class Definition extends Common
             }
         }elseif($p_modelId != null && $p_fieldId == null){
             
-            $cacheKey       = 'data_definitions_' . $p_modelId . '_all' . time();
+            $cacheKey       = 'data_definitions_' . $p_modelId . '_all';
             $cacheLifetime  = 3600;
 
             $cacheKey       .= ($p_extended) ? "_ext" : "";

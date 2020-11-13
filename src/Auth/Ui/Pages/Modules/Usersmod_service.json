@@ -1,0 +1,226 @@
+{
+  "accessControl": true,
+  "urlMaps": {
+    "MANAGE": "{var(global:urlbase)}users/manage"
+  },
+  "actionDefault": "manage",
+  "actionParamNum": 5,
+  "actions": {
+    "manage": {
+      "layout": {
+        "modTop": {
+          "components": [
+            {
+              "referenceName": "moduletopbar",
+              "classPath": "Nubesys\\Core\\Ui\\Components\\Modules\\TopBar\\TopBar",
+              "dataService": {
+                "type": "service",
+                "scope": "service",
+                "name": "module-top-bar",
+                "params": {}
+              },
+              "title": "Manejo de Usuarios",
+              "actions": []
+            }
+          ]
+        },
+        "modMain": {
+          "components": [
+            {
+              "referenceName": "modulemanager",
+              "classPath": "Nubesys\\Core\\Ui\\Components\\Modules\\Manager\\Manager",
+              "dataService": {
+                "type": "service",
+                "scope": "service",
+                "name": "module-manager",
+                "params": {}
+              },
+              "renderedFields": [],
+              "tabs": {
+                "usuarios": {
+                  "label": "Usuarios",
+                  "referenceName": "usuarios",
+                  "elementTag": "table-list",
+                  "classPath": "\\Nubesys\\Core\\Ui\\Components\\Modules\\Selectors\\Table",
+                  "dataService": {
+                    "type": "service",
+                    "scope": "service",
+                    "name": "module-selector",
+                    "params": {
+                      "model": "usuario"
+                    }
+                  },
+                  "notRenderedFields": [
+                    "genero",
+                    "fecha_nacimiento",
+                    "tipo_idoc",
+                    "numero_idoc"
+                  ],
+                  "linkAction": "",
+                  "rowLinks": [],
+                  "rowActions": [
+                    {
+                      "type": "actions",
+                      "label": "editar",
+                      "style": "edit green",
+                      "urlMap": "var(local:urlMaps.MANAGE)",
+                      "actions": [
+                        {
+                          "scope": "modulemanager",
+                          "name": "doOpenSlider",
+                          "params": {
+                            "slider": "editusuario",
+                            "slidersParams": {
+                              "editusuario": {
+                                "dataService": {
+                                  "type": "service",
+                                  "scope": "service",
+                                  "name": "module-editor",
+                                  "params": {
+                                    "model": "usuario",
+                                    "id": "%(data:_id)%"
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": "actions",
+                      "label": "Agregar Usuario",
+                      "style": "green",
+                      "icon": "plus icon",
+                      "actions": [
+                        {
+                          "scope": "modulemanager",
+                          "name": "doOpenSlider",
+                          "params": {
+                            "slider": "addusuario",
+                            "slidersParams": {
+                              "addusuario": {
+                                "dataService": {
+                                  "type": "service",
+                                  "scope": "service",
+                                  "name": "module-editor",
+                                  "params": {
+                                    "model": "usuario"
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "sliders": {
+                "addusuario": {
+                  "label": "Agregar Usuario",
+                  "referenceName": "addusuario",
+                  "elementTag": "form-editor",
+                  "classPath": "\\Nubesys\\Core\\Ui\\Components\\Modules\\Editors\\Form",
+                  "dataService": {
+                    
+                  },
+                  "hardDefaultData": {},
+                  "notRenderedFields": [
+                    "genero",
+                    "fecha_nacimiento",
+                    "tipo_idoc",
+                    "numero_idoc"
+                  ],
+                  "onAddActions": [
+                    {
+                      "scope": "usuarios",
+                      "name": "doReloadData",
+                      "params": {}
+                    },
+                    {
+                      "scope": "modulemanager",
+                      "name": "doCloseSlider",
+                      "params": {
+                        "slider": "addusuario"
+                      }
+                    }
+                  ],
+                  "sliderTopActions": [
+                    {
+                      "type": "actions",
+                      "label": "Guardar Datos",
+                      "urlMap": "var(local:urlMaps.LIST)",
+                      "style": "green",
+                      "icon": "save icon",
+                      "actions": [
+                        {
+                          "scope": "addusuario",
+                          "name": "doSendData",
+                          "params": {
+                            "dataServiceName": "module-editor-save"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "editusuario": {
+                  "label": "Editar Usuario",
+                  "referenceName": "editusuario",
+                  "elementTag": "form-editor",
+                  "classPath": "\\Nubesys\\Core\\Ui\\Components\\Modules\\Editors\\Form",
+                  "dataService": {
+                  },
+                  "notRenderedFields": [
+                    "genero",
+                    "fecha_nacimiento",
+                    "tipo_idoc",
+                    "numero_idoc",
+                    "password",
+                    "password_reset"
+                  ],
+                  "onEditActions": [
+                    {
+                      "scope": "usuarios",
+                      "name": "doReloadData",
+                      "params": {}
+                    },
+                    {
+                      "scope": "modulemanager",
+                      "name": "doCloseSlider",
+                      "params": {
+                        "slider": "editusuario"
+                      }
+                    }
+                  ],
+                  "sliderTopActions": [
+                    {
+                      "type": "actions",
+                      "label": "Guardar Datos",
+                      "urlMap": "var(local:urlMaps.LIST)",
+                      "style": "green",
+                      "icon": "save icon",
+                      "actions": [
+                        {
+                          "scope": "editusuario",
+                          "name": "doSendData",
+                          "params": {
+                            "dataServiceName": "module-editor-save"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}

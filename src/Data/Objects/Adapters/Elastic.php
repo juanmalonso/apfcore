@@ -179,7 +179,7 @@ class Elastic extends Common
         return $result;
     }
 
-    public function searchDocs(\Elastica\Type $p_type, $p_keyword, $p_fields, $p_sorts, $p_page, $p_rows, $p_facets, $p_filters){
+    public function searchDocs(\Elastica\Type $p_type, $p_keyword, $p_fields, $p_sorts, $p_page, $p_rows, $p_facets, $p_filters, $p_ranges){
         
         $result = false;
 
@@ -201,7 +201,7 @@ class Elastic extends Common
         $queryAND       = new \Elastica\Query\BoolQuery();
         $queryAND->addMust($queryString);
 
-        if(isset($p_filters['ranges'])){
+        /*if(isset($p_filters['ranges'])){
 
             foreach ($p_filters['ranges'] as $field=>$ranges){
 
@@ -212,8 +212,8 @@ class Elastic extends Common
                 ));
                 $queryAND->addFilter($queryRangeTmp);
             }
-        }
-
+        }*/
+        
         if(isset($p_filters['and'])){
 
             foreach ($p_filters['and'] as $term=>$values){
@@ -234,17 +234,32 @@ class Elastic extends Common
             }
         }
 
-        /*        
-        $queryRange     = new \Elastica\Query\Range();
-        $queryRange->addField("objDateAdd", array(
-            "gte" => "2020-06-10 10:11:59",
-            "lte" => "2021-06-05 10:11:59"
-        ));
-        $queryAND->addFilter($queryRange);
-        */
+        foreach($p_ranges as $field=>$range){
+            $queryRange     = new \Elastica\Query\Range();
+            $queryRange->addField($field, $range);
+            $queryAND->addFilter($queryRange);
+        }
 
         $queryMain      = new \Elastica\Query\BoolQuery();
         $queryMain->addMust($queryAND);
+
+        //TODO AGGREGATIONS EN UNA FUNCION RECURSIVA
+        foreach($p_facets as $field=>$aggregation){
+            
+            if($aggregation['type'] == 'terms'){
+
+                $termsAgg = new \Elastica\Aggregation\Terms($aggregation['name']);
+                $termsAgg->setField($field);
+
+                if(isset($aggregation['size'])){
+
+                    $termsAgg->setSize($aggregation['size']);
+                }
+                
+                $query->addAggregation($termsAgg);
+            }
+        }
+
         /*
         if(strlen($p_keyword) > 0){
 
@@ -336,26 +351,45 @@ class Elastic extends Common
         }*/
 
         //TODO : FALTA FACETS
-
+        
         if(count($p_sorts) > 0){
 
             $query->addSort($p_sorts);
         }
 
         $query->setQuery($queryMain);
-        /*var_dump(json_encode($query->getQuery()->toArray()));
-        echo "<hr>";
-        exit();*/
+
+        //var_dump(json_encode($query->getQuery()->toArray()));
+        //echo "<hr>";
+
         $resultSet = $p_type->search($query);
 
         //var_dump(json_encode($resultSet->getQuery()->toArray()));
         //echo "<hr>";
+        //exit();
 
         $result = array();
         $result['totals'] = $resultSet->getTotalHits();
 
-        $result['facets'] = array();
-        //TODO : Falta Facets
+        $result['facets']       = array();
+
+        if($resultSet->hasAggregations()){
+
+            foreach($resultSet->getAggregations() as $aggregation=>$aggregationData){
+
+                $buckets = array();
+
+                if(isset($aggregationData['buckets']) && \is_array($aggregationData['buckets'])){
+
+                    foreach($aggregationData['buckets'] as $bucket){
+
+                        $buckets[$bucket['key']] = $bucket['doc_count'];
+                    }
+                }
+            }
+
+            $result['facets'][$aggregation]   = $buckets;
+        }
 
         $result['docs'] = array();
 
@@ -363,7 +397,7 @@ class Elastic extends Common
 
             $result['docs'][] = $doc;
         }
-
+        
         return $result;
     }
 

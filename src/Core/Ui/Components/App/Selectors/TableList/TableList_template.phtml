@@ -105,7 +105,7 @@
                                 <template v-if="paginator.type == 'actions'">
                                     <a v-if="paginatorPrevPage != false" class="icon item" v-on:click="doComponentAction(paginator.actions, {'page':paginatorPrevPage,'rows':data.rows}, $event)"><i class="left chevron icon"></i></a>
                                     <template v-for="(paginatorItem, paginatorIndex) in paginatorButtons">
-                                        <a v-if="paginatorItem == data.page" class="active item"> ${paginatorItem} </a>
+                                        <a v-if="paginatorItem == data.page" class="active item" style="background-color: #21ba45;font-weight: bold;color: #ffffff;"> ${paginatorItem} </a>
                                         <a v-if="paginatorItem != data.page" class="item" v-on:click="doComponentAction(paginator.actions, {'page':paginatorItem,'rows':data.rows}, $event)"> ${paginatorItem} </a>
                                     </template>
                                     <a v-if="paginatorNextPage != false" class="icon item" v-on:click="doComponentAction(paginator.actions, {'page':paginatorNextPage,'rows':data.rows}, $event)"><i class="right chevron icon"></i></a>
@@ -114,7 +114,7 @@
                                 <template v-if="paginator.type == 'links'">
                                     <a v-if="paginatorPrevPage != false" class="icon item" v-bind:href="paginator.urlbase + '/page:' + paginatorPrevPage + '/rows:' + data.rows"><i class="left chevron icon"></i></a>
                                     <template v-for="(paginatorItem, paginatorIndex) in paginatorButtons">
-                                        <a v-if="paginatorItem == data.page" class="active item"> ${paginatorItem} </a>
+                                        <a v-if="paginatorItem == data.page" class="active item" style="background-color: #21ba45;font-weight: bold;color: #ffffff;"> ${paginatorItem} </a>
                                         <a v-if="paginatorItem != data.page" class="item" v-bind:href="paginator.urlbase + '/page:' + paginatorItem + '/rows:' + data.rows"> ${paginatorItem} </a>
                                     </template>
                                     <a v-if="paginatorNextPage != false" class="icon item" v-bind:href="paginator.urlbase + '/page:' + paginatorNextPage + '/rows:' + data.rows"><i class="right chevron icon"></i></a>

@@ -2,12 +2,12 @@
 
 namespace Nubesys\Core\Ui\Components;
 
-use Nubesys\Core\Common;
+use Nubesys\Core\AppCommon;
 use Nubesys\Core\Ui\View\View;
 use Phalcon\Mvc\View\Engine\Volt;
 use Nubesys\Core\Register;
 
-class UiComponent extends Common {
+class UiComponent extends AppCommon {
 
     protected $id;
     protected $serviceId;
@@ -36,6 +36,7 @@ class UiComponent extends Common {
 
         //INITIALS VIEW VARS
         $this->setViewVar("id", $this->getId());
+        $this->setViewVar("idReference", $this->getId());
     }
 
     //COMPONENTS REFERENCE NAMES
@@ -46,6 +47,8 @@ class UiComponent extends Common {
         $this->initScope($globalScopeKey);
 
         $this->getScope($globalScopeKey)->set($p_name, $this->getId());
+
+        //$this->setJsDataVar("referenceName", $p_name);
     }
 
     //ID
@@ -109,7 +112,7 @@ class UiComponent extends Common {
     protected function getLocal($p_key){
 
         $globalScopeKey     = "local." . $this->getId() . ".scope";
-
+        
         $this->initScope($globalScopeKey);
 
         if(!strpos($p_key, '.')){

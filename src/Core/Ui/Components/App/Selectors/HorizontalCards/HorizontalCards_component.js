@@ -1,4 +1,4 @@
-Vue.component("___tag_", {
+Vue.component("___idReference_", {
   mixins: [nbsComponentMixin],
   data: function () {
     return ___jsdata_;
@@ -9,7 +9,7 @@ Vue.component("___tag_", {
     //console.log($('#el_dimmable').dimmer('hide'));
     
     $('.dropdown').dropdown();
-    
+    //___idReference_
   },
   methods: {
     onSelectLinkOption: function (linkIndex, data, event){
@@ -206,5 +206,5 @@ Vue.component("___tag_", {
       return result;
     }
   },
-  template: "#___tag_-template"
+  template: "#___idReference_-template"
 });

@@ -1298,8 +1298,14 @@ class NbsObject extends Common
 
                                 $orders                 = $p_query['orders'];
                             }
+
+                            $ranges                      = array();
+                            if(isset($p_query['ranges'])){
+
+                                $ranges                 = $p_query['ranges'];
+                            }
                             
-                            $queryResult = $this->elastic->searchDocs($type, $keyword, $fields, $orders, $page, $rows, $facets, $filters);
+                            $queryResult = $this->elastic->searchDocs($type, $keyword, $fields, $orders, $page, $rows, $facets, $filters, $ranges);
                             
                             if($queryResult != false){
 
@@ -1771,7 +1777,7 @@ class NbsObject extends Common
         
         $result = false;
 
-        $cacheKey       = 'data_object_' . $p_id . time();
+        $cacheKey       = 'data_object_' . $p_id;
         $cacheLifetime  = 3600;
         $cacheType      = 'file';
         

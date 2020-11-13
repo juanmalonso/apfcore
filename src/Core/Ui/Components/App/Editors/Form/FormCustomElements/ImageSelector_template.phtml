@@ -144,13 +144,41 @@
       </div>
     </div>
 
+    <div class="ui cards">
+      <div v-for="(image, imageIndex) in images" class="ui card" style="width: 100px;">
+        <div class="image">
+          <img v-bind:src="basepath +'image/sq100/' + image + '.jpg'">
+        </div>
+        <div class="extra content" style="padding:10px !important;">
+          <div class="ui two mini buttons">
+            <div class="ui basic blue icon button" style="width:40px !important;" v-on:click="doOpenImageSelectorSlide(imageIndex)" >
+              <i class="pen icon"></i>
+            </div>
+            <div class="ui basic red icon button" style="width:40px !important;" v-on:click="doRemoveSelectedImage(imageIndex)">
+              <i class="trash icon"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div v-if="(!isMultiple() && !hasImages()) || (isMultiple())" class="ui card" style="width: 100px;height: fit-content;">
+        <div class="extra content" style="padding:10px !important;">
+          <div class="ui basic icon button" style="width: 80px !important;height: 80px !important;padding-top: 30px;" v-on:click="doOpenImageSelectorSlide('_' + (imagesMaxIndex() + 1))">
+            <i class="plus green icon" style="font-size: 40px;"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!--
     <div v-for="(image, index) in images" class="ui icon massive button" v-on:click="doOpenImageSelectorSlide(index)" v-bind:style="'min-width: 100px;min-height: 100px;padding-top: 38px;background-image: url(\''+ basepath +'image\/sq100\/' + image + '.jpg\');'">
       <i class="pen blue icon" style="color:white;"></i>
     </div>
-
+    -->
+    <!-- 
     <div v-if="(!isMultiple() && !hasImages()) || (isMultiple())" class="ui icon massive basic button" v-on:click="doOpenImageSelectorSlide('_' + (imagesMaxIndex() + 1))" style="min-width: 100px;min-height: 100px;padding-top: 38px;">
       <i class="plus icon"></i>
     </div>
+    -->
 
     <select v-if="isMultiple()" v-bind:id="'field_' + $attrs.id" v-bind:name="$attrs.id + '[]'" multiple="" v-bind:form="$attrs.forForm">
           <option v-for="(image, index) in images" :key="index" v-bind:value="image" selected="true">${image}</option>

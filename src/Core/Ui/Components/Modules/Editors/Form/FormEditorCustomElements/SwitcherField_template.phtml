@@ -1,0 +1,10 @@
+<div class="ui field" v-bind:class="{required: getUiOption('required')}">
+
+    <div class="ui toggle checkbox" ref="checkBox">
+      <input type="checkbox">
+    </div>
+
+    <input type="hidden" placeholder="" ref="realField" v-bind:name="field.id" v-bind:form="forForm">
+    
+    <p v-if="getUiOption('info') != ''" style="font-size:.8em">${ getUiOption('info') }</p>
+</div>

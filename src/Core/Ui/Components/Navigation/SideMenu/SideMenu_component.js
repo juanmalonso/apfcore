@@ -1,4 +1,4 @@
-Vue.component("___tag_", {
+Vue.component("___idReference_", {
   mixins: [nbsComponentMixin],
   data: function() {
     return ___jsdata_;
@@ -7,5 +7,5 @@ Vue.component("___tag_", {
     var _self = this;
   },
   methods: {},
-  template: "#___tag_-template"
+  template: "#___idReference_-template"
 });

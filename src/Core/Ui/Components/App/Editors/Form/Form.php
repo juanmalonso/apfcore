@@ -10,6 +10,7 @@ class Form extends VueUiComponent {
     public function mainAction(){
 
         $this->registerReference("editor");
+        $this->setJsDataVar("referenceName", 'editor');
         
         /*$this->addJsSource("https://cdn.jsdelivr.net/npm/semantic-ui-calendar@0.0.8/dist/calendar.min.js");
         $this->addCssSource("https://cdn.jsdelivr.net/npm/semantic-ui-calendar@0.0.8/dist/calendar.min.css");*/

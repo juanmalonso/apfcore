@@ -2,9 +2,9 @@
 
 namespace Nubesys\Core\Services;
 
-use Nubesys\Core\Common;
+use Nubesys\Core\AppCommon;
 
-class Service extends Common {
+class Service extends AppCommon {
 
     public function __construct($p_di)
     {

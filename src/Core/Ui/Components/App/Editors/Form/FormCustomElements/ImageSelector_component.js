@@ -1,4 +1,4 @@
-Vue.component("___tag_", {
+Vue.component("___idReference_", {
   mixins: [nbsComponentMixin, nbsFieldComponentMixin],
   data: function () {
     return ___jsdata_;
@@ -56,12 +56,20 @@ Vue.component("___tag_", {
       return result;
     },
     doOpenImageSelectorSlide: function(index){
-
+      
+      console.log("doOpenImageSelectorSlide", index);
+      
       $('#sidebar_' + this.$attrs.id).sidebar('show');
 
       this.imageSelectedIndex = index;
 
       this.doImageUnselected();
+
+      if(_.has(this.images, index)){
+
+        this.doImageSelected(this.images[index]);
+      }
+
       this.doDisabledUploadButton();
       this.doDisabledAceptarButton();
 
@@ -103,6 +111,32 @@ Vue.component("___tag_", {
 
         $('option[value=' + value + ']').attr('selected','selected');
       });
+    },
+    doRemoveSelectedImage: function(index){
+      console.log("doRemoveSelectedImage", index);
+      var newSelected = {};
+      console.log("newSelected", newSelected);
+      _.each(this.images, function(value, key, list){
+
+        console.log("image - compare", key, value, index, key != index);
+
+        if(key != index){
+
+          newSelected[key] = value;
+        }
+      });
+      
+      console.log("newSelected", newSelected);
+      this.$set(this, "images", newSelected);
+      console.log("this.images", this.images);
+
+      _.each(_.values(this.images), function(value, key, list){
+
+        console.log($('option[value=' + value + ']'));
+
+        $('option[value=' + value + ']').attr('selected','selected');
+      });
+      
     },
     onSelectedFile: function (event){
       var _self   = this;
@@ -282,5 +316,5 @@ Vue.component("___tag_", {
   },
   computed: {
   },
-  template: "#___tag_-template"
+  template: "#___idReference_-template"
 });

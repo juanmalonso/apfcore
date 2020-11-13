@@ -1,0 +1,74 @@
+  <div>
+
+    <form v-bind:id="field.id + '_form'" v-bind:name="field.id + '_form'" method="post" enctype="multipart/form-data"></form>
+    
+    <div class="ui two stackable cards" style="padding-bottom: 14px;">
+
+      <div v-for="(grp, grpIndex) in field.typeOptions.groups" :key="grpIndex" class="card" style="-webkit-box-shadow: 0 0px 0px 0 #ffffff, 0 0 0 1px #d4d4d5; box-shadow: 0 0px 0px 0 #ffffff, 0 0 0 0px #ffffff;margin-right: 0px;margin-bottom: 0px;">
+        <div class="content" style="padding:0px;">
+          <div class="ui form">
+          <template v-for="(fld, fldIndex) in grp.fields">
+            
+            <template v-if="fld.type == 'label'">
+              <div class="ui large label" style="background-color: transparent; width:80%;">
+                ${fld.value}
+              </div>
+            </template>
+
+            <template v-if="fld.type == 'text'">
+              <div class="field">
+                <label v-if="_.has(fld, 'label')">${fld.label}</label>
+                <div class="ui input">
+                  
+                  <template v-if="_.has(fld, 'placeholder')">
+                    <input type="text" v-bind:id="field.id + '_' + fld.id + '_field'" v-bind:name="fld.id" v-bind:placeholder="fld.placeholder" v-bind:form="field.id + '_form'" />
+                  </template>
+                  <template v-else>
+                    <input type="text" v-bind:id="field.id + '_' + fld.id + '_field'" v-bind:name="fld.id" v-bind:form="field.id + '_form'" />
+                  </template>
+                </div>
+              </div>
+            </template>
+
+            <template v-if="fld.type == 'textarea'">
+              <div class="ui input">
+                <textarea v-bind:id="field.id + '_' + fld.id + '_field'" v-bind:name="fld.id" v-bind:form="field.id + '_form'"  v-bind:placeholder="fld.placeholder" v-bind:cols="30" v-bind:rows="fld.rows" />
+              </div>
+            </template>
+
+            <template v-if="fld.type == 'boolean'">
+              <div class="ui toggle checkbox" v-bind:id="field.id + '_' + fld.id + '_checkbox'">
+                <input type="checkbox" v-bind:id="field.id + '_' + fld.id + '_field'" v-bind:name="fld.id" v-bind:form="field.id + '_form'">
+              </div>
+              <template v-if="setCheckbox(fld.id)"></template>
+            </template>
+
+            <template v-if="fld.type == 'radio'">
+              <div class="inline fields">
+                <label v-if="_.has(fld, 'label')">${fld.label}</label>
+                <template v-for="(option, optionIndex) in fld.options">
+                  <div class="field">
+                    <div class="ui radio checkbox" v-bind:id="field.id + '_' + fld.id + '_radio_' + optionIndex">
+                      <input type="radio" v-bind:name="fld.id" v-bind:value="option.value" v-bind:form="field.id + '_form'">
+                      <label>${option.label}</label>
+                    </div>
+                  </div>
+                  <template v-if="setRadio(fld.id, optionIndex)"></template>
+                </template>
+              </div>
+            </template>
+
+          </template>
+          </div>
+        </div>
+
+        <template v-if="setFieldStyle()"></template>
+
+        <p v-if="getUiOption('info') != ''" style="font-size:.8em">${ getUiOption('info') }</p>
+      </div>
+    </div>
+
+    <input type="hidden" placeholder="" v-bind:id="field.id + '_field'" v-bind:name="field.id" v-bind:form="forForm">
+
+  </div>
+  

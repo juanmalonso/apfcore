@@ -34,8 +34,10 @@ class Expressions
     }
 
     public static function evaluateDataExpression($p_data, $p_expression){
+
+        $dot = new \Adbar\Dot($p_data);
         
-        $expression = self::normalizeDataExpresion(\Nubesys\Core\Library\Utils\Struct::flatten($p_data), $p_expression);
+        $expression = self::normalizeDataExpresion($dot->flatten(), $p_expression);
         
         return self::evaluate($expression);
     }
@@ -62,6 +64,11 @@ class Expressions
 
             $language->set('start',function ($l, $r) : bool {
                 return (strpos($l, $r) === 0) ? true : false;
+            });
+
+            $language->set('in',function ($l, $r) : bool {
+                
+                return (in_array($l, \explode(",", $r))) ? true : false;
             });
 
             $language->set('+',function ($l, $r) : float {

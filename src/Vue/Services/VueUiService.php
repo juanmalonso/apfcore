@@ -121,7 +121,7 @@ class VueUiService extends UiService {
         
         parent::doPageRender($p_action, $p_params, true);
 
-        $this->setJsReferencesNamesDataVar();
+        //$this->setJsReferencesNamesDataVar();
 
         $this->loadVueTemplates();
 

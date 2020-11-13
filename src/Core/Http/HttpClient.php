@@ -1,0 +1,43 @@
+<?php
+namespace Nubesys\Core\Http;
+
+use Nubesys\Core\Common;
+
+class HttpClient extends Common
+{
+    public function __construct($p_di){
+
+        $this->setDI($p_di);
+    }
+
+    public function httpGet($p_url, $p_getParams = array()){
+
+        //TODO
+    }
+
+    public function httpJsonPost($p_url, $p_postParam = null, $p_getParams = array()){
+        $result             = false;
+        $client             = new \GuzzleHttp\Client();
+        
+        $response           = $client->post($p_url, [
+            'json' => $p_postParam
+        ]);
+        
+        if($response->getStatusCode() == 200){
+            
+            if($response->hasHeader('Content-Length') && $response->getHeader('Content-Length')[0] > 1){
+                
+                $result     = json_decode($response->getBody()->getContents());
+                
+            }else{
+
+                //TODO Error de http CLIENT
+            }
+        }else{
+
+            //TODO Error de http CLIENT
+        }
+
+        return $result;
+    }
+}

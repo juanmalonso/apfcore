@@ -1,0 +1,38 @@
+<div class="ui grid" v-bind:class="(_.size($attrs) > 1) ? '' : 'padded'">
+    <div class="column">
+        <div class="ui horizontal segments" style="min-height: 800px; margin:0px;">
+            <!-- TABLE SEGMENT -->
+            
+                <div v-for="(column, columnIndex) in getKanbanColumns()" :key="columnIndex" class="ui segment">
+                    <div class="ui basic large label" style="border: 0px solid #ffffff;"><i v-bind:class="'dot circle ' + column.style + ' icon'"></i>${column.label}</div>
+                    
+                        <!--
+                        <div class="ui segment">
+                            
+                            <img class="ui avatar image" v-bind:src="basepath + 'image/sq60/gray/image_no-image.jpg'">
+                            <span>
+                                [namefield]com
+                            </span>
+                            
+                        </div>
+                        -->
+
+                        <div v-for="(card, cardIndex) in getKanbanColumnData(column.key)" :key="cardIndex" class="ui segment">
+                            <a v-bind:href="parseStringBlocks(urlMaps[linkAction], card)">${card['_id']} - ${card['empresa']}</a>
+                            <!--<a v-bind:href="parseStringBlocks(urlMaps[linkAction], card)">
+                                <ElementDataValueCell v-if="options.cardFields.image.type == 'field'" v-bind:id="card['_id'] + '-' + options.cardFields.image.field" v-bind:forceRenderType="options.cardFields.image.forceRenderType" v-bind:srcMap="options.cardFields.image.srcMap" v-bind:fieldIndex="options.cardFields.image.field" v-bind:model="model" v-bind:field="fields[options.cardFields.image.field]" v-bind:value="parseStringBlocks(options.cardFields.image.value, card)" attrwatcher="value" v-bind:dataRow="card" v-bind:urlMaps="urlMaps" style="display: inline-block;"></ElementDataValueCell>
+                            <span>
+                                <ElementDataValueCell v-if="options.cardFields.title.type == 'field'" v-bind:id="card['_id'] + '-' + options.cardFields.title.field" v-bind:fieldIndex="options.cardFields.title.field" v-bind:model="model" v-bind:field="fields[options.cardFields.title.field]" v-bind:value="parseStringBlocks(options.cardFields.title.value, card)" attrwatcher="value" v-bind:dataRow="card" v-bind:urlMaps="urlMaps" style="display: inline-block;"></ElementDataValueCell>
+                            </span>
+                            </a>
+                            <br />
+                            [TAGS]
+                            <br />
+                            [PROGRSS] -->
+                        </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

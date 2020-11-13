@@ -1,0 +1,83 @@
+<div id="___id_" class="ui padded grid">
+        <div class="wide column">
+            <div class="ui basic segment loadingElement" style="padding:0px;">
+                <div class="ui basic horizontal segments" style="margin-top:0px">
+                    <div class="ui basic segment" style="padding: 0px;">
+
+                        <template v-if="_.size(sliders) > 0">
+                            <div v-for="(sliderData, sliderIndex, index) in sliders" :key="sliderIndex"  class="ui right very wide sidebar" v-bind:id="sliderIndex + '_sidebar'" style="width: 920px; background-color: #ffffff; overflow: scroll;">
+                                
+                                <div class="ui fluid container" style="border-bottom: 1px solid rgb(221, 221, 221); background-color: white;">
+                                    <div class="ui secondary menu">
+                                    
+                                        <div class="left menu" style="padding-left: 10px;">
+                                            <div class="item" style="padding-left: 0px; margin-left: 0px;">
+                                            <div class="ui basic button" v-on:click="doCloseSlider({'slider':sliderIndex})">
+                                                <i class="arrow left icon"></i> cancelar
+                                            </div>
+                                            </div>
+                                        </div>
+
+                                        <div v-if="_.has(sliderData,'sliderTopActions') && sliderData.sliderTopActions.length > 0" class="right menu" style="padding-left: 10px;">
+                                            <div v-for="(action, actionIndex) in sliderData.sliderTopActions" class="item" style="padding-left: 0px; margin-left: 0px;">
+                                                <a v-if="action.type == 'link'" v-bind:class="'ui ' + action.style + ' button'" v-bind:href="parseStringBlocks(action.urlMap, {})">
+                                                    <i v-bind:class="action.icon"></i> ${action.label}
+                                                </a>
+                                                <button v-if="action.type == 'actions'" v-bind:class="'ui ' + action.style + ' button'" v-on:click="doComponentAction(action.actions, {}, $event)">
+                                                    <i v-bind:class="action.icon"></i> ${action.label}
+                                                </button>
+                                            </div>
+                                        </div>
+                                        
+                                    </div>
+                                    
+                                </div>
+
+                                <div class="ui fluid container" style="padding: 14px; border-bottom: 1px solid rgb(221, 221, 221); background-color: white;">
+
+                                    {% for sliderTag, sliderTagCamel in sliders %}
+                                        <template v-if="isOpenSlider(sliderIndex) && sliderData.elementTag == '{{sliderTag}}'">
+                                            <Element{{ sliderTagCamel }} v-bind:id="sliderData.referenceName" v-bind:activeslider="(isOpenSlider(sliderIndex)) ? 'active' : 'unactive'" v-bind:dataService="getSliderDataService(sliderData.referenceName, sliderData.dataService)" attrwatcher="activeslider" v-bind:urlMaps="urlMaps"></Element{{ sliderTagCamel }}>
+                                        </template>
+                                    {% endfor  %}
+
+                                </div>
+                            </div>
+                        </template>
+                        
+                        <ElementTableManagerHeader v-bind:id="referenceName + '_header'" v-bind:model="model" v-bind:fields="fields" v-bind:dataRow="objects[0]" attrwatcher="dataRow" v-bind:urlMaps="urlMaps"></ElementTableManagerHeader>
+                        
+                        <template v-if="_.size(tabs) > 0">
+                            
+                            <div class="ui top attached tabular menu" style="padding-left: 14px; padding-right: 14px;">
+                                <a v-for="(tabData, tabIndex, index) in tabs" :key="tabIndex" class="item" v-bind:class="(index == 0) ? 'active' : ''" v-bind:data-tab="tabIndex" v-on:click="doActivateTab(tabIndex)">${tabData.label}</a>
+                            </div>
+                            
+                            <div v-for="(tabData, tabIndex, index) in tabs" :key="tabIndex" class="ui bottom attached tab segment" v-bind:class="(index == 0) ? 'active' : ''" v-bind:data-tab="tabIndex">
+                                
+                                <template v-if="tabData.elementTag == 'table-list'">
+                                    <ElementTableList v-bind:id="tabData.referenceName" v-bind:activetab="(activetab == tabIndex) ? 'active' : 'unactive'" v-bind:dataService="tabData.dataService" attrwatcher="activetab" v-bind:urlMaps="urlMaps"></ElementTableList>
+                                </template>
+
+                                <template v-if="tabData.elementTag == 'form-editor'">
+                                    <ElementFormEditor v-bind:id="tabData.referenceName" v-bind:activetab="(activetab == tabIndex) ? 'active' : 'unactive'" v-bind:dataService="tabData.dataService" attrwatcher="activetab" v-bind:urlMaps="urlMaps"></ElementFormEditor>
+                                </template>
+
+                            </div>
+
+                            <template v-if="doRenderedTabs()"></template>
+
+                        </template>
+                        
+                    </div>
+                    <div class="ui basic segment" style="width: 200px;max-width: 200px;min-width: 200px;">
+
+                        <template v-for="(stateAction, stateActionIndex) in stateActions">
+                            <ElementToStateAction v-bind:id="referenceName + '_header_' + stateActionIndex + '_state'" v-bind:stateActionData="stateAction" v-bind:urlMaps="urlMaps"></ElementToStateAction>
+                        </template>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+</div>

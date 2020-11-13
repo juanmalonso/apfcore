@@ -139,7 +139,7 @@ class UiService extends Service {
 
     //PARAMS
     protected function setParams($p_params){
-
+        
         foreach($p_params as $key=>$value){
 
             switch ($key) {
@@ -431,9 +431,9 @@ class UiService extends Service {
 
     public function doService($p_uiServiceName, $p_params){
         
-        $this->loadJsonTree();
-        
         $this->setParams($p_params);
+
+        $this->loadJsonTree();
         
         if(method_exists($this, $p_uiServiceName)){
 

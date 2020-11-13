@@ -1,0 +1,8 @@
+<div class="ui field" v-bind:class="{required: getUiOption('required')}">
+
+    <div ref="editor" v-bind:id="field.id + '_editor'"></div>
+
+    <input type="hidden" v-bind:id="field.id + '_field'" v-bind:name="field.id" v-bind:form="forForm">
+
+    <p v-if="getUiOption('info') != ''" style="font-size:.8em">${ getUiOption('info') }</p>
+</div>

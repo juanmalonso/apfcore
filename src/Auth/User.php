@@ -53,7 +53,7 @@ class User extends Common {
             $objectsDataSourceOptions                  = array();
             $objectsDataSourceOptions['model']         = $userModel;
 
-            $objectsDataSource          = new ObjectsDataSource($this->getDI(), $objectsDataSourceOptions);
+            $objectsDataSource      = new ObjectsDataSource($this->getDI(), $objectsDataSourceOptions);
 
             $userData               = $objectsDataSource->getData($userId);
             
@@ -93,36 +93,39 @@ class User extends Common {
     }
 
     private function getUserRoleData($p_role){
-        
+        $result                             = false;
+
         $dataSourceOptions                  = array();
         $dataSourceOptions['model']         = "roles";
 
         $dataSource                         = new DataSource($this->getDI(), new ObjectsDataSource($this->getDI(), $dataSourceOptions));
-
+        
         $roleData                           = $dataSource->getData($p_role);
         
-        if(isset($roleData['menus'])){
+        if(isset($roleData['_id'])){
 
-            $rolesMenusData                 = array();
-            
-            foreach($roleData['menus'] as $menu){
+            if(isset($roleData['menus'])){
 
-                $rolesMenusData[$menu]      = $this->getRoleMenuData($menu);
+                $rolesMenusData                 = array();
+                
+                foreach($roleData['menus'] as $menu){
+    
+                    $rolesMenusData[$menu]      = $this->getRoleMenuData($menu);
+                }
+                
+                $roleData['menus']              = $rolesMenusData;
             }
             
-            $roleData['menus']              = $rolesMenusData;
+            $result['id']                       = $roleData['_id'];
+            $result['name']                     = $roleData['name'];
+            $result['description']              = $roleData['description'];
+            $result['privilegios']              = $roleData['privilegios'];
+            $result['menus']                    = $roleData['menus'];
+            $result['path']                     = $roleData['path'];
         }
         
-        $result                             = array();
-        $result['id']                       = $roleData['_id'];
-        $result['name']                     = $roleData['name'];
-        $result['description']              = $roleData['description'];
-        $result['privilegios']              = $roleData['privilegios'];
-        $result['menus']                    = $roleData['menus'];
-        $result['path']                     = $roleData['path'];
-
         //TODO : PRIVILEGioS
-
+        
         return $result;
     }
 
