@@ -19,6 +19,15 @@ class LoginForm extends VueUiComponent {
             
             if($userData){
 
+                if(isset($userData['password_reset'])){
+
+                    if($userData['password_reset']){
+
+                        header("Location: " . $this->getDI()->get('config')->main->url->base . 'password');
+                        exit();
+                    }
+                }
+
                 $this->setSession("user_loged", true);
                 $this->setSession("user_data", $userData);
 
@@ -32,6 +41,7 @@ class LoginForm extends VueUiComponent {
                 $this->setSession("user_startpage", $startpage);
 
                 header("Location: " . $startpage);
+                exit();
 
             }else{
 

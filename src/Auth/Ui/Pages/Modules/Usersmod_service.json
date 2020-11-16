@@ -24,6 +24,20 @@
             }
           ]
         },
+        "modSide": {
+          "components": [
+            {
+              "referenceName": "modulesidemenu",
+              "classPath": "Nubesys\\Core\\Ui\\Components\\Modules\\SideMenu\\SideMenu",
+              "dataService": {
+                "type": "service",
+                "scope": "service",
+                "name": "module-side-menu",
+                "params": {}
+              }
+            }
+          ]
+        },
         "modMain": {
           "components": [
             {
@@ -57,7 +71,35 @@
                     "numero_idoc"
                   ],
                   "linkAction": "",
-                  "rowLinks": [],
+                  "rowLinks": [
+                    {
+                      "type": "actions",
+                      "label": "Resetear Password",
+                      "style": "blue",
+                      "actions": [
+                        {
+                          "scope": "modulemanager",
+                          "name": "doOpenSlider",
+                          "params": {
+                            "slider": "resetpassoword",
+                            "slidersParams": {
+                              "resetpassoword": {
+                                "dataService": {
+                                  "type": "service",
+                                  "scope": "service",
+                                  "name": "module-editor",
+                                  "params": {
+                                    "model": "usuario",
+                                    "id": "%(data:_id)%"
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  ],
                   "rowActions": [
                     {
                       "type": "actions",
@@ -128,7 +170,9 @@
                   "dataService": {
                     
                   },
-                  "hardDefaultData": {},
+                  "hardDefaultData": {
+                    "avatar":"avatar_noavatar"
+                  },
                   "notRenderedFields": [
                     "genero",
                     "fecha_nacimiento",
@@ -207,6 +251,60 @@
                       "actions": [
                         {
                           "scope": "editusuario",
+                          "name": "doSendData",
+                          "params": {
+                            "dataServiceName": "module-editor-save"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "resetpassoword": {
+                  "label": "Resetar Contraseña",
+                  "referenceName": "resetpassoword",
+                  "elementTag": "form-editor",
+                  "classPath": "\\Nubesys\\Core\\Ui\\Components\\Modules\\Editors\\Form",
+                  "dataService": {
+                  },
+                  "notRenderedFields": [
+                    "genero",
+                    "fecha_nacimiento",
+                    "tipo_idoc",
+                    "numero_idoc",
+                    "avatar",
+                    "nombre",
+                    "apellido",
+                    "telefono",
+                    "email",
+                    "role",
+                    "roles",
+                    "login"
+                  ],
+                  "onEditActions": [
+                    {
+                      "scope": "usuarios",
+                      "name": "doReloadData",
+                      "params": {}
+                    },
+                    {
+                      "scope": "modulemanager",
+                      "name": "doCloseSlider",
+                      "params": {
+                        "slider": "resetpassoword"
+                      }
+                    }
+                  ],
+                  "sliderTopActions": [
+                    {
+                      "type": "actions",
+                      "label": "Guardar Datos",
+                      "urlMap": "var(local:urlMaps.LIST)",
+                      "style": "green",
+                      "icon": "save icon",
+                      "actions": [
+                        {
+                          "scope": "resetpassoword",
                           "name": "doSendData",
                           "params": {
                             "dataServiceName": "module-editor-save"

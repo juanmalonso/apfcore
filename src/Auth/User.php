@@ -58,7 +58,7 @@ class User extends Common {
             $userData               = $objectsDataSource->getData($userId);
             
             if($userData['password'] == $p_password){
-                
+
                 if(isset($userData['roles'])){
 
                     $userRolesData                  = array();
@@ -78,10 +78,11 @@ class User extends Common {
 
                 $result                             = array();
                 $result['id']                       = $userData['_id'];
+                $result['model']                    = $userModel;
                 $result['nombre']                   = $userData['nombre'];
                 $result['apellido']                 = $userData['apellido'];
                 $result['login']                    = $userData['login'];
-                $result['password_reset']           = $userData['password_reset'];
+                $result['password_reset']           = ($userData['password_reset'] == "1") ? true : false;
                 $result['avatar']                   = (isset($userData['avatar'])) ? $userData['avatar'] : "avatar_noavatar";
                 $result['genero']                   = $userData['genero'];
                 $result['role']                     = $userData['role'];
@@ -177,6 +178,24 @@ class User extends Common {
         $result['path']                     = $menuItemData['path'];
         $result['order']                    = $menuItemData['objOrder'];
 
+        return $result;
+    }
+
+    public function resetPassword($p_model, $p_id, $p_password){
+        
+        $result                             = false;
+
+        $dataSourceOptions                  = array();
+        $dataSourceOptions['model']         = $p_model;
+
+        $dataSource                         = new DataSource($this->getDI(), new ObjectsDataSource($this->getDI(), $dataSourceOptions));
+
+        $userData                           = array();
+        $userData['password']               = $p_password;
+        $userData['password_reset']         = "0";
+
+        $result                             = $dataSource->editData($p_id, $userData);
+        
         return $result;
     }
 }

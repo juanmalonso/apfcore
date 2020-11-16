@@ -217,6 +217,82 @@ class AppModule extends VueUiService {
         }
     }
 
+    //TOPBAR
+    public function moduleSideMenuService(){
+        //\sleep(1);
+        if($this->hasJsonParam()){
+
+            $params                         = $this->getJsonParam();
+
+            $scopePath                      = $this->getScopePath($params);
+
+            if($scopePath !== false){
+
+                $result                     = array();
+
+                //USER
+                $user                       = false;
+                $items                      = array();
+
+                if($this->hasSession("user_loged") && $this->getSession("user_loged") == true){
+
+                    $userData               = $this->getSession("user_data");
+
+                    $user                   = array();
+                    $user['label']          = $userData['login'];
+                    $user['url']            = $this->getDI()->get('config')->main->url->base . "profile/";
+                    $user['avatar']         = $this->getDI()->get('config')->main->url->base . "avatar/sq100/" . $userData['avatar'] . ".jpg";
+
+
+                    $items                  = array();
+
+                    $userData['roles'][]    = $userData['role'];
+                    
+                    foreach($userData['roles'] as $role){
+                        
+                        if(isset($role['menus'])){
+
+                            foreach($role['menus'] as $menu){
+
+                                if(isset($menu['items'])){
+
+                                    foreach($menu['items'] as $item){
+
+                                        if(!isset($items[$item['id']])){
+
+                                            $itemTmp                = array();
+                                            $itemTmp['label']       = $item['name'];
+                                            $itemTmp['icon']        = $item['icon'];
+                                            $itemTmp['url']         = $this->getDI()->get('config')->main->url->base . $item['path'];
+                                            $itemTmp['order']       = $item['order'];
+
+                                            $items[$item['id']]     = $itemTmp;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                $result["user"]         = $user;
+                $result["items"]        = $items;
+
+                //REFERENCE NAME
+                $result["referenceName"]    = ($this->getLocal($scopePath))['referenceName'];
+
+                $this->setServiceSuccess($result);
+            }else{
+
+                $this->setServiceError("Invalid ScopePath: " . $scopePath);
+            }
+
+        }else{
+
+            $this->setServiceError("Invalid Params");
+        }
+    }
+
     //BOARD
     public function moduleBoardService(){
         //\sleep(3);
@@ -579,10 +655,26 @@ class AppModule extends VueUiService {
                     $result["dataActions"]      = array();
 
                     //TODO CUSTOM FIELDS
-                    
-                    //HARD
+
+                    //PRE DATA MANIPULATIONS
                     if(isset($params["data"])){
+
+                        //NOT RENDERED FIELDS
+                        $dataTmp = array();
+                        if(isset(($this->getLocal($scopePath))['notRenderedFields'])){
+
+                            foreach($params["data"] as $field=>$value){
+
+                                if(!in_array($field, ($this->getLocal($scopePath))['notRenderedFields'])){
+
+                                    $dataTmp[$field] = $value;
+                                }
+                            }
+
+                            $params["data"] = $dataTmp;
+                        }
                         
+                        //HARD FIELDS VALUE
                         if(isset(($this->getLocal($scopePath))['hardDefaultData'])){
 
                             $hardDefaultData = ($this->getLocal($scopePath))['hardDefaultData'];
@@ -593,7 +685,7 @@ class AppModule extends VueUiService {
                             }
                         }
                     }
-                    //var_dump($params);exit();
+                    
                     if(isset($params["id"])){
                         //EDIT
                         if(isset($params["data"])){

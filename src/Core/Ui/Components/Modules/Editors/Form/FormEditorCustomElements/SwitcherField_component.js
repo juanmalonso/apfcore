@@ -59,7 +59,7 @@ Vue.component("___idReference_", {
       return $(this.$refs.realField).val();
     },
     doUnchecked: function (){
-
+      
       if(this.field.type == "boolean"){
         
         $(this.$refs.realField).val("false");
@@ -69,11 +69,12 @@ Vue.component("___idReference_", {
       }
     },
     doChecked: function (){
-
-      if(this.$attrs.valueAs == "boolean"){
+      
+      $(this.$refs.realField).val("asd");
+      if(this.field.type == "boolean"){
 
         $(this.$refs.realField).val("true");
-      }else if(this.$attrs.valueAs == "binary"){
+      }else if(this.field.type == "boolean01"){
 
         $(this.$refs.realField).val("1");
       }

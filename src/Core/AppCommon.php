@@ -31,6 +31,11 @@ class AppCommon extends Common
         return $this->getDI()->get('session')->set($p_key, $p_value);
     }
 
+    protected function destroySession(){
+
+        return $this->getDI()->get('session')->destroy();
+    }
+
     //SCOPES
     protected function hasScope($p_key){
 

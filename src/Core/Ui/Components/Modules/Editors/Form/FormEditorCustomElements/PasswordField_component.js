@@ -10,7 +10,7 @@ Vue.component("___idReference_", {
   methods: {
     setFieldValue: function (value) {
 
-      $(this.$refs.realField).val(value);
+      //$(this.$refs.realField).val(value);
     },
     getFieldValue: function () {
 

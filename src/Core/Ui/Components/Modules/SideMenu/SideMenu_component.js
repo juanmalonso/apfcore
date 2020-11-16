@@ -9,11 +9,11 @@ Vue.component("___idReference_", {
   methods: {
   },
   computed:{
-    title: function(){
-      return this.getScopeData("title");
+    user: function(){
+      return this.getScopeData("user", false);
     },
-    actions: function(){
-      return this.getScopeData("actions");
+    items: function(){
+      return this.getScopeData("items", []);
     }
   },
   template: "#___idReference_-template"
