@@ -7,10 +7,10 @@
     
     <a v-for="(item, index) in items" :key="index" class="item" style="padding-right: 8px; padding-left: 8px; min-width:100%;" v-bind:href="item.url">
         <i v-bind:class="item.icon"></i>
-        ${ item.label }
+        <div style="max-width: 70px !important;">${ item.label }</div>
     </a>
     <a class="item" style="padding-right: 8px; padding-left: 8px; min-width:100%;" v-bind:href="basepath + 'logout'">
         <i class="sign out alternate red icon"></i>
-        Salir
+        <div style="max-width: 70px !important;">Salir</div>
     </a>
 </div>
