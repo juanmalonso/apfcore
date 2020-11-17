@@ -18,6 +18,9 @@ class LoginForm extends VueUiComponent {
             $userData                       = $userManager->loginUser($this->getPostParam('login'), $this->getPostParam('password'));
             
             if($userData){
+                
+                $this->setSession("user_loged", true);
+                $this->setSession("user_data", $userData);
 
                 if(isset($userData['password_reset'])){
 
@@ -27,9 +30,6 @@ class LoginForm extends VueUiComponent {
                         exit();
                     }
                 }
-
-                $this->setSession("user_loged", true);
-                $this->setSession("user_data", $userData);
 
                 $startpage                  = $this->getDI()->get('config')->main->url->base . 'board/';
 
