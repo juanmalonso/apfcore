@@ -19,7 +19,7 @@ class ModuleComponent extends VueUiComponent {
         $dataService['type']                    = "service";
         $dataService['scope']                   = "service";
         $dataService['emitter']                 = "";
-        $dataService['params']                  = new \stdClass();
+        $dataService['params']                  = array();
         
         $this->setDataSercvice($dataService);
 

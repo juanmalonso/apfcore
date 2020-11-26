@@ -1,0 +1,19 @@
+<div v-bind:id="$attrs.id" >
+    <template v-for="(filterData, filterIndex) in filters">
+        <div class="ui input" style="margin: 14px 14px 0px 0px;">
+            <ElementDropdownFilter v-if="filterData.type == 'dropdown'" v-bind:id="referenceName + '_filters_' + filterIndex + '_filter'" v-bind:filter="filterData" v-bind:filterIndex="filterIndex" v-bind:urlMaps="urlMaps"></ElementDropdownFilter>
+        </div>
+    </template>
+    
+    <div class="ui input" style="margin: 14px 14px 0px 0px;">
+        <div class="ui icon basic button" v-on:click="doReset()">
+            <i class="undo alternate red icon"></i> Reset
+        </div>
+    </div>
+    
+    <div class="ui input" style="margin: 14px 14px 0px 0px;">
+        <div class="ui icon button" v-on:click="doFilter()">
+            <i class="filter icon"></i> Filtrar
+        </div>
+    </div>
+</div>

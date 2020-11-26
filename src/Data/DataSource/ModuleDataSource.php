@@ -33,7 +33,7 @@ class ModuleDataSource extends Common {
         $result["fields"]                               = $this->getModelDefinitions($p_model, $result["model"]);
         $result["fieldsGroups"]                         = $this->getModelDefinitionsGroups();
         $result['page']                                 = (isset($p_query['page'])) ? $p_query['page'] : 1;
-        $result['rows']                                 = (isset($p_query['rows'])) ? $p_query['rows'] : 2;
+        $result['rows']                                 = (isset($p_query['rows'])) ? $p_query['rows'] : 15;
         
         $validFilters       = array();
         $validRanges        = array();

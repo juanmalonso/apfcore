@@ -1,0 +1,4 @@
+<div>
+    <select v-if="!filter.multiple" class="ui search dropdown" ref="realDropdown" v-bind:name="filterIndex"></select>
+    <select v-if="filter.multiple" class="ui search dropdown" ref="realDropdown" v-bind:name="filterIndex + '[]'" multiple=""></select>
+</div>

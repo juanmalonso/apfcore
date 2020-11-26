@@ -113,6 +113,7 @@ class AppModule extends VueUiService {
                 }
             }   
         }
+        
     }
 
     private function getActionComponents($p_action){
@@ -217,7 +218,7 @@ class AppModule extends VueUiService {
         }
     }
 
-    //TOPBAR
+    //SIDEMENU
     public function moduleSideMenuService(){
         //\sleep(1);
         if($this->hasJsonParam()){
@@ -330,6 +331,12 @@ class AppModule extends VueUiService {
                         $query["filters"]               = $params["filters"];
                     }
 
+                    //KEYWORD
+                    if(isset($params["keyword"])){
+
+                        $query["keyword"]               = $params["keyword"];
+                    }
+
                     //ORDERS
                     if(isset($params["orders"])){
 
@@ -348,7 +355,18 @@ class AppModule extends VueUiService {
                         $query["aggregations"]          = $params["aggregations"];
                     }
 
-                    $result                     = $this->getModelObjects($params['model'], $query);
+                    $result                             = $this->getModelObjects($params['model'], $query);
+
+                    //FILTERS
+                    $result["filters"]                  = array();
+
+                    //KEYWORD
+                    $result["keyword"]                              = "*";
+
+                    if(isset($params["keyword"])){
+
+                        $result["keyword"]                          = $params["keyword"];
+                    }
 
                     //ROW LINKS
                     $result["rowLinks"]              = array();
@@ -404,7 +422,7 @@ class AppModule extends VueUiService {
     //SELECTOR
     public function moduleSelectorService(){
         //\sleep(3);
-
+        
         if($this->hasJsonParam()){
 
             $params                         = $this->getJsonParam();
@@ -414,7 +432,7 @@ class AppModule extends VueUiService {
             if($scopePath !== false){
 
                 if(isset($params["model"])){
-                            
+                    
                     $result                             = array();
                     
                     //OBJECTS
@@ -438,6 +456,12 @@ class AppModule extends VueUiService {
                         $query["filters"]               = $params["filters"];
                     }
 
+                    //KEYWORD
+                    if(isset($params["keyword"])){
+
+                        $query["keyword"]               = $params["keyword"];
+                    }
+
                     //ORDERS
                     if(isset($params["orders"])){
 
@@ -456,7 +480,7 @@ class AppModule extends VueUiService {
                         $query["aggregations"]          = $params["aggregations"];
                     }
 
-                    $result                     = $this->getModelObjects($params['model'], $query);
+                    $result                             = $this->getModelObjects($params['model'], $query);
 
                     //NOT RENDERED FIELDS
                     if(isset(($this->getLocal($scopePath))['notRenderedFields'])){
@@ -487,6 +511,54 @@ class AppModule extends VueUiService {
                                 $definition['uiOptions']->hidden = true;
                             }
                         }
+                    }
+
+                    //FILTERS
+                    $result["filters"]                                  = array();
+                    //MODEL FILTERS
+                    foreach($result['fields'] as $field=>$definition){
+
+                        if($definition['uiOptions']->filterable && !$definition['uiOptions']->hidden){
+
+                            if(property_exists($definition['typeOptions'],"model")){
+
+                                $filterTmp                              = array();
+                                $filterTmp['type']                      = (property_exists($definition['typeOptions'],"filterType")) ? $definition['typeOptions']->filterType : "dropdown";
+                                $filterTmp['multiple']                  = (property_exists($definition['typeOptions'],"filterMultiple")) ? $definition['typeOptions']->filterMultiple : true;
+                                $filterTmp['label']                     = $definition['uiOptions']->label;
+                                $filterTmp['model']                     = $definition['typeOptions']->model;
+
+                                $result["filters"][$definition['id']]   = $filterTmp;
+                            }
+                        }
+                    }
+                    
+                    //HARD FILTERS
+                    if(isset(($this->getLocal($scopePath))['hardFilters'])){
+
+                        foreach(($this->getLocal($scopePath))['hardFilters'] as $filterIndex=>$filterData){
+
+                            $result["filters"][$filterIndex]        = $filterData;
+                        }
+                    }
+
+                    if(isset($params['filters'])){
+
+                        foreach($params['filters'] as $filter=>$value){
+
+                            if($result['filters'][$filter]){
+
+                                $result['filters'][$filter]['value'] = $value;
+                            }
+                        }
+                    }
+
+                    //KEYWORD
+                    $result["keyword"]                              = "*";
+
+                    if(isset($params["keyword"])){
+
+                        $result["keyword"]                          = $params["keyword"];
                     }
 
                     //ROW LINKS

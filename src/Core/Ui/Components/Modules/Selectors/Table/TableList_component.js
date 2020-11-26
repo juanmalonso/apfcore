@@ -55,6 +55,26 @@ Vue.component("___idReference_", {
 
       return result;
     },
+    hasFilters: function(){
+      var result = false;
+
+      if(_.size(this.filters) > 0){
+
+        result = true;
+      }
+
+      return result;
+    },
+    isSearchable: function(){
+      var result = false;
+
+      if(_.size(this.filters) > 0){
+
+        result = true;
+      }
+
+      return result;
+    },
     doGotoPage: function (params, event) {
       var _self = this;
 
@@ -113,6 +133,12 @@ Vue.component("___idReference_", {
     },
     fields:function(){
       return this.getScopeData("fields");
+    },
+    filters:function(){
+      return this.getScopeData("filters");
+    },
+    keyword:function(){
+      return this.getScopeData("keyword");
     },
     page:function(){
       return this.getScopeData("page");

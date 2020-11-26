@@ -9,6 +9,8 @@ class TableList extends ModuleComponent {
 
         parent::mainAction();
 
+        $this->placeVueCustomElement("filters", "Nubesys\\Core\\Ui\\Components\\Modules\\Filters");
+        $this->placeVueCustomElement("search-box", "Nubesys\\Core\\Ui\\Components\\Modules\\Search");
         $this->placeVueCustomElement("data-value-cell");
     }
 }
