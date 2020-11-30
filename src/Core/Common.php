@@ -116,6 +116,10 @@ class Common extends Injectable
                 $result = $this->getPostParam($p_name);
                 break;
 
+            case 'allpost':
+                $result = $this->allPostParams();
+                break;
+
             case 'json':
                 $result = $this->getJsonParam($p_name);
                 break;
