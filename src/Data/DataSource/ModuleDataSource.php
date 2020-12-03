@@ -210,6 +210,13 @@ class ModuleDataSource extends Common {
         return $result;
     }
 
+    public function setModelObjectState($p_model, $p_id, $p_state, $p_data){
+
+        //TODO: VALIDACION DE ESTADOS
+
+        return $this->dataEngine->setState($p_model, $p_id, $p_state, $p_data);
+    }
+
     public function editModelObjectData($p_model, $p_id, $p_data){
         
         return $this->dataEngine->editObject($p_model, $p_id, $p_data);
@@ -323,6 +330,40 @@ class ModuleDataSource extends Common {
             }
         }
         
+        return $result;
+    }
+
+    public function getDataFieldDefinitions($p_field){
+
+        $result                                             = array();
+
+        $definition                                         = $this->dataEngine->getField($p_field);
+        
+        $result["id"]                                       = $definition['dafId'];
+        $result["type"]                                     = $definition['typId'];
+        $result["group"]                                    = "tostatedata";
+        $result["defaultValue"]                             = $definition['dafDefaultValue'];
+
+        if($definition['typId'] == "json" && ($definition['dafDefaultValue'] == "" || $definition['dafDefaultValue'] == "{}")){
+
+            $result["defaultValue"]                         = new \stdClass();
+
+        }elseif(($definition['typId'] == "objectsr" || $definition['typId'] == "tags" || $definition['typId'] == "options") && ($definition['dafDefaultValue'] == "" || $definition['dafDefaultValue'] == "[]")){
+
+            $result["defaultValue"]                         = array();
+        }
+
+        $result["order"]                                    = 1;
+        $result["isName"]                                   = false;
+        $result["isImage"]                                  = false;
+        $result["isRelation"]                               = false;
+        $result["isState"]                                  = false;
+        $result["uiOptions"]                                = $definition['dafUiOptions'];
+        $result["indexOptions"]                             = $definition['dafIndexOptions'];
+        $result['typeOptions']                              = $definition['dafTypOptions'];
+        $result['validationOptions']                        = $definition['dafTypValidationOptions'];
+        $result['attachFileOptions']                        = $definition['dafAttachFileOptions'];
+
         return $result;
     }
 
@@ -478,7 +519,7 @@ class ModuleDataSource extends Common {
 
                 }
 
-                $stateRow["order"]                              = 0;
+                $stateRow["order"]                              = 200;
                 $stateRow["isName"]                             = false;
                 $stateRow["isImage"]                            = false;
                 $stateRow["isRelation"]                         = false;
@@ -515,7 +556,7 @@ class ModuleDataSource extends Common {
                 $stateRow["type"]                               = "json";
                 $stateRow["group"]                              = "data";
                 $stateRow["defaultValue"]                       = array();
-                $stateRow["order"]                              = 0;
+                $stateRow["order"]                              = 201;
                 $stateRow["isName"]                             = false;
                 $stateRow["isImage"]                            = false;
                 $stateRow["isRelation"]                         = false;
@@ -540,8 +581,28 @@ class ModuleDataSource extends Common {
                 $result[$stateRow["id"]]    = $stateRow;
             }
         }
+        
+        usort($result, function ($a, $b){
 
-        return $result;
+            $aOrder = (int)$a["order"];
+            $bOrder = (int)$b["order"];
+            
+            if($aOrder == $bOrder){
+
+                return 0;
+            }
+
+            return ($aOrder < $bOrder) ? -1 : 1;
+        });
+        
+        $orderedResult = array();
+
+        foreach($result as $definition){
+
+            $orderedResult[$definition["id"]] = $definition;
+        }
+
+        return $orderedResult;
     }
 
     /*public function getDataFields(){

@@ -160,7 +160,8 @@ class Definition extends Common
 
                                 if(!in_array($childDefinition['dafId'], $parentExtendedDefinitionsKeys)){
                                     
-                                    $childDefinition['defOrder']    = $lastParentDefinitionOrder + $childDefinition['defOrder'];
+                                    //$childDefinition['defOrder']    = $lastParentDefinitionOrder + $childDefinition['defOrder'];
+                                    $childDefinition['defOrder']    = $childDefinition['defOrder'];
 
                                     $extendedResult[]               = $childDefinition;
                                 }
@@ -209,7 +210,7 @@ class Definition extends Common
 
             }
         }
-
+        
         return $result;
     }
 

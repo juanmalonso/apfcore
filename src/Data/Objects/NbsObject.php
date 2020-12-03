@@ -802,11 +802,12 @@ class NbsObject extends Common
         return $result;
     }
 
-    public function state($p_model, $p_id, $p_state){
+    public function state($p_model, $p_id, $p_state, $p_data){
 
         $stateData                      = array();
-        $atateData['objState']          = $p_state;
-
+        $stateData['objState']          = $p_state;
+        $stateData['objStateData']      = $p_data;
+        
         return $this->edit($p_model, $p_id, $stateData);
     }
 
@@ -872,16 +873,18 @@ class NbsObject extends Common
                     $stateDataTmp['date']               = $updateData['objDateUpdated'];
                     $stateDataTmp['user']               = "";
 
-                    if(isset($p_data['stateData'])){
-                    
-                        if(is_object($p_data['stateData'])){
+                    if(isset($p_data['objStateData'])){
 
-                            $stateDataTmp['data']           = json_decode($p_data['stateData']);
+                        $updateData['objStateData']     = $p_data['objStateData'];
+                    
+                        if(is_object($p_data['objStateData'])){
+
+                            $stateDataTmp['data']           = json_decode($p_data['objStateData']);
                         }
 
-                        if(is_string($p_data['stateData'])){
+                        if(is_string($p_data['objStateData'])){
 
-                            $stateDataTmp['data']           = json_decode($p_data['stateData']);
+                            $stateDataTmp['data']           = json_decode($p_data['objStateData']);
                         }
 
                     }else{
@@ -967,6 +970,11 @@ class NbsObject extends Common
                 if(isset($updateData['objStatesLog'])){
 
                     $updateData['objStatesLog'] = json_encode($updateData['objStatesLog'], JSON_UNESCAPED_UNICODE);
+                }
+
+                if(isset($updateData['objStateData'])){
+
+                    $updateData['objStateData'] = json_encode($updateData['objStateData'], JSON_UNESCAPED_UNICODE);
                 }
                 
                 $updateData['objData'] = json_encode(array_replace((array)$objectData['objData'],(array)$_dataTemp),JSON_UNESCAPED_UNICODE);
@@ -1819,6 +1827,15 @@ class NbsObject extends Common
                         $selectResult['objStatesLog'] = array();
                     }
 
+                    if (isset($selectResult['objStateData'])) {
+    
+                        $selectResult['objStateData'] = json_decode($selectResult['objStateData']);
+
+                    } else {
+    
+                        $selectResult['objStateData'] = new \stdClass();
+                    }
+
                     foreach ($modelRelations as $modelRelation) {
 
                         $fieldId = 'rel_' . $modelRelation['modId'];
@@ -1962,6 +1979,15 @@ class NbsObject extends Common
                 }else{
 
                     $object['objStatesLog'] = array();
+                }
+
+                if(isset($object['objStateData'])){
+
+                    $object['objStateData'] = json_decode($object['objStateData']);
+
+                }else{
+
+                    $object['objStateData'] = new \stdClass();
                 }
 
                 $result[] = $object;

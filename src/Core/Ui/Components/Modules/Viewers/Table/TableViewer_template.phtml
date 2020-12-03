@@ -1,0 +1,81 @@
+<div class="ui grid" v-bind:class="(_.size($attrs) > 1) ? '' : 'padded'">
+    <div class="column">
+        <div class="ui basic segment loadingElement" style="padding:0px;">
+
+            <div v-if="hasActions()" class="ui basic right aligned segment" style="padding:0px;">
+                <template v-for="(action, actionIndex) in actions">
+                    <a v-if="action.type == 'link'" v-bind:class="'ui ' + action.style + ' button'" v-bind:href="parseStringBlocks(action.urlMap, {})">
+                        <i v-bind:class="action.icon"></i> ${action.label}
+                    </a>
+                    <button v-if="action.type == 'actions'" v-bind:class="'ui ' + action.style + ' button'" v-on:click="doComponentAction(action.actions, {}, $event)">
+                        <i v-bind:class="action.icon"></i> ${action.label}
+                    </button>
+                </template>
+            </div>
+
+            <div v-if="_.size(getFieldsGroups()) > 1" class="ui top attached tabular menu" style="padding-left: 14px; padding-right: 14px;">
+                <template v-for="(fieldsGroup, fieldsGroupIndex, index) in getFieldsGroups()">
+                    <a class="item formtab" v-bind:id="fieldsGroup.key + '_tab'" v-bind:class="(index == 0) ? 'active' : ''" v-bind:data-tab="fieldsGroup.key">${fieldsGroup.label}</a>
+                    <template v-if="setTab(fieldsGroup.key + '_tab')"></template>
+                </template>
+            </div>
+
+            <template v-for="(fieldsGroup, fieldsGroupIndex, index) in getFieldsGroups()">
+                <div class="ui bottom attached tab segment" v-bind:class="(index == 0) ? 'active' : ''" v-bind:data-tab="fieldsGroup.key" style="padding: 0px; border-width: 0px; margin-top: -1px;">
+                
+                        <table class="ui celled striped table">
+                            
+                            <tbody>
+            
+                                <tr v-if="!field.uiOptions.hidden" v-for="(field, fieldIndex) in getGroupFields(fieldsGroup.key)" :key="fieldIndex">
+                                    <td style="width: 15%;vertical-align: top;">
+                                        
+                                        <div class="ui large label" style="background-color: transparent;">
+                                            <i v-bind:class="field.uiOptions.icon + ' icon hidden-in-tablet'"></i> ${field.uiOptions.label}
+                                        </div>
+                                        
+                                        <div v-if="field.uiOptions.help != ''" class="ui icon basic mini help button right floated helpPopup" v-bind:data-html="field.uiOptions.help" data-position="right center" data-variation="very wide">
+                                            <i class="help blue icon"></i>
+                                        </div>
+                                    </td>
+                                    <td>
+                                    
+                                    <template v-if="!isCustomField(fieldIndex)">
+
+                                        <ElementDataValueCell v-bind:id="referenceName + '_' + field.id + '_field'" v-bind:fieldIndex="fieldIndex" v-bind:model="model" v-bind:field="field" v-bind:value="objects[0][fieldIndex]" attrwatcher="value" v-bind:dataRow="objects[0]" v-bind:urlMaps="urlMaps"></ElementDataValueCell>
+                
+                                        <!--
+                                        <ElementTextField v-if="field.type == 'text'" v-bind:id="referenceName + '_form_' + field.id + '_field'" v-bind:forForm="referenceName + '_form'" v-bind:field="field" v-bind:fieldIndex="fieldIndex" v-bind:data="objects[0]" v-bind:urlMaps="urlMaps"></ElementTextField>
+                                        <ElementIntegerField v-if="field.type == 'integer'" v-bind:id="referenceName + '_form_' + field.id + '_field'" v-bind:forForm="referenceName + '_form'" v-bind:field="field" v-bind:fieldIndex="fieldIndex" v-bind:data="objects[0]" v-bind:urlMaps="urlMaps"></ElementIntegerField>
+                                        <ElementDateField v-if="field.type == 'datetime'" v-bind:id="referenceName + '_form_' + field.id + '_field'" v-bind:forForm="referenceName + '_form'" v-bind:field="field" v-bind:fieldIndex="fieldIndex" v-bind:data="objects[0]" v-bind:urlMaps="urlMaps"></ElementDateField>
+                                        <ElementOptionsField v-if="field.type == 'options'" v-bind:id="referenceName + '_form_' + field.id + '_field'" v-bind:forForm="referenceName + '_form'" v-bind:field="field" v-bind:fieldIndex="fieldIndex" v-bind:data="objects[0]" v-bind:urlMaps="urlMaps"></ElementOptionsField>
+                                        <ElementOptionsField v-if="field.type == 'objectr'" v-bind:id="referenceName + '_form_' + field.id + '_field'" v-bind:forForm="referenceName + '_form'" v-bind:field="field" v-bind:fieldIndex="fieldIndex" v-bind:data="objects[0]" v-bind:urlMaps="urlMaps"></ElementOptionsField>
+                                        <ElementOptionsField v-if="field.type == 'objectsr'" v-bind:id="referenceName + '_form_' + field.id + '_field'" v-bind:forForm="referenceName + '_form'" v-bind:field="field" v-bind:fieldIndex="fieldIndex" v-bind:data="objects[0]" v-bind:urlMaps="urlMaps"></ElementOptionsField>
+                                        <ElementSwitcherField v-if="field.type == 'boolean' || field.type == 'boolean01'" v-bind:id="referenceName + '_form_' + field.id + '_field'" v-bind:forForm="referenceName + '_form'" v-bind:field="field" v-bind:fieldIndex="fieldIndex" v-bind:data="objects[0]" v-bind:urlMaps="urlMaps"></ElementSwitcherField>
+                                        <ElementTagsField v-if="field.type == 'tags'" v-bind:id="referenceName + '_form_' + field.id + '_field'" v-bind:forForm="referenceName + '_form'" v-bind:field="field" v-bind:fieldIndex="fieldIndex" v-bind:data="objects[0]" v-bind:urlMaps="urlMaps"></ElementTagsField>
+                                        <ElementPasswordField v-if="field.type == 'password'" v-bind:id="referenceName + '_form_' + field.id + '_field'" v-bind:forForm="referenceName + '_form'" v-bind:field="field" v-bind:fieldIndex="fieldIndex" v-bind:data="objects[0]" v-bind:urlMaps="urlMaps"></ElementPasswordField>
+                                        <ElementSchemaFormField v-if="field.type == 'subform'" v-bind:id="referenceName + '_form_' + field.id + '_field'" v-bind:forForm="referenceName + '_form'" v-bind:field="field" v-bind:fieldIndex="fieldIndex" v-bind:data="objects[0]" v-bind:urlMaps="urlMaps"></ElementSchemaFormField>
+                                        -->
+                                    </template>
+            
+                                    {% for customFieldIndex, customField in customFields %}
+                                        <template v-if="fieldIndex == '{{ customFieldIndex }}'">
+                                        <!--
+                                        <Element{{ customField['camelizedTag'] }} v-bind:forForm="id + '_form'" v-bind:field="field" v-bind:fieldIndex="fieldIndex" v-bind:data="objects[0]" v-bind:urlMaps="urlMaps"></Element{{ customField['camelizedTag'] }}>
+                                        -->
+                                        </template>
+                                    {% endfor  %}
+                                    
+                                    
+                                    </td>
+                                </tr>
+            
+                            </tbody>
+                        </table>
+
+                </div>
+            </template>
+        </div>
+        
+    </div>
+</div>

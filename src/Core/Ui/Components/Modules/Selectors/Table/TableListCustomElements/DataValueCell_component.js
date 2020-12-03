@@ -65,10 +65,11 @@ Vue.component("___idReference_", {
             this.setMultipleScopeData({"tags": tags});
           }
         }else{
-
-          this.setScopeData("renderType", "VALUE");
-
-          this.setMultipleScopeData({"value": this.getOptionLabel(this.$attrs.value, field.typeOptions.data)});
+          
+          this.setScopeData("renderType", "LABEL");
+          console.log("OPTIONS TYPE OPTION LABEL",this.field.id, this.getOptionLabel(this.$attrs.value, field.typeOptions.data));
+          
+          this.setMultipleScopeData({"label": this.getOptionLabel(this.$attrs.value, field.typeOptions.data)});
         }
       }else if(field.type == "tags"){
 
@@ -165,7 +166,7 @@ Vue.component("___idReference_", {
     },
     getOptionLabel: function(value, data){
       var result = null;
-
+      
       _.each(data, function (option, key) {
 
         if(result == null){
@@ -176,7 +177,7 @@ Vue.component("___idReference_", {
           }
         }
       });
-
+      
       return result;
     },
     getImageObjectData: function(){
@@ -234,6 +235,9 @@ Vue.component("___idReference_", {
     },
     icon:function(){
       return this.getScopeData("icon","");
+    },
+    label:function(){
+      return this.getScopeData("label","");
     }
   },
   template: "#___idReference_-template"

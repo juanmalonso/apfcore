@@ -18,22 +18,71 @@ class AppCommon extends Common
 
     protected function hasSession($p_key){
 
-        return $this->getDI()->get('session')->has($p_key);
+        $sessionScopeKey     = "session.scope";
+
+        $this->initScope($sessionScopeKey, $_SESSION);
+
+        if(!strpos($p_key, '.')){
+
+            return $this->getScope($sessionScopeKey)->has($p_key);
+        }else{
+
+            return $this->getScope($sessionScopeKey)->hasDot($p_key);
+        }
+
+        //return $this->getDI()->get('session')->has($p_key);
     }
 
     protected function getSession($p_key){
 
-        return $this->getDI()->get('session')->get($p_key);
+        $sessionScopeKey     = "session.scope";
+
+        $this->initScope($sessionScopeKey, $_SESSION);
+
+        if(!strpos($p_key, '.')){
+            
+            return $this->getScope($sessionScopeKey)->get($p_key);
+        }else{
+            
+            return $this->getScope($sessionScopeKey)->getDot($p_key);
+        }
+
+        //return $this->getDI()->get('session')->get($p_key);
+    }
+
+    protected function allSession(){
+
+        $sessionScopeKey     = "session.scope";
+
+        $this->initScope($sessionScopeKey, $_SESSION);
+
+        return $this->getScope($sessionScopeKey)->all();
     }
 
     protected function setSession($p_key, $p_value){
+        
+        $result = $this->getDI()->get('session')->set($p_key, $p_value);
 
-        return $this->getDI()->get('session')->set($p_key, $p_value);
+        $sessionScopeKey     = "session.scope";
+
+        $this->initScope($sessionScopeKey, $_SESSION);
+        
+        $this->getScope($sessionScopeKey)->set($p_key, $p_value);
+        
+        return $result;
     }
 
     protected function destroySession(){
 
-        return $this->getDI()->get('session')->destroy();
+        $result = $this->getDI()->get('session')->destroy();
+
+        $sessionScopeKey     = "session.scope";
+
+        $this->initScope($sessionScopeKey, $_SESSION);
+
+        $this->getScope($sessionScopeKey)->setAll(array());
+
+        return $result;
     }
 
     //SCOPES
@@ -52,11 +101,15 @@ class AppCommon extends Common
         $this->getDI()->get('global')->set($p_key, $p_value);
     }
 
-    protected function initScope($p_key){
+    protected function initScope($p_key, $p_data = array()){
 
         if(!$this->hasScope($p_key)){
 
-            $this->setScope($p_key, new Register());
+            $scope = new Register();
+
+            $scope->setAll($p_data);
+
+            $this->setScope($p_key, $scope);
         }
     }
 

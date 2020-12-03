@@ -149,9 +149,9 @@ class DataEngine extends Common
         return $result;
     }
 
-    public function setState($p_model, $p_id, $p_state){
-
-        return $this->object->state($p_model, $p_id, $p_state);
+    public function setState($p_model, $p_id, $p_state, $p_data){
+        
+        return $this->object->state($p_model, $p_id, $p_state, $p_data);
     }
 
     public function getField($p_field, $p_extended = true){

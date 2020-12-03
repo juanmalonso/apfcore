@@ -64,7 +64,7 @@ class Manager extends ModuleComponent {
                     $componentParams['dataService']                     = $dataService;
                     
                 }
-
+                
                 $this->placeVueCustomElement($component['elementTag'], $component['classPath'], $componentParams);
                 
             }

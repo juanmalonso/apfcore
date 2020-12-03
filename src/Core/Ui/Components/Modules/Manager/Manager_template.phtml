@@ -63,6 +63,10 @@
                                     <ElementFormEditor v-bind:id="tabData.referenceName" v-bind:activetab="(activetab == tabIndex) ? 'active' : 'unactive'" v-bind:dataService="tabData.dataService" attrwatcher="activetab" v-bind:urlMaps="urlMaps"></ElementFormEditor>
                                 </template>
 
+                                <template v-if="tabData.elementTag == 'table-viewer'">
+                                    <ElementTableViewer v-bind:id="tabData.referenceName" v-bind:activetab="(activetab == tabIndex) ? 'active' : 'unactive'" v-bind:dataService="tabData.dataService" attrwatcher="activetab" v-bind:urlMaps="urlMaps"></ElementTableViewer>
+                                </template>
+
                             </div>
 
                             <template v-if="doRenderedTabs()"></template>
@@ -73,7 +77,7 @@
                     <div class="ui basic segment" style="width: 200px;max-width: 200px;min-width: 200px;">
 
                         <template v-for="(stateAction, stateActionIndex) in stateActions">
-                            <ElementToStateAction v-bind:id="referenceName + '_header_' + stateActionIndex + '_state'" v-bind:stateActionData="stateAction" v-bind:urlMaps="urlMaps"></ElementToStateAction>
+                            <ElementToStateAction v-bind:id="referenceName + '_header_' + stateActionIndex + '_state'" v-bind:stateActionData="stateAction" v-bind:model="model" v-bind:dataRow="objects[0]" v-bind:urlMaps="urlMaps"></ElementToStateAction>
                         </template>
                         
                     </div>

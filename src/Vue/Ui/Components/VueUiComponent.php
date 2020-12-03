@@ -125,12 +125,12 @@ class VueUiComponent extends UiComponent {
             $subElementClassPath        = $this->getClassPath() . "CustomElements\\" . $camelizedTag;
         }
         
-        $instance                   = new $subElementClassPath($this->getDI());
+        //$instance                     = new $subElementClassPath($this->getDI());
         
         if(class_exists($subElementClassPath)){
 
             $instance                   = new $subElementClassPath($this->getDI());
-
+            
             $this->setViewVar("Element" . $camelizedTag, $instance->getId());
 
             $this->elementsGlobalVars["_" . $instance->getHashId()]   = $instance->getId();

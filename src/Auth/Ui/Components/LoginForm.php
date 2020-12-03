@@ -39,7 +39,7 @@ class LoginForm extends VueUiComponent {
                 }
     
                 $this->setSession("user_startpage", $startpage);
-
+                
                 header("Location: " . $startpage);
                 exit();
 

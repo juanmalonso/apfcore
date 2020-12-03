@@ -95,7 +95,7 @@ class AppModule extends VueUiService {
                     $componentParams["dataService"]     = $component["dataService"];
 
                     if(isset($component["tabs"])){
-
+                        
                         $componentParams["tabs"]        = $component["tabs"];
                     }
 
@@ -821,7 +821,7 @@ class AppModule extends VueUiService {
                             }
                         }
                     }
-
+                    
                     //RENDERED FIELDS
                     if(isset(($this->getLocal($scopePath))['renderedFields'])){
 
@@ -1024,6 +1024,28 @@ class AppModule extends VueUiService {
         return $result;
     }
 
+    public function toStateService(){
+        //\sleep(3);
+        if($this->hasJsonParam()){
+
+            $params                         = $this->getJsonParam();
+            
+            if(isset($params["model"]) && isset($params["id"]) && isset($params["state"])){
+                
+                $result['toStateResult']    = $this->setModelObjectState($params["model"], $params["id"], $params["state"], $params["data"]);
+                
+                $this->setServiceSuccess($result);
+            }else{
+
+                $this->setServiceError("Model Param Not Found");
+            }
+
+        }else{
+
+            $this->setServiceError("Invalid Params");
+        }
+    }
+
     //OBJECT NAME AND IMAGE
     public function objectNameAndImageService(){
         //\sleep(3);
@@ -1122,6 +1144,21 @@ class AppModule extends VueUiService {
                                                 $stateActionTmp                 = $stateAction;
                                                 $stateActionTmp->style          = ($states->$toState)->style;
 
+                                                if(property_exists($stateActionTmp, "toStateInputData")){
+
+                                                    $newToStateInputData        = new \stdClass();
+
+                                                    foreach($stateActionTmp->toStateInputData as $fieldName=>$fieldData){
+
+                                                        if(property_exists($fieldData, "data_field")){
+
+                                                            $newToStateInputData->$fieldName    = $this->getFieldData($fieldData->data_field);
+                                                        }
+                                                    }
+
+                                                    $stateActionTmp->toStateInputData = $newToStateInputData;
+                                                }
+
                                                 $result[]                       = $stateActionTmp;
 
                                             }else if($stateAction->type == "actions"){
@@ -1166,6 +1203,19 @@ class AppModule extends VueUiService {
     }
 
     //DATA SOURCE METHODS
+    protected function setModelObjectState($p_model, $p_id, $p_state, $p_data){
+
+        $dataSource                         = new ModuleDataSource($this->getDI());
+
+        return $dataSource->setModelObjectState($p_model, $p_id, $p_state, $p_data);
+    }
+
+    protected function getFieldData($p_field){
+
+        $dataSource                         = new ModuleDataSource($this->getDI());
+
+        return $dataSource->getDataFieldDefinitions($p_field);
+    }
     
     protected function getModelObjectNameField($p_model){
 
