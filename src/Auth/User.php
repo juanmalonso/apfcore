@@ -58,7 +58,7 @@ class User extends Common {
             $userData               = $objectsDataSource->getData($userId);
             
             if($userData['password'] == $p_password){
-
+                
                 if(isset($userData['roles'])){
 
                     $userRolesData                  = array();
@@ -173,6 +173,7 @@ class User extends Common {
         $result                             = array();
         $result['id']                       = $menuItemData['_id'];
         $result['name']                     = $menuItemData['name'];
+        $result['label']                    = $menuItemData['label'];
         $result['description']              = $menuItemData['description'];
         $result['icon']                     = $menuItemData['icon'];
         $result['path']                     = $menuItemData['path'];

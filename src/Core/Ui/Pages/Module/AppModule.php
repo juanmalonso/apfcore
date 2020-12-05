@@ -247,6 +247,31 @@ class AppModule extends VueUiService {
 
                     $items                  = array();
 
+                    if(isset($userData['role']['menus'])){
+
+                        foreach($userData['role']['menus'] as $menu){
+
+                            if(isset($menu['items'])){
+
+                                foreach($menu['items'] as $item){
+
+                                    if(!isset($items[$item['id']])){
+
+                                        $itemTmp                = array();
+                                        $itemTmp['label']       = $item['label'];
+                                        $itemTmp['icon']        = $item['icon'];
+                                        $itemTmp['url']         = $this->getDI()->get('config')->main->url->base . $item['path'];
+                                        $itemTmp['order']       = $item['order'];
+
+                                        $items[$item['id']]     = $itemTmp;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    /*
+                    MULTI ROLE
                     $userData['roles'][]    = $userData['role'];
                     
                     foreach($userData['roles'] as $role){
@@ -262,7 +287,7 @@ class AppModule extends VueUiService {
                                         if(!isset($items[$item['id']])){
 
                                             $itemTmp                = array();
-                                            $itemTmp['label']       = $item['name'];
+                                            $itemTmp['label']       = $item['label'];
                                             $itemTmp['icon']        = $item['icon'];
                                             $itemTmp['url']         = $this->getDI()->get('config')->main->url->base . $item['path'];
                                             $itemTmp['order']       = $item['order'];
@@ -274,6 +299,7 @@ class AppModule extends VueUiService {
                             }
                         }
                     }
+                    */
                 }
 
                 $result["user"]         = $user;
