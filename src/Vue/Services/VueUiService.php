@@ -21,7 +21,6 @@ class VueUiService extends UiService {
         $this->setJsDataVar("serviceId", $this->getId());
 
         $this->setJsDataVar("path", $this->getUrlClassPath());
-        
         //INITIAL JS AND CSS RESOURCES
         //CSS
 

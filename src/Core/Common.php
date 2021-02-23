@@ -51,7 +51,50 @@ class Common extends Injectable
     }
 
     //COMMON LOG MANAGMENT
-    
+    protected function logCustom($p_msg, $p_context = NULL, $p_data = NULL){
+       
+        $this->getDI()->get('logger')->custom($p_msg, $p_context, $p_data);
+    }
+
+    protected function logInfo($p_msg, $p_context = NULL, $p_data = NULL){
+
+        $this->getDI()->get('logger')->info($p_msg, $p_context, $p_data);
+    }
+
+    protected function logEmergency($p_msg, $p_context = NULL, $p_data = NULL){
+
+        $this->getDI()->get('logger')->emergency($p_msg, $p_context, $p_data);
+    }
+
+    protected function logCritical($p_msg, $p_context = NULL, $p_data = NULL){
+
+        $this->getDI()->get('logger')->critical($p_msg, $p_context, $p_data);
+    }
+
+    protected function logDebug($p_msg, $p_context = NULL, $p_data = NULL){
+        
+        $this->getDI()->get('logger')->debug($p_msg, $p_context, $p_data);
+    }
+
+    protected function logNotice($p_msg, $p_context = NULL, $p_data = NULL){
+
+        $this->getDI()->get('logger')->notice($p_msg, $p_context, $p_data);
+    }
+
+    protected function logWarning($p_msg, $p_context = NULL, $p_data = NULL){
+
+        $this->getDI()->get('logger')->warning($p_msg, $p_context, $p_data);
+    }
+
+    protected function logError($p_msg, $p_context = NULL, $p_data = NULL){
+
+        $this->getDI()->get('logger')->error($p_msg, $p_context, $p_data);
+    }
+
+    protected function logAlert($p_msg, $p_context = NULL, $p_data = NULL){
+
+        $this->getDI()->get('logger')->alert($p_msg, $p_context, $p_data);
+    }
 
     //COMMON CACHE MANAGMENT
     protected function hasCache($p_key){

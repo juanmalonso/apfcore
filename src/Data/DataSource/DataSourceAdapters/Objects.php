@@ -33,6 +33,26 @@ class Objects extends DataSourceAdapter {
         return $this->modelDataDefinitions;
     }
 
+    public function getDataRenderableDefinitions(){
+        $result                 = array();
+        
+        $notRenderableFields    = array();
+        if(isset($this->options['notRenderableFields'])){
+
+            $notRenderableFields = $this->options['notRenderableFields'];
+        }
+
+        foreach($this->modelDataDefinitions as $fieldId=>$definition){
+
+            if(!in_array($fieldId, $notRenderableFields)){
+
+                $result[$fieldId] = $definition;
+            }
+        }
+        
+        return $result;
+    }
+
     public function getData($p_query){
         
         if(is_array($p_query)){
@@ -47,7 +67,7 @@ class Objects extends DataSourceAdapter {
 
             //HARD FILTERS
             if(isset($this->options['hardfilters'])){
-
+                    
                 if(!isset($p_query['filters'])){
 
                     $p_query['filters']                     = array();
@@ -58,7 +78,7 @@ class Objects extends DataSourceAdapter {
                     $p_query['filters'][$field]             = $terms; 
                 }
             }
-
+            
             //HARD RANGES
             if(isset($this->options['hardranges'])){
 
@@ -72,18 +92,18 @@ class Objects extends DataSourceAdapter {
                     $p_query['ranges'][$field]             = $range; 
                 }
             }
-
+            
             foreach($this->getDataDefinitions() as $definition){
                 
                 //FILTERS
                 if(isset($p_query['filters']) && \is_array($p_query['filters'])){
 
                     if(property_exists($definition['uiOptions'],'filterable')){
-
+                        
                         if($definition['uiOptions']->filterable == true){
-
+                            
                             if(isset($p_query['filters'][$definition['id']])){
-
+                                
                                 if( in_array($definition['id'], array('objActive', 'objUserAdd', 'objUserUpdated', 'objErased', 'objUserErased', 'objIndexed', 'objState'))){
 
                                     $validFilters[$definition['id']] = (array)$p_query['filters'][$definition['id']];
@@ -95,7 +115,7 @@ class Objects extends DataSourceAdapter {
                         }
                     }
                 }
-
+                
                 //SEARCH FIELDS
                 if(property_exists($definition['uiOptions'],'searchable')){
 
@@ -420,54 +440,47 @@ class Objects extends DataSourceAdapter {
         $definitionsRow['attachFileOptions']                = new \stdClass();
         
         */
-        
-        $notRenderableFields    = array();
-        if(isset($this->options['notRenderableFields'])){
-
-            $notRenderableFields = $this->options['notRenderableFields'];
-        }
 
         //OBJECTS FIELDS
         $definitions            = $this->dataEngine->getDefinition($this->options['model'], null);
+        
         $definitionsLastOrder   = 0;
         if(\is_array($definitions)){
 
             foreach($definitions as $definition){
 
                 $fieldId                                                = $definition['dafId'];
-                
-                if(!in_array($fieldId, $notRenderableFields)){
 
-                    $definitionsRow                                     = array();
-                    $definitionsRow["id"]                               = $definition['dafId'];
-                    $definitionsRow["type"]                             = $definition['typId'];
-                    $definitionsRow["group"]                            = $definition['flgId'];
-                    $definitionsRow["defaultValue"]                     = $definition['defDafDefaultValue'];
+                $definitionsRow                                     = array();
+                $definitionsRow["id"]                               = $definition['dafId'];
+                $definitionsRow["type"]                             = $definition['typId'];
+                $definitionsRow["group"]                            = $definition['flgId'];
+                $definitionsRow["defaultValue"]                     = $definition['defDafDefaultValue'];
 
-                    if($definition['typId'] == "json" && ($definition['defDafDefaultValue'] == "" || $definition['defDafDefaultValue'] == "{}")){
+                if($definition['typId'] == "json" && ($definition['defDafDefaultValue'] == "" || $definition['defDafDefaultValue'] == "{}")){
 
-                        $definitionsRow["defaultValue"]                 = new \stdClass();
+                    $definitionsRow["defaultValue"]                 = new \stdClass();
 
-                    }elseif(($definition['typId'] == "objectsr" || $definition['typId'] == "tags" || $definition['typId'] == "options") && ($definition['defDafDefaultValue'] == "" || $definition['defDafDefaultValue'] == "[]")){
+                }elseif(($definition['typId'] == "objectsr" || $definition['typId'] == "tags" || $definition['typId'] == "options") && ($definition['defDafDefaultValue'] == "" || $definition['defDafDefaultValue'] == "[]")){
 
-                        $definitionsRow["defaultValue"]                 = array();
-                    }
-
-                    $definitionsRow["order"]                            = $definition['defOrder'];
-                    $definitionsRow["isName"]                           = $definition['defIsName'];
-                    $definitionsRow["isImage"]                          = $definition['defIsImage'];
-                    $definitionsRow["isRelation"]                       = false;
-                    $definitionsRow["isState"]                          = false;
-                    $definitionsRow["uiOptions"]                        = $definition['defDafUiOptions'];
-                    $definitionsRow["indexOptions"]                     = $definition['defDafIndexOptions'];
-                    $definitionsRow['typeOptions']                      = $definition['defDafTypOptions'];
-                    $definitionsRow['validationOptions']                = $definition['defDafTypValidationOptions'];
-                    $definitionsRow['attachFileOptions']                = $definition['defDafAttachFileOptions'];
-
-                    $definitionsLastOrder                               = (int)$definitionsRow["order"];
-
-                    $this->modelDataDefinitions[$definitionsRow["id"]]  = $definitionsRow;
+                    $definitionsRow["defaultValue"]                 = array();
                 }
+
+                $definitionsRow["order"]                            = $definition['defOrder'];
+                $definitionsRow["isName"]                           = $definition['defIsName'];
+                $definitionsRow["isImage"]                          = $definition['defIsImage'];
+                $definitionsRow["isRelation"]                       = false;
+                $definitionsRow["isState"]                          = false;
+                $definitionsRow["uiOptions"]                        = $definition['defDafUiOptions'];
+                $definitionsRow["indexOptions"]                     = $definition['defDafIndexOptions'];
+                $definitionsRow['typeOptions']                      = $definition['defDafTypOptions'];
+                $definitionsRow['validationOptions']                = $definition['defDafTypValidationOptions'];
+                $definitionsRow['attachFileOptions']                = $definition['defDafAttachFileOptions'];
+
+                $definitionsLastOrder                               = (int)$definitionsRow["order"];
+                
+                $this->modelDataDefinitions[$definitionsRow["id"]]  = $definitionsRow;
+                
             }
         }
         

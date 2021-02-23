@@ -432,7 +432,7 @@ class AppCrud extends VueUiService {
             //TODO: FILTROS DE objState
             //TODO: FILTROS DE objDateAdd
             
-            foreach($p_dataSource->getDataDefinitions() as $field=>$definition){
+            foreach($p_dataSource->getDataRenderableDefinitions() as $field=>$definition){
 
                 $disabledFilters                        = array();
 
@@ -542,9 +542,7 @@ class AppCrud extends VueUiService {
         return $result;
     }
 
-    
-
-     /*
+    /*
      ___   ______   _        ______    _____   _______    ____    _____  
     / ____| |  ____| | |      |  ____|  / ____| |__   __|  / __ \  |  __ \ 
     | (___   | |__    | |      | |__    | |         | |    | |  | | | |__) |
@@ -617,7 +615,7 @@ class AppCrud extends VueUiService {
         //TODO: FALTAN LOS CAMPOS OBJECTSR
         //TODO: FALTAN LOS CAMPOS OBJECTR        
         
-        foreach($p_dataSource->getDataDefinitions() as $field=>$definition){
+        foreach($p_dataSource->getDataRenderableDefinitions() as $field=>$definition){
             
             $fieldTemp                  = array();
             $fieldTemp['renderType']    = "VALUE";
@@ -850,7 +848,7 @@ class AppCrud extends VueUiService {
     //SELECTOR DATOS
     protected function getSelectorData($p_dataSource){
 
-        $definitions                        = $p_dataSource->getDataDefinitions();
+        $definitions                        = $p_dataSource->getDataRenderableDefinitions();
         
         $dataSourceQuery                    = array();
         $dataSourceQuery['page']            = ($this->hasUrlParam("page")) ? $this->getUrlParam("page") : 1;
@@ -1098,8 +1096,8 @@ class AppCrud extends VueUiService {
             }
         }
 
-        //SE REEMPLASAN LOS DATOS SEGUN PARAMETROS URL
-        foreach($p_dataSource->getDataDefinitions() as $field=>$definition){
+        //SE REEMPLAZAN LOS DATOS SEGUN PARAMETROS URL
+        foreach($p_dataSource->getDataRenderableDefinitions() as $field=>$definition){
             
             if($this->hasUrlParam($field)){
 
@@ -1114,7 +1112,7 @@ class AppCrud extends VueUiService {
         
         $result                         = array();
         
-        foreach($p_dataSource->getDataDefinitions() as $field=>$definition){
+        foreach($p_dataSource->getDataRenderableDefinitions() as $field=>$definition){
             
             $fieldTemp                  = array();
 
@@ -1261,7 +1259,7 @@ class AppCrud extends VueUiService {
         //VER LOS CAMAPOR ESPECIALES ORDER, STATUS, ACTIVATABLE ETC
         //TODO: FALTAN LOS CAMPOS BASE
         
-        foreach($p_dataSource->getDataDefinitions() as $field=>$definition){
+        foreach($p_dataSource->getDataRenderableDefinitions() as $field=>$definition){
             
             $fieldTemp                  = array();
 
@@ -1592,7 +1590,7 @@ class AppCrud extends VueUiService {
             }
         }
 
-        foreach($p_dataSource->getDataDefinitions() as $field=>$definition){
+        foreach($p_dataSource->getDataRenderableDefinitions() as $field=>$definition){
             
             if($this->hasUrlParam($field)){
 

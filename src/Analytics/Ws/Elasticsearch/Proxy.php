@@ -1,19 +1,10 @@
 <?php
 
-namespace Nubesys\Core\Ws;
+namespace Nubesys\Analytics\Ws\Elasticsearch;
 
 use Nubesys\Core\Services\WsService;
 
-class ApiTest extends WsService {
-
-    public function rawQueryMethod($p_params){
-
-        $result = new \stdClass();
-        $result->method = "TEST";
-        $result->time = date("H:i:s");
-
-        $this->setServiceSuccess($result);
-    }
+class Proxy extends WsService {
 
     public function testMethod($p_params){
 

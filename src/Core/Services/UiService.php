@@ -48,13 +48,15 @@ class UiService extends Service {
 
         //INITIAL JS AND CSS RESOURCES
         //CSS
-        $this->addCssSource("https://cdn.jsdelivr.net/npm/fomantic-ui@2.7.7/dist/semantic.min.css");
-
+        //$this->addCssSource("https://cdn.jsdelivr.net/npm/fomantic-ui@2.7.7/dist/semantic.min.css");
+        $this->addCssSource("https://cdn.jsdelivr.net/npm/fomantic-ui@2.8.7/dist/semantic.min.css");
+        
         //JS
         $this->addJsSource("https://cdn.jsdelivr.net/jquery/3.0.0/jquery.min.js");
         $this->addJsSource("https://cdn.jsdelivr.net/npm/underscore@1.9.1/underscore.min.js");
         $this->addJsSource("https://cdn.jsdelivr.net/npm/axios@0.18.0/dist/axios.min.js");
-        $this->addJsSource("https://cdn.jsdelivr.net/npm/fomantic-ui@2.7.7/dist/semantic.min.js");
+        //$this->addJsSource("https://cdn.jsdelivr.net/npm/fomantic-ui@2.7.7/dist/semantic.min.js");
+        $this->addJsSource("https://cdn.jsdelivr.net/npm/fomantic-ui@2.8.7/dist/semantic.min.js");
         $this->addJsSource("https://cdn.jsdelivr.net/momentjs/2.15.1/moment.min.js");
         $this->addJsSource("https://cdn.jsdelivr.net/npm/numeral@2.0.6/numeral.min.js");
     }

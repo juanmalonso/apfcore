@@ -61,6 +61,11 @@ class DataSource extends Common {
         return $this->adapter->getDataDefinitions();
     }
 
+    public function getDataRenderableDefinitions(){
+
+        return $this->adapter->getDataRenderableDefinitions();
+    }
+
     public function getDataFieldDefinitions($p_field){
 
         return $this->adapter->getDataFieldDefinitions($p_field);

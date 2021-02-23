@@ -29,15 +29,23 @@ class HttpClient extends Common
                 
                 $result     = json_decode($response->getBody()->getContents());
                 
+
             }else{
 
                 //TODO Error de http CLIENT
             }
         }else{
 
-            //TODO Error de http CLIENT
+            $this->toStdOut("HTTP ERROR", $response->getStatusCode() . " - " . $response->getReasonPhrase());
         }
 
         return $result;
+    }
+
+    private function toStdOut($p_title, $p_message){
+
+        $stdout = fopen('php://stdout', 'w');
+        fputs($stdout, $p_title . ": \r\n" . $p_message ."\r\n");
+        fclose($stdout);
     }
 }

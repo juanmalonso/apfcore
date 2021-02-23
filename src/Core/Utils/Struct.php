@@ -94,16 +94,17 @@ class Struct
 
     public static function extendArray(){
 
-        $arrays = func_get_args();
-        $base = array_shift($arrays);
+        $arrays     = func_get_args();
+        $base       = array_shift($arrays);
+        
         foreach ($arrays as $array) {
-            reset($base);
-            while (list($key, $value) = @each($array)) {
 
-                if (is_array($value) && @is_array($base[$key])) {
+            foreach($array as $key=>$value){
 
+                if(is_array($value) && (isset($base[$key]) && is_array($base[$key]))){
+                    
                     $base[$key] = self::extendArray($base[$key], $value);
-                } else {
+                }else{
 
                     $base[$key] = $value;
                 }

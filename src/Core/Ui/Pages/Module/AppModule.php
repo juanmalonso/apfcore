@@ -76,6 +76,8 @@ class AppModule extends VueUiService {
     private function placeActionComponents($p_action){
 
         $layouts                                        = $this->getActionComponents($p_action);
+
+        $this->setActionPageTitle($p_action);
         
         foreach($layouts as $layout=>$components){
 
@@ -114,6 +116,34 @@ class AppModule extends VueUiService {
             }   
         }
         
+    }
+
+    private function setActionPageTitle($p_action){
+        
+        $scopePath          = "actions." . $p_action . ".title";
+        
+        if($this->hasLocal($scopePath)){
+            
+            $this->setTitle($this->getLocal($scopePath));
+
+            $this->logInfo("PAGE-VIEW", "NOSVAMOOS|EVENT", $this->getLocal($scopePath));
+        }
+
+        $sesid                                  = $this->getSessionId();
+
+        $cacheKey                               = 'unique_visit_' . $sesid;
+        $cacheLifetime                          = 180000;
+        $cacheType                              = 'redis';
+
+        if(!$this->hasCache($cacheKey)){
+
+            $eventParams                                            = array();
+            $eventParams['sesid']                                   = $sesid;
+
+            $this->logInfo("UNIQUE-VISIT", "NOSVAMOOS|EVENT", $eventParams);
+
+            $this->setCache($cacheKey, $eventParams['sesid'], $cacheLifetime);
+        }
     }
 
     private function getActionComponents($p_action){

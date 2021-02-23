@@ -1,24 +1,23 @@
 {
-    "name": "juanmalonso/apfcore",
-    "description": "Description of project juanmalonso/apfcore",
-    "type": "library",
-    "license": "GPL-3.0-or-later",
-    "authors": [
-        {
-            "name": "Juan Manuel Alonso Vallovera",
-            "email": "manialonso@gmail.com"
-        }
-    ],
-    "require": {
-        
-    },
-    "autoload": {
-      "psr-4": {
-        "Nubesys\\Core\\": "src/Core/",
-        "Nubesys\\Vue\\": "src/Vue/",
-        "Nubesys\\Data\\": "src/Data/",
-        "Nubesys\\Auth\\":"src/Auth",
-        "Nubesys\\File\\":"src/File"
-      }
+  "name": "juanmalonso/apfcore",
+  "description": "Description of project juanmalonso/apfcore",
+  "type": "library",
+  "license": "GPL-3.0-or-later",
+  "authors": [
+    {
+      "name": "Juan Manuel Alonso Vallovera",
+      "email": "manialonso@gmail.com"
     }
+  ],
+  "require": {},
+  "autoload": {
+    "psr-4": {
+      "Nubesys\\Core\\": "src/Core/",
+      "Nubesys\\Vue\\": "src/Vue/",
+      "Nubesys\\Data\\": "src/Data/",
+      "Nubesys\\Auth\\": "src/Auth",
+      "Nubesys\\File\\": "src/File",
+      "Nubesys\\Analytics\\": "src/Analytics/"
+    }
+  }
 }
