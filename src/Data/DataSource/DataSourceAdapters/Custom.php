@@ -73,4 +73,24 @@ class Custom extends DataSourceAdapter {
 
         return $this->options['definitions'];
     }
+
+    public function getDataRenderableDefinitions(){
+        $result                 = array();
+        
+        $notRenderableFields    = array();
+        if(isset($this->options['notRenderableFields'])){
+
+            $notRenderableFields = $this->options['notRenderableFields'];
+        }
+
+        foreach($this->options['definitions'] as $fieldId=>$definition){
+
+            if(!in_array($fieldId, $notRenderableFields)){
+
+                $result[$fieldId] = $definition;
+            }
+        }
+        
+        return $result;
+    }
 }

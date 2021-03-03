@@ -493,39 +493,37 @@ class Objects extends DataSourceAdapter {
 
                 $fieldId                                                = "rel_" . $relation['modId'];
 
-                if(!in_array($fieldId, $notRenderableFields)){
+                $relationRow                                        = array();
+                $relationRow["id"]                                  = $fieldId;
+                $relationRow["type"]                                = "options";
 
-                    $relationRow                                        = array();
-                    $relationRow["id"]                                  = $fieldId;
-                    $relationRow["type"]                                = "options";
+                if(property_exists($relation['relUiOptions'], 'editGroup')){
 
-                    if(property_exists($relation['relUiOptions'], 'editGroup')){
+                    $relationRow["group"]                           = $relation['relUiOptions']->editGroup;
+                }else{
 
-                        $relationRow["group"]                           = $relation['relUiOptions']->editGroup;
-                    }else{
-
-                        $relationRow["group"]                           = "data";
-                    }
-                    
-                    $relationRow["defaultValue"]                        = "";
-                    $relationRow["order"]                               = $definitionsLastOrder++;
-                    $relationRow["isName"]                              = false;
-                    $relationRow["isImage"]                             = false;
-                    $relationRow["isRelation"]                          = true;
-                    $relationRow["isState"]                             = false;
-                    $relationRow["uiOptions"]                           = $relation['relUiOptions'];
-                    $relationRow["indexOptions"]                        = $relation['relIndexOptions'];
-                    $relationRow['typeOptions']                         = new \stdClass();
-                    $relationRow['validationOptions']                   = new \stdClass();
-                    $relationRow['attachFileOptions']                   = new \stdClass();
-                    $relationRow["leftModId"]                           = $relation['relLeftModId'];
-                    $relationRow["leftDirection"]                       = $relation['relLeftDirection'];
-                    $relationRow["rightModId"]                          = $relation['relRightModId'];
-                    $relationRow["rightDirection"]                      = $relation['relRightDirection'];
-                    $relationRow["cardinality"]                         = $relation['relCardinality'];
-                    
-                    $this->modelDataDefinitions[$relationRow["id"]]     = $relationRow;
+                    $relationRow["group"]                           = "data";
                 }
+                
+                $relationRow["defaultValue"]                        = "";
+                $relationRow["order"]                               = $definitionsLastOrder++;
+                $relationRow["isName"]                              = false;
+                $relationRow["isImage"]                             = false;
+                $relationRow["isRelation"]                          = true;
+                $relationRow["isState"]                             = false;
+                $relationRow["uiOptions"]                           = $relation['relUiOptions'];
+                $relationRow["indexOptions"]                        = $relation['relIndexOptions'];
+                $relationRow['typeOptions']                         = new \stdClass();
+                $relationRow['validationOptions']                   = new \stdClass();
+                $relationRow['attachFileOptions']                   = new \stdClass();
+                $relationRow["leftModId"]                           = $relation['relLeftModId'];
+                $relationRow["leftDirection"]                       = $relation['relLeftDirection'];
+                $relationRow["rightModId"]                          = $relation['relRightModId'];
+                $relationRow["rightDirection"]                      = $relation['relRightDirection'];
+                $relationRow["cardinality"]                         = $relation['relCardinality'];
+                
+                $this->modelDataDefinitions[$relationRow["id"]]     = $relationRow;
+                
             }
         }
 
@@ -535,82 +533,77 @@ class Objects extends DataSourceAdapter {
             //STATE
             $fieldId                                            = "objState";
             
-            if(!in_array($fieldId, $notRenderableFields)){
+            $stateRow                                       = array();
+            $stateRow["id"]                                 = $fieldId;
+            $stateRow["type"]                               = "text";
+            $stateRow["group"]                              = "data";
+            $stateRow["defaultValue"]                       = $definition['defDafDefaultValue'];
 
-                
-                $stateRow                                       = array();
-                $stateRow["id"]                                 = $fieldId;
-                $stateRow["type"]                               = "text";
-                $stateRow["group"]                              = "data";
-                $stateRow["defaultValue"]                       = $definition['defDafDefaultValue'];
+            if(property_exists($this->modelData['statesOptions'], 'defaultState')){
 
-                if(property_exists($this->modelData['statesOptions'], 'defaultState')){
+                $stateRow["defaultValue"]                   = $this->modelData['statesOptions']->defaultState;
 
-                    $stateRow["defaultValue"]                   = $this->modelData['statesOptions']->defaultState;
-
-                }
-
-                $stateRow["order"]                              = 0;
-                $stateRow["isName"]                             = false;
-                $stateRow["isImage"]                            = false;
-                $stateRow["isRelation"]                         = false;
-                $stateRow["isState"]                            = true;
-                $stateRow["uiOptions"]                          = new \stdClass();
-                $stateRow["uiOptions"]->help                    = '';
-                $stateRow["uiOptions"]->icon                    = 'caret right';
-                $stateRow["uiOptions"]->info                    = '';
-                $stateRow["uiOptions"]->label                   = 'Estado';
-                $stateRow["uiOptions"]->hidden                  = false;
-                $stateRow["uiOptions"]->readOnly                = true;
-                $stateRow["uiOptions"]->listable                = true;
-                $stateRow["uiOptions"]->required                = true;
-                $stateRow["uiOptions"]->sortable                = true;
-                $stateRow["uiOptions"]->filterable              = true;
-                $stateRow["uiOptions"]->searchable              = false;
-                $stateRow["indexOptions"]                       = new \stdClass();
-                $stateRow['typeOptions']                        = new \stdClass();
-                $stateRow['validationOptions']                  = new \stdClass();
-                $stateRow['attachFileOptions']                  = new \stdClass();
-
-                $this->modelDataDefinitions[$stateRow["id"]]    = $stateRow;
             }
+
+            $stateRow["order"]                              = 0;
+            $stateRow["isName"]                             = false;
+            $stateRow["isImage"]                            = false;
+            $stateRow["isRelation"]                         = false;
+            $stateRow["isState"]                            = true;
+            $stateRow["uiOptions"]                          = new \stdClass();
+            $stateRow["uiOptions"]->help                    = '';
+            $stateRow["uiOptions"]->icon                    = 'caret right';
+            $stateRow["uiOptions"]->info                    = '';
+            $stateRow["uiOptions"]->label                   = 'Estado';
+            $stateRow["uiOptions"]->hidden                  = false;
+            $stateRow["uiOptions"]->readOnly                = true;
+            $stateRow["uiOptions"]->listable                = true;
+            $stateRow["uiOptions"]->required                = true;
+            $stateRow["uiOptions"]->sortable                = true;
+            $stateRow["uiOptions"]->filterable              = true;
+            $stateRow["uiOptions"]->searchable              = false;
+            $stateRow["indexOptions"]                       = new \stdClass();
+            $stateRow['typeOptions']                        = new \stdClass();
+            $stateRow['validationOptions']                  = new \stdClass();
+            $stateRow['attachFileOptions']                  = new \stdClass();
+
+            $this->modelDataDefinitions[$stateRow["id"]]    = $stateRow;
+            
 
 
             //STATELOGS
             
             $fieldId                                            = "objStatesLog";
-            
-            if(!in_array($fieldId, $notRenderableFields)){
                 
-                $stateRow                                       = array();
-                $stateRow["id"]                                 = $fieldId;
-                $stateRow["type"]                               = "json";
-                $stateRow["group"]                              = "data";
-                $stateRow["defaultValue"]                       = array();
-                $stateRow["order"]                              = 0;
-                $stateRow["isName"]                             = false;
-                $stateRow["isImage"]                            = false;
-                $stateRow["isRelation"]                         = false;
-                $stateRow["isState"]                            = true;
-                $stateRow["uiOptions"]                          = new \stdClass();
-                $stateRow["uiOptions"]->help                    = '';
-                $stateRow["uiOptions"]->icon                    = 'caret right';
-                $stateRow["uiOptions"]->info                    = '';
-                $stateRow["uiOptions"]->label                   = 'Estado Historico';
-                $stateRow["uiOptions"]->hidden                  = true;
-                $stateRow["uiOptions"]->readOnly                = true;
-                $stateRow["uiOptions"]->listable                = false;
-                $stateRow["uiOptions"]->required                = false;
-                $stateRow["uiOptions"]->sortable                = true;
-                $stateRow["uiOptions"]->filterable              = true;
-                $stateRow["uiOptions"]->searchable              = false;
-                $stateRow["indexOptions"]                       = new \stdClass();
-                $stateRow['typeOptions']                        = new \stdClass();
-                $stateRow['validationOptions']                  = new \stdClass();
-                $stateRow['attachFileOptions']                  = new \stdClass();
+            $stateRow                                       = array();
+            $stateRow["id"]                                 = $fieldId;
+            $stateRow["type"]                               = "json";
+            $stateRow["group"]                              = "data";
+            $stateRow["defaultValue"]                       = array();
+            $stateRow["order"]                              = 0;
+            $stateRow["isName"]                             = false;
+            $stateRow["isImage"]                            = false;
+            $stateRow["isRelation"]                         = false;
+            $stateRow["isState"]                            = true;
+            $stateRow["uiOptions"]                          = new \stdClass();
+            $stateRow["uiOptions"]->help                    = '';
+            $stateRow["uiOptions"]->icon                    = 'caret right';
+            $stateRow["uiOptions"]->info                    = '';
+            $stateRow["uiOptions"]->label                   = 'Estado Historico';
+            $stateRow["uiOptions"]->hidden                  = true;
+            $stateRow["uiOptions"]->readOnly                = true;
+            $stateRow["uiOptions"]->listable                = false;
+            $stateRow["uiOptions"]->required                = false;
+            $stateRow["uiOptions"]->sortable                = true;
+            $stateRow["uiOptions"]->filterable              = true;
+            $stateRow["uiOptions"]->searchable              = false;
+            $stateRow["indexOptions"]                       = new \stdClass();
+            $stateRow['typeOptions']                        = new \stdClass();
+            $stateRow['validationOptions']                  = new \stdClass();
+            $stateRow['attachFileOptions']                  = new \stdClass();
 
-                $this->modelDataDefinitions[$stateRow["id"]]    = $stateRow;
-            }
+            $this->modelDataDefinitions[$stateRow["id"]]    = $stateRow;
+            
         }
     }
 
