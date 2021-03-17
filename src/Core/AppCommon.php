@@ -101,6 +101,11 @@ class AppCommon extends Common
         $this->getDI()->get('global')->set($p_key, $p_value);
     }
 
+    protected function getAllScopes(){
+
+        return $this->getDI()->get('global')->all();
+    }
+
     protected function initScope($p_key, $p_data = array()){
 
         if(!$this->hasScope($p_key)){
@@ -354,6 +359,69 @@ class AppCommon extends Common
         foreach($p_values as $key=>$value){
             
             $this->setPostParam($key, $value);
+        }
+    }
+
+    //HEADERS SCOPE
+    protected function hasHeader($p_key){
+        
+        $globalScopeKey     = "headers.scope";
+
+        $this->initScope($globalScopeKey);
+
+        if(!strpos($p_key, '.')){
+
+            return $this->getScope($globalScopeKey)->has($p_key);
+        }else{
+
+            return $this->getScope($globalScopeKey)->hasDot($p_key);
+        }
+    }
+
+    protected function getHeader($p_key){
+
+        $globalScopeKey     = "headers.scope";
+
+        $this->initScope($globalScopeKey);
+
+        if(!strpos($p_key, '.')){
+
+            return $this->getScope($globalScopeKey)->get($p_key);
+        }else{
+
+            return $this->getScope($globalScopeKey)->getDot($p_key);
+        }
+    }
+
+    protected function setHeader($p_key, $p_value){
+
+        $globalScopeKey     = "headers.scope";
+
+        $this->initScope($globalScopeKey);
+
+        if(!strpos($p_key, '.')){
+
+            $this->getScope($globalScopeKey)->set($p_key, $p_value);
+        }else{
+
+            $this->getScope($globalScopeKey)->setDot($p_key, $p_value);
+        }
+    }
+
+    protected function allHeaders(){
+
+        $globalScopeKey     = "headers.scope";
+
+        $this->initScope($globalScopeKey);
+
+        return $this->getScope($globalScopeKey)->all();
+    }
+
+    protected function setAllHeaders($p_values){
+        
+        foreach($p_values as $key=>$value){
+            
+            $this->setHeader($key, $value);
         }
     }
 

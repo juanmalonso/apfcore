@@ -46,6 +46,8 @@ class CoreUiController extends Controller
 
     protected function loadUiService($p_serviceClass, $p_urlparams){
         
+        $this->getDI()->get("responseManager")->setHeader("Content-Type", "application/json");
+
         if(class_exists($p_serviceClass)){
 
             $uiService              = new $p_serviceClass($this->getDI());
@@ -56,25 +58,27 @@ class CoreUiController extends Controller
             $params['JSON']         = $this->getDI()->get('requestManager')->getJSON();
             $params['FILES']        = $this->getDI()->get('requestManager')->getFILES();
 
-            $uiServiceName          = "dataService";
+            $uiServiceMethodName          = "dataService";
 
             if(isset($p_urlparams[2])){
 
                 $methodName         = \lcfirst(\Phalcon\Text::camelize($p_urlparams[2]));
                 
-                if(method_exists($uiService, $methodName . "Service")){
-
-                    $uiServiceName      = $methodName . "Service";
-                }
+                $uiServiceMethodName      = $methodName . "Service";
             }
 
-            $this->getDI()->get("responseManager")->setHeader("Content-Type", "application/json");
+            if(method_exists($uiService, $uiServiceMethodName)){
 
-            $uiService->doService($uiServiceName, $params);
+                $uiService->doService($uiServiceMethodName, $params);
+
+            }else{
+
+                $this->getDI()->get("responseManager")->setError("Method " . $p_serviceClass . " " . $uiServiceMethodName . " Not Found!");
+            }
 
         }else{
 
-            //TODO: ERROR
+            $this->getDI()->get("responseManager")->setError("Service " . $p_serviceClass . " Not Found!");
         }
     }
 }

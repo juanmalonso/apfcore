@@ -14,43 +14,39 @@ class CoreWsController extends Controller
     
     protected function loadWebService($p_serviceClass, $p_urlparams){
         
+        $this->getDI()->get("responseManager")->setHeader("Content-Type", "application/json");
+
         if(class_exists($p_serviceClass)){
             
-            $wsService              = new $p_serviceClass($this->getDI());
-            
+            $wsService                  = new $p_serviceClass($this->getDI());
+
             $params = array();
             $params['URL']          = $p_urlparams;
-            $params['GET']          = $this->getDI()->get('swoolerequest')->get;
-            $data['JSON']           = null;
-            
-            if($this->getDI()->get('swoolerequest')->rawContent() != ""){
+            $params['GET']          = $this->getDI()->get('requestManager')->getGET();
+            $params['POST']         = $this->getDI()->get('requestManager')->getPOST();
+            $params['JSON']         = $this->getDI()->get('requestManager')->getJSON();
+
+            $wsServiceMethodName    = "getMethod";
+            //FALTAN LOS METODOS REST Full
+            if(isset($p_urlparams[5])){
+
+                $methodName         = \lcfirst(\Phalcon\Text::camelize($p_urlparams[5]));
                 
-                if(\Nubesys\Core\Utils\Struct::isValidJson($this->getDI()->get('swoolerequest')->rawContent())){
-
-                    $data['JSON']       = json_decode($this->getDI()->get('swoolerequest')->rawContent(),true);
-                }
+                $wsServiceMethodName      = $methodName . "Method";
             }
 
-            $wsServiceMethodName       = "getMethod";
+            if(method_exists($wsService, $wsServiceMethodName)){
 
-            if(isset($p_urlparams[3]) && method_exists($wsService, $p_urlparams[3] . "Method")){
+                $wsService->doService($wsServiceMethodName, $params);
+                
+            }else{
 
-                $wsServiceMethodName   = $p_urlparams[3] . "Method";
-            }else if(method_exists($wsService, strtolower($this->getDI()->get('swoolerequest')->server['request_method']) . "Method")){
-
-                $wsServiceMethodName   = strtolower($this->getDI()->get('swoolerequest')->server['request_method']) . "Method";
+                $this->getDI()->get("responseManager")->setError("Method " . $p_serviceClass . " " . $wsServiceMethodName . " Not Found!");
             }
-            
-            $this->getDI()->get('sessionManager')->start($this->getDI()->get('global')->get('sesid'));
-            
-            $wsService->$wsServiceMethodName($params);
 
-            $this->getDI()->get('sessionManager')->end();
-
-            $this->getDI()->get("responseObject")->setHeader("x-nbssessid", $this->getDI()->get('sessionManager')->getId());
         }else{
-
-            $this->getDI()->get("responseObject")->setError("Service " . $p_serviceClass . " Not Found!");
+            
+            $this->getDI()->get("responseManager")->setError("Service " . $p_serviceClass . " Not Found!");
         }
     }
 }

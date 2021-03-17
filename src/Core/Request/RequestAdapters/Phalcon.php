@@ -21,8 +21,8 @@ class Phalcon extends Common {
     }
 
     public function getHeaders(){
-
-        return $this->requestObject->getHeaders();
+        
+        return getallheaders();
     }
 
     public function getGET(){

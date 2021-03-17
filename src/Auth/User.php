@@ -13,37 +13,15 @@ class User extends Common {
 
     public function __construct($p_di)
     {
+        
         parent::__construct($p_di);
     }
 
     public function loginUser($p_login, $p_password){
         
         $result                     = false;
-
-        $tableDataSource            = new TableDataSource($this->getDI());
-
-        $queryString                = "";
-
-        $userTables                 = $this->getDI()->get('config')->main->user->tables->toArray();
         
-        $tableIndex                 = 0;
-
-        foreach($userTables as $table){
-            
-            $queryString            .=  "SELECT _id, modId FROM " . $table . " WHERE JSON_EXTRACT(objData, '$.login') = '" . $p_login . "'";
-
-            if($tableIndex < count($userTables) - 1){
-
-                $queryString            .=  " UNION ALL ";
-            }else{
-
-                $queryString            .=  ";";
-            }
-
-            $tableIndex ++;
-        }
-        
-        $queryResult                = $tableDataSource->rawQuery($queryString);
+        $queryResult                = $this->usersTablesQuery("SELECT _id, modId FROM {{table}} WHERE JSON_EXTRACT(objData, '$.login') = '" . $p_login . "'");
         
         if(\is_array($queryResult) && count($queryResult) > 0){
 
@@ -91,6 +69,88 @@ class User extends Common {
         }
         
         return $result;
+    }
+
+    public function loginApiUser($p_userId, $p_apiKey){
+        
+        $result                     = false;
+
+        $queryResult                = $this->usersTablesQuery("SELECT _id, modId FROM {{table}} WHERE SHA1(JSON_UNQUOTE(JSON_EXTRACT(objData, '$.login'))) = '" . $p_userId . "'");
+        
+        if(\is_array($queryResult) && count($queryResult) > 0){
+
+            $userId                 = $queryResult[0]['_id'];
+            $userModel              = $queryResult[0]['modId'];
+
+            $objectsDataSourceOptions                  = array();
+            $objectsDataSourceOptions['model']         = $userModel;
+
+            $objectsDataSource      = new ObjectsDataSource($this->getDI(), $objectsDataSourceOptions);
+
+            $userData               = $objectsDataSource->getData($userId);
+            
+            if($userData['api_key'] == $p_apiKey){
+                
+                if(isset($userData['roles'])){
+
+                    $userRolesData                  = array();
+        
+                    foreach($userData['roles'] as $role){
+        
+                        $userRolesData[$role]       = $this->getUserRoleData($role);
+                    }
+        
+                    $userData['roles']              = $userRolesData;
+                }
+
+                if(isset($userData['role'])){
+
+                    $userData['role']               = $this->getUserRoleData($userData['role']);
+                }
+
+                $result                             = array();
+                $result['id']                       = $userData['_id'];
+                $result['model']                    = $userModel;
+                $result['nombre']                   = $userData['nombre'];
+                $result['apellido']                 = $userData['apellido'];
+                $result['login']                    = $userData['login'];
+                $result['password_reset']           = ($userData['password_reset'] == "1") ? true : false;
+                $result['avatar']                   = (isset($userData['avatar'])) ? $userData['avatar'] : "avatar_noavatar";
+                $result['genero']                   = $userData['genero'];
+                $result['role']                     = $userData['role'];
+                $result['roles']                    = $userData['roles'];
+            }
+        }
+        
+        return $result;
+    }
+
+    private function usersTablesQuery($p_mainQuery){
+
+        $tableDataSource                            = new TableDataSource($this->getDI());
+
+        $queryString                                = "";
+
+        $userTables                                 = $this->getDI()->get('config')->main->user->tables->toArray();
+        
+        $tableIndex                                 = 0;
+
+        foreach($userTables as $table){
+            
+            $queryString                            .=  str_replace("{{table}}",$table,$p_mainQuery);
+
+            if($tableIndex < count($userTables) - 1){
+
+                $queryString            .=  " UNION ALL ";
+            }else{
+
+                $queryString            .=  ";";
+            }
+
+            $tableIndex ++;
+        }
+        
+        return $tableDataSource->rawQuery($queryString);
     }
 
     private function getUserRoleData($p_role){
