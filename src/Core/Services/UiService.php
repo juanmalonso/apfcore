@@ -27,13 +27,35 @@ class UiService extends Service {
 
         $this->csssources   = new Register();
         $this->jssources    = new Register();
-        $this->metatags    = new Register();
+        $this->metatags     = new Register();
 
         $this->snippedsk    = array();
 
         //INITIALS VIEW VARS
         $this->setViewVar("id", $this->getId());
         $this->setViewVar("splashurl", $this->getDI()->get('config')->ui->splash->url);
+        
+        //SESID
+        if($this->getDI()->get('global')->has('global.sesid')){
+
+            $this->setViewVar("sesid", $this->getDI()->get('global')->get('global.sesid'));
+        }else{
+
+            $this->setViewVar("sesid", "unknown");
+        }
+
+        //ACCID
+        if($this->getDI()->get('global')->has('global.accid')){
+
+            $this->setViewVar("accid", $this->getDI()->get('global')->get('global.accid'));
+        }else{
+
+            $this->setViewVar("accid", "unknown");
+        }
+
+        //GOOGLE TRACKING
+        $this->setViewVar("gTracking", "Off");
+        $this->setViewVar("tagManagerId", $this->getDI()->get('config')->google->tagmanagerid);
 
         //INITIAL JS AND CSS RESOURCES
         //CSS

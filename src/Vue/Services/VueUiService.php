@@ -133,7 +133,7 @@ class VueUiService extends UiService {
         $this->setViewVar("content", "<" . $this->getId() . " id=\"" . $this->getId() . "\"></" . $this->getId() . ">");
 
         if(!$p_inherited){
-
+            
             return $this->view->renderTemplate("template");
         }else {
 

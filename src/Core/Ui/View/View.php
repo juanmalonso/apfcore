@@ -126,7 +126,13 @@ class View extends Common {
 
         //var_dump($this->vars->all());
 
-        return $this->vars->get("Element" . $p_matches[1]);
+        if($this->vars->has("Element" . $p_matches[1])){
+
+            return $this->vars->get("Element" . $p_matches[1]);
+        }else{
+            
+            return $p_matches[0];
+        }
     }
 
     protected function replaceVars($p_code){
