@@ -61,7 +61,7 @@ class File extends Common {
     }
 
     public function getFileTypeMIME($p_extension){
-
+        
         $result = false;
 
         $types  = $this->getDI()->get('config')->files->types;
@@ -74,6 +74,19 @@ class File extends Common {
                 break;
             }
         }
+
+        return $result;
+    }
+
+    public function getFileData($p_fileName, $p_relativePath, $p_fileExtension){
+        $result         = null;
+
+        $fullPath       = $this->getDI()->get('config')->files->path . $p_relativePath . "/" . $p_fileName . "." . $p_fileExtension;
+
+        if(file_exists($fullPath)){
+
+            $result     = file_get_contents($fullPath);
+        };
 
         return $result;
     }

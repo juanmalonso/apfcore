@@ -34,6 +34,7 @@ class UiService extends Service {
         //INITIALS VIEW VARS
         $this->setViewVar("id", $this->getId());
         $this->setViewVar("splashurl", $this->getDI()->get('config')->ui->splash->url);
+        $this->setViewVar("basepath", $this->getDI()->get('config')->main->url->base);
         
         //SESID
         if($this->getDI()->get('global')->has('global.sesid')){
