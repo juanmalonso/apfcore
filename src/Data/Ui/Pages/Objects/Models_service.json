@@ -188,7 +188,7 @@
           "urlMap": "var(local:application.urlMaps.RELATION)",
           "condition": {
             "type": "jsexpression",
-            "expression": "'%(data:modType)%' == 'RELATION'"
+            "expression": "'%(data:modType.id)%' == 'RELATION'"
           }
         }
       ],

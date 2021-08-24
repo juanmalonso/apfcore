@@ -20,7 +20,8 @@ class HttpClient extends Common
         $client             = new \GuzzleHttp\Client();
         
         $response           = $client->post($p_url, [
-            'json' => $p_postParam
+            'json'      => $p_postParam,
+            'verify'    => false
         ]);
         
         if($response->getStatusCode() == 200){

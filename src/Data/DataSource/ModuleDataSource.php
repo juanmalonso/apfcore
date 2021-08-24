@@ -40,7 +40,7 @@ class ModuleDataSource extends Common {
         $validAggregations  = array();
         //$validSearchFields      = array('_id');
 
-        //HARD FILTERS
+        //HARD FILTERS (OPTIONS)
         if(isset($this->options['hardfilters'])){
 
             if(!isset($p_query['filters'])){
@@ -54,6 +54,20 @@ class ModuleDataSource extends Common {
             }
         }
 
+        //HARD FILTERS (PARAMS)
+        if(isset($p_query['hardfilters'])){
+            
+            if(!isset($p_query['filters'])){
+
+                $p_query['filters']                     = array();
+            }
+
+            foreach($p_query['hardfilters'] as $field=>$terms){
+
+                $p_query['filters'][$field]             = $terms; 
+            }
+        }
+        
         //HARD RANGES
         if(isset($this->options['hardranges'])){
 
@@ -68,6 +82,18 @@ class ModuleDataSource extends Common {
             }
         }
 
+        //ID FILTERS
+        if(isset($p_query['filters']) && \is_array($p_query['filters'])){
+
+            foreach($p_query['filters'] as $filter=>$terms){
+
+                if(\in_array($filter, array("_id"))){
+
+                    $validFilters[$filter] = (array)$terms;
+                }
+            }
+        }
+
         foreach($result["fields"] as $definition){
             
             //FILTERS
@@ -79,7 +105,7 @@ class ModuleDataSource extends Common {
 
                         if(isset($p_query['filters'][$definition['id']])){
 
-                            if( in_array($definition['id'], array('objActive', 'objUserAdd', 'objUserUpdated', 'objErased', 'objUserErased', 'objIndexed', 'objState'))){
+                            if(in_array($definition['id'], array('objActive', 'objUserAdd', 'objUserUpdated', 'objErased', 'objUserErased', 'objIndexed', 'objState'))){
 
                                 $validFilters[$definition['id']] = (array)$p_query['filters'][$definition['id']];
                             }else{
@@ -90,7 +116,7 @@ class ModuleDataSource extends Common {
                     }
                 }
             }
-
+            
             //SEARCH FIELDS
             if(property_exists($definition['uiOptions'],'searchable')){
 
@@ -227,7 +253,7 @@ class ModuleDataSource extends Common {
         return $this->dataEngine->addObject($p_model, $p_data);
     }
 
-    public function getNameField($p_model){
+    public function getFirstNameField($p_model){
 
         $result                         = "_id";
         $modelData                      = $this->getModelData($p_model);
@@ -239,6 +265,27 @@ class ModuleDataSource extends Common {
 
                 $result = $definition['id'];
                 break;
+            }
+        }
+
+        return $result;
+    }
+
+    public function getNameFields($p_model){
+
+        $result                         = array("_id");
+        $modelData                      = $this->getModelData($p_model);
+        $modelDataDefinitions           = $this->getModelDefinitions($p_model, $modelData);
+
+        $index                          = 0;
+        foreach($modelDataDefinitions as $definition){
+
+            if($definition['isName'] == "1"){
+
+
+                $result[$index]         = $definition['id'];
+                
+                $index                  += 1;
             }
         }
 

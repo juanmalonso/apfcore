@@ -64,7 +64,11 @@
                       "model": "usuario"
                     }
                   },
+                  "hiddenFields": [
+                    "password_reset"
+                  ],
                   "notRenderedFields": [
+                    "avatar",
                     "genero",
                     "fecha_nacimiento",
                     "tipo_idoc",
@@ -168,12 +172,12 @@
                   "elementTag": "form-editor",
                   "classPath": "\\Nubesys\\Core\\Ui\\Components\\Modules\\Editors\\Form",
                   "dataService": {
-                    
                   },
                   "hardDefaultData": {
                     "avatar":"avatar_noavatar"
                   },
                   "notRenderedFields": [
+                    "avatar",
                     "genero",
                     "fecha_nacimiento",
                     "tipo_idoc",
@@ -220,12 +224,12 @@
                   "dataService": {
                   },
                   "notRenderedFields": [
+                    "avatar",
                     "genero",
                     "fecha_nacimiento",
                     "tipo_idoc",
                     "numero_idoc",
-                    "password",
-                    "password_reset"
+                    "password"
                   ],
                   "onEditActions": [
                     {

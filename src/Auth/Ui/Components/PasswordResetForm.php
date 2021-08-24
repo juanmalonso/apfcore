@@ -19,8 +19,8 @@ class PasswordResetForm extends VueUiComponent {
 
                 if($this->getSession("user_loged") == true){
                     
-                    $resetPasswordResult = $userManager->resetPassword($this->getSession("user_data")['model'], $this->getSession("user_data")['id'], $this->hasPostParam('password'));
-
+                    $resetPasswordResult = $userManager->resetPassword($this->getSession("user_data")['model'], $this->getSession("user_data")['id'], $this->getPostParam('password'));
+                    
                     if($resetPasswordResult){
 
                         header("Location: " . $this->getDI()->get('config')->main->url->base . "logout");

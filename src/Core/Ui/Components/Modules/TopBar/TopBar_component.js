@@ -10,7 +10,7 @@ Vue.component("___idReference_", {
   },
   computed:{
     title: function(){
-      return this.getScopeData("title");
+      return this.getScopeData("title", "none");
     },
     actions: function(){
       return this.getScopeData("actions");

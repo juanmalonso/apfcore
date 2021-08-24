@@ -32,13 +32,20 @@ Vue.component("___idReference_", {
             "name":"objects-list",
             "scope":"service",
             "params": {
-              "model":this.getTypeOption("model"),
               "rows":1000
             }
           };
 
+          newDataService.params.model = this.getTypeOption("model");
+
           var cacheKey        = "object_name_and_image_" + this.getTypeOption("model");
           cacheKey.replace("-", "_");
+          
+
+          if(this.getTypeOption("hardFilters") != undefined){
+
+            newDataService.params.hardFilters = this.getTypeOption("hardFilters");
+          }
 
           Vue.set(this, 'dataService', newDataService);
               

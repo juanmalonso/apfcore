@@ -3,25 +3,22 @@
 namespace Nubesys\Core\Ui\Pages\Module;
 
 use Nubesys\Vue\Services\VueUiService;
-use Nubesys\Core\Register;
 use Nubesys\Data\DataSource\ModuleDataSource;
 
 class AppModule extends VueUiService {
 
-    protected $componentsReferences;
+    protected $slidersTree = array();
 
     //MAIN ACTION
     public function mainAction(){
 
         $this->accessControl();
-
-        $this->componentsReferences = new Register();
         
         $this->callServiceAction();
 
         //SLIDERSJS SERVICE VARS
         $this->setJsDataVar("maxzindex", 5000);
-        $this->setJsDataVar("componentsReferences", $this->componentsReferences->all());
+        $this->setJsDataVar("sliderstree", $this->slidersTree);
     }
 
     //CALL SERVICE ACTION
@@ -40,16 +37,14 @@ class AppModule extends VueUiService {
         
         //TODO BEFORE ACTION OVERWRITE METHOD $this->beforeAction($action) --> <action>BeforeAction()
 
+        //$this->placeActionComponents($action);
+
         $this->setActionPageTitle($action);
 
-        $initialScope       = "actions." . $action;
+        $this->buildActionComponents($action);
 
-        $actionTree         = $this->getScopeTree($initialScope);
-
-        $this->buildTreeEntities($initialScope, $actionTree);
-        
         //TODO AFFTER ACTION OVERWRITE METHOD $this->affterAction($action) --> <action>AffterAction()
-
+        
     }
 
     protected function accessControl(){
@@ -83,212 +78,122 @@ class AppModule extends VueUiService {
         }
     }
 
-    protected function setComponentParam($p_scopePath, $key, $p_value){
+    private function buildActionComponents($p_action){
 
-        $this->componentsReferences->setDot($p_scopePath . "." . $key, $p_value);
+        /* MODULE SIDE */
+        $this->buildActionLayoutComponents($p_action, "modSide");
+
+        /* MODULE TOP */
+        $this->buildActionLayoutComponents($p_action, "modTop");
+
+        /* MODULE MAIN */
+        $this->buildActionLayoutComponents($p_action, "modMain");
+
+        /* MODULE SLIDERS */
+        $this->buildActionLayoutComponents($p_action, "modSliders");
     }
 
-    private function buildTreeEntities($p_lastScopePath, $p_entitiesTree, $p_componentParams = array()){
-        $result = "";
+    private function buildActionLayoutComponents($p_action, $p_layout){
 
-        $index = 0;
-        foreach($p_entitiesTree as $entityReference=>$entityDefinition){
+        $layoutTree                                     = $this->getActionLayoutTree($p_action, $p_layout);
+        
+        foreach($layoutTree as $referenceName=>$component){
 
-            if(is_array($entityDefinition) && isset($entityDefinition["type"])){
+            if($component["type"] == "component"){
 
-                $active                     = true;
+                if(isset($component["classPath"])){
 
-                if(isset($entityDefinition["active"])){
-
-                    $active                 = $entityDefinition["active"];
-                }
-
-                if($active){
-
-                    $scopePath                  = $p_lastScopePath . "." . $entityReference;
-
-                    $this->setComponentParam($scopePath, "type", $entityDefinition["type"]);
-
-                    //PAGE LAYOUT
-                    if($entityDefinition["type"] == "pagelayout"){
-
-                        $renderCode                         = $this->buildTreeEntities($scopePath, $entityDefinition);
-                        
-                        //AHORA COLOCA COMPONENTES RESULTANTES
-                        //TODO: HACER QUE RETORNE CODIGO PARA QUE SEA MAS DINAMICO EL TEMPLATE
-                        $this->buildPageLayout($entityReference, $renderCode);
-                    }
-
-                    //COMPONENT
-                    if($entityDefinition["type"] == "component"){
-
-                        $result                             .= $this->buildComponentCode($scopePath, $entityReference, $entityDefinition, $p_componentParams);
-                    }
-
-                    //SLIDER
-                    if($entityDefinition["type"] == "slider"){
-
-                        $this->setComponentParam($scopePath, "open", false);
-
-                        $p_componentParams['sliderReference']           = $entityReference;
-
-                        $renderCode                                     = $this->buildTreeEntities($scopePath, $entityDefinition, $p_componentParams);
-
-                        $result                                         .= $this->buildSliderCode($entityReference, $renderCode);
-                    }
-
-                    //SLIDER LAYOUT
-                    if($entityDefinition["type"] == "sliderlayout"){
-
-                        $renderCode                                     = $this->buildTreeEntities($scopePath, $entityDefinition, $p_componentParams);
-
-                        $result                                         .= $this->buildSliderLayoutCode($entityReference, $renderCode);
-                    }
-
-                    //TABS MENU
-                    if($entityDefinition["type"] == "tabsmenu"){
-
-                        $p_componentParams['tabReference']              = $entityReference;
-
-                        $tabsArray                                      = $this->buildTreeEntities($scopePath, $entityDefinition, $p_componentParams);
-                        
-                        $result                                         .= $this->buildTabsMenuCode($entityReference, $tabsArray);
-                    }
-
-                    //TABS MENU ITEM
-                    if($entityDefinition["type"] == "tabsmenuitem"){
-
-                        if($index == 1){
-
-                            $this->setComponentParam($scopePath, "active", true);
-                        }else{
-
-                            $this->setComponentParam($scopePath, "active", false);
-                        }
-
-                        if(!\is_array($result)){
-
-                            $result                                     = array();
-                        }
-
-                        $p_componentParams['tabItemReference']          = $entityReference;
-
-                        $result[$entityReference]                       = array();
-                        $result[$entityReference]['label']              = $entityDefinition['label'];
-                        $result[$entityReference]['content']            = $this->buildTreeEntities($scopePath, $entityDefinition, $p_componentParams);
-                    }
-
+                    $this->placeActionLayoutComponent($p_action, $p_layout, $referenceName, $component);
                 }
             }
-
-            $index += 1;
-        }
-
-        return $result;
-    }
-
-    private function buildComponentCode($p_lastScopePath, $p_referenceName, $p_component, $p_aditionalParams = array()){
-        $result = "";
-        
-        //TODO: BEFORE AFFTER CODE
-
-        if(isset($p_component["classPath"])){
-                    
-            if(class_exists($p_component["classPath"])){
-
-                $componentClassPath                         = $p_component["classPath"];
-    
-                $componentInstance                          = new $componentClassPath($this->getDI());
                 
-                $componentParams                            = \array_merge($p_aditionalParams, array());
-                $componentParams["scopePath"]               = $p_lastScopePath;
-                $componentParams["referenceName"]           = $p_referenceName;
-                $componentParams["dataService"]             = $p_component["dataService"];
+            if($component["type"] == "slider"){
 
-                $result .= $componentInstance->doComponentRender($componentParams, $this->getId());
+                $this->buildActionSliderComponents($p_action, $p_layout, $referenceName, $component);
+            }
+        }
+    }
+
+    private function buildActionSliderComponents($p_action, $p_layout, $p_sliderReferenceName, $p_slider){
+        
+        $sliderLayoutrRenderCode    = '<div class="ui right very wide sidebar" id="' . $p_sliderReferenceName . '" style="width: 920px; background-color: #ffffff; overflow: scroll;">';
+
+        /* SLIDER TOP */
+        $sliderLayoutrRenderCode    .= $this->getSliderLayoutRenderCode($p_action, $p_layout, $p_sliderReferenceName, "sliderTop", $p_slider["sliderTop"]);
+
+        /* SLIDER MAIN */
+        $sliderLayoutrRenderCode    .= $this->getSliderLayoutRenderCode($p_action, $p_layout, $p_sliderReferenceName, "sliderMain", $p_slider["sliderMain"]);
+
+        $sliderLayoutrRenderCode    .= '</div>';
+        
+        $this->placeActionSlider($p_action, $p_layout, $sliderLayoutrRenderCode);
+    }
+
+    private function placeActionSlider($p_action, $p_layout, $p_sliderLayoutrRenderCode){
+
+        $sliderCode     .= $p_sliderLayoutrRenderCode;
+
+        $this->strAppendViewVar($p_layout, $sliderCode);
+        
+    }
+
+    private function getSliderLayoutRenderCode($p_action, $p_layout, $p_sliderReferenceName, $p_sliderLayout, $p_layoutTree){
+        
+        $result = "";
+        
+        foreach($p_layoutTree as $referenceName=>$component){
+
+            if($component["type"] == "component"){
+
+                if(isset($component["classPath"])){
+                    
+                    if(class_exists($component["classPath"])){
+
+                        $componentClassPath                         = $component["classPath"];
+            
+                        $componentInstance                          = new $componentClassPath($this->getDI());
+                        
+                        $componentParams                            = array();
+                        $componentParams["moduleAction"]            = $p_action;
+                        $componentParams["actionLayout"]            = $p_layout;
+                        $componentParams["sliderLayout"]            = $p_sliderLayout;
+                        $componentParams["sliderReferenceName"]     = $p_sliderReferenceName;
+                        $componentParams["referenceName"]           = $referenceName;
+                        $componentParams["dataService"]             = $component["dataService"];
+
+                        $result .= $componentInstance->doComponentRender($componentParams, $this->getId());
+
+                        if(!isset($this->slidersTree[$p_sliderReferenceName])){
+
+                            $this->slidersTree[$p_sliderReferenceName]                  = array("opened" => false, "references" => array());
+                        }
+
+                        $this->slidersTree[$p_sliderReferenceName]["references"][]      = $referenceName;
+                    }
+                }
             }
         }
 
         return $result;
     }
 
-    private function buildSliderLayoutCode($p_layout, $p_code){
+    private function placeActionLayoutComponent($p_action, $p_layout, $p_referenceName, $p_component){
 
-        $sliderLayoutCode           = '<!-- SLIDER ' . $p_layout . ' LAYOUT START -->';
-
-        $sliderLayoutCode           .= $p_code;
-
-        $sliderLayoutCode           .= '<!-- SLIDER ' . $p_layout . ' LAYOUT END -->';
-
-        return $sliderLayoutCode;
-    }
-
-    private function buildSliderCode($p_sliderReferenceName, $p_code){
-
-        $sliderCode                 = '<div class="ui right very wide sidebar" id="' . $p_sliderReferenceName . '" style="width: 920px; background-color: #ffffff; overflow: scroll;">';
-        
-        $sliderCode                 .= $p_code;
-
-        $sliderCode                 .= '</div>';
-        
-        return $sliderCode;
-    }
-
-    private function buildTabsMenuCode($p_tabsReferenceName, $p_array){
-
-        $tabsMenuCode               = '<div class="ui grid padded">';
-        $tabsMenuCode               .= '<div class="column">';
-        $tabsMenuCode               .= '<div class="ui basic segment loadingElement" style="padding: 0px;">';
-        $tabsMenuCode               .= '<div class="ui top attached tabular menu" id="' . $p_tabsReferenceName . ' " style="padding-left: 14px; padding-right: 14px;">';
-        
-        $index = 0;
-        foreach($p_array as $tabItemReference=>$tabItem){
-
-            $active                 = ($index == 0) ? ' active' : '';
-
-            $tabsMenuCode           .= '<div class="item' . $active . ' tabbuttom" id="' . $tabItemReference . '_item" data-tab="' . $tabItemReference . '" onclick="nbsApp._nbs_service.doActiveTabSlider({\'tab\':\'' . $tabItemReference . '\'},null);">' . $tabItem['label'] . '</div>';
-
-            $index += 1;
-        }
-
-        $tabsMenuCode               .= '</div>';
-
-        $index = 0;
-        foreach($p_array as $tabItemReference=>$tabItem){
-
-            $active                 = ($index == 0) ? ' active ' : ' ';
+        if(class_exists($p_component["classPath"])){
+                
+            $componentClassPath                 = $p_component["classPath"];
             
-            $tabsMenuCode           .= '<div class="ui tab' . $active . 'segment" id="' . $tabItemReference . '_segment" data-tab="' . $tabItemReference . '" style="padding: 0px; margin-top: -2px;">' . $tabItem['content'] . '</div>';
+            $componentInstance                  = new $componentClassPath($this->getDI());
 
-            $index += 1;
+            $componentParams                    = array();
+            $componentParams["moduleAction"]    = $p_action;
+            $componentParams["actionLayout"]    = $p_layout;
+            $componentParams["referenceName"]   = $p_referenceName;
+            $componentParams["dataService"]     = $p_component["dataService"];
+
+            $this->appendComponent($p_layout, $componentInstance, $componentParams);
         }
-
-        $tabsMenuCode .=            '</div></div></div>';
-        
-        return $tabsMenuCode;
     }
-
-    private function buildPageLayout($p_layout, $p_code){
-        
-        $this->setViewVar($p_layout, $p_code);
-    }
-
-    private function getScopeTree($p_scopePath){
-
-        $result             = array();
-        
-        if($this->hasLocal($p_scopePath)){
-
-            $result         = $this->getLocal($p_scopePath);
-
-        }else{
-            
-            exit("Module -> " . $p_scopePath . " Not Found");
-        }
-        
-        return $result;
-    }
-
     /*
     private function placeActionComponents($p_action){
 
@@ -367,6 +272,23 @@ class AppModule extends VueUiService {
         }
     }
 
+    private function getActionLayoutTree($p_action, $p_layout){
+        
+        $result             = array();
+        $scopePath          = "actions." . $p_action . "." . $p_layout;
+        
+        if($this->hasLocal($scopePath)){
+
+            $result         = $this->getLocal($scopePath);
+
+        }else{
+            
+            exit("Module -> " . $scopePath . " Not Found");
+        }
+        
+        return $result;
+    }
+
     /*
     private function getActionComponents($p_action){
         
@@ -406,94 +328,52 @@ class AppModule extends VueUiService {
         return $result;
     }
     */
-    //MODULE DATA SERVICES
-
-    //SET RELATIONS
-    public function moduleSetRelationService(){
-        //\sleep(3);
-        
-        if($this->hasJsonParam()){
-
-            $params                                 = $this->getJsonParam();
-            
-            $scopePath                              = (isset($params["scopePath"])) ? $params["scopePath"] : false;
-
-            if(isset($params["model"]) && isset($params["relation"]) && isset($params["id"])){
-                $resul                              = array();
-                $result["dataActions"]              = array();
-
-                $relData                            = array();
-
-                if(isset($params["relData"])){
-
-                    $relData    = $params["relData"];
-                }
-
-                //ADD
-                if(isset($params["relAdd"])){
-
-                    $relData[] = $params["relAdd"];
-                }
-
-                //TODO : EDIT/REMOVE
-                
-                $data                               = array();
-
-                $data['rel_' . $params['relation']] = $relData;
-
-                $editResult                         = $this->editModelObject($params['model'], $params["id"], $data);
-                
-                $this->setLocal("relData", $relData);
-                
-                //TODO CONTROL DE ERROR
-                            
-                //DATA ACTIONS
-                if($scopePath !== false){
-
-                    if(isset(($this->getLocal($scopePath))['onRelationActions'])){
-
-                        $result["dataActions"] = ($this->getLocal($scopePath))['onAddRelationActions'];
-                    }
-
-                    if(isset(($this->getLocal($scopePath))['onRemoveRelationActions'])){
-
-                        $result["dataActions"] = ($this->getLocal($scopePath))['onRemoveRelationActions'];
-                    }
-
-                    if(isset(($this->getLocal($scopePath))['onResponseActions'])){
-
-                        $result["dataActions"] = ($this->getLocal($scopePath))['onResponseActions'];
-                    }
-                }
-                
-                if(isset($params['onAddRelationActions'])){
-                    
-                    $result["dataActions"] = array_merge($result["dataActions"], $this->parseData($params['onAddRelationActions']));
-                }
-
-                if(isset($params['onRemoveRelationActions'])){
-
-                    $result["dataActions"] = array_merge($result["dataActions"], $this->parseData($params['onRemoveRelationActions']));
-                }
-
-                if(isset($params['onResponseActions'])){
-
-                    $result["dataActions"] = array_merge($result["dataActions"], $this->parseData($params['onResponseActions']));
-                }
-                
-                $this->setServiceSuccess($result);
-            }else{
-
-                $this->setServiceError("Some required param not found");
-            }
-
-        }else{
-
-            $this->setServiceError("Invalid Params");
-        }
-    }
 
     //MODULE COMPONETS ACTIONS
+    protected function getScopePath($p_params){
+        $result = false;
+
+        if(isset($p_params["moduleAction"]) && isset($p_params["actionLayout"]) && isset($p_params["referenceName"])){
+
+            $scopePath                  = "actions." . $p_params["moduleAction"] . "." . $p_params["actionLayout"];
+
+            if(isset($p_params["sliderLayout"]) && isset($p_params["sliderReferenceName"])){
+
+                $scopePath              .= "." . $p_params["sliderReferenceName"] . "." . $p_params["sliderLayout"];
+            }
+
+            $scopePath                  .= "." . $p_params["referenceName"];
+
+            if($this->hasLocal($scopePath)){
+
+                $result                 = $scopePath;
+            }
+        }
+
+        /*
+        if(isset($p_params["moduleAction"]) && isset($p_params["actionLayout"]) && isset($p_params["componentIndex"])){
+
+            $scopePath                  = "actions." . $p_params["moduleAction"] . ".layout." . $p_params["actionLayout"] . ".components." . $p_params["componentIndex"];
+
+            if(isset($p_params['tabIndex'])){
+
+                $scopePath              .= ".tabs." . $p_params['tabIndex'];
+            }
+
+            if(isset($p_params['sliderIndex'])){
+
+                $scopePath              .= ".sliders." . $p_params['sliderIndex'];
+            }
+
+            if($this->hasLocal($scopePath)){
+
+                $result                 = $scopePath;
+            }
+        }
+        */
+        
+        return $result;
+    }
 
     //TOPBAR
     public function moduleTopBarService(){
@@ -502,7 +382,7 @@ class AppModule extends VueUiService {
 
             $params                         = $this->getJsonParam();
 
-            $scopePath                      = (isset($params["scopePath"])) ? $params["scopePath"] : false;
+            $scopePath                      = $this->getScopePath($params);
 
             if($scopePath !== false){
 
@@ -539,7 +419,7 @@ class AppModule extends VueUiService {
 
             $params                         = $this->getJsonParam();
 
-            $scopePath                      = (isset($params["scopePath"])) ? $params["scopePath"] : false;
+            $scopePath                      = $this->getScopePath($params);
 
             if($scopePath !== false){
 
@@ -634,16 +514,141 @@ class AppModule extends VueUiService {
         }
     }
 
+    //BOARD
+    public function moduleBoardService(){
+        //\sleep(3);
+
+        if($this->hasJsonParam()){
+
+            $params                         = $this->getJsonParam();
+
+            $scopePath                      = $this->getScopePath($params);
+
+            if($scopePath !== false){
+
+                if(isset($params["model"])){
+                            
+                    $result                     = array();
+                    
+                    //OBJECTS
+                    $query                      = array();
+
+                    //PAGE
+                    if(isset($params["page"])){
+
+                        $query["page"]          = $params["page"];
+                    }
+                    
+                    //ROWS
+                    if(isset($params["rows"])){
+
+                        $query["rows"]          = $params["rows"];
+                    }
+
+                    //FILTERS
+                    if(isset($params["filters"])){
+
+                        $query["filters"]               = $params["filters"];
+                    }
+
+                    //KEYWORD
+                    if(isset($params["keyword"])){
+
+                        $query["keyword"]               = $params["keyword"];
+                    }
+
+                    //ORDERS
+                    if(isset($params["orders"])){
+
+                        $query["orders"]                = $params["orders"];
+                    }
+
+                    //RANGES
+                    if(isset($params["ranges"])){
+
+                        $query["ranges"]                = $params["ranges"];
+                    }
+
+                    //AGGREGATIONS
+                    if(isset($params["aggregations"])){
+
+                        $query["aggregations"]          = $params["aggregations"];
+                    }
+
+                    $result                             = $this->getModelObjects($params['model'], $query);
+
+                    //FILTERS
+                    $result["filters"]                  = array();
+
+                    //KEYWORD
+                    $result["keyword"]                              = "*";
+
+                    if(isset($params["keyword"])){
+
+                        $result["keyword"]                          = $params["keyword"];
+                    }
+
+                    //ROW LINKS
+                    $result["rowLinks"]              = array();
+                    if(isset(($this->getLocal($scopePath))['rowLinks'])){
+
+                        $result["rowLinks"]            = ($this->getLocal($scopePath))['rowLinks'];
+                    }
+
+                    //ROW ACTIONS
+                    $result["rowActions"]               = array();
+                    if(isset(($this->getLocal($scopePath))['rowActions'])){
+                        
+                        $result["rowActions"]           = ($this->getLocal($scopePath))['rowActions'];
+                    }
+
+                    //COMPONENT ACTIONS
+                    $result["actions"]                  = array();
+                    if(isset(($this->getLocal($scopePath))['actions'])){
+                        
+                        $result["actions"]              = ($this->getLocal($scopePath))['actions'];
+                    }
+
+                    //URL MAPS & LINK ACTION
+                    $result["urlMaps"]          = $this->getLocal("urlMaps");
+
+                    $result["linkAction"]       = ($this->getLocal($scopePath))['linkAction'];
+
+                    //OPTIONS
+                    $result["options"]                  = array();
+                    if(isset(($this->getLocal($scopePath))['options'])){
+
+                        $result['options']              = ($this->getLocal($scopePath))['options'];
+                    }
+
+                    //REFERENCE NAME
+                    $result["referenceName"]            = ($this->getLocal($scopePath))['referenceName'];
+                    
+                    $this->setServiceSuccess($result);
+                }else{
+
+                    $this->setServiceError("Model Param Not Found");
+                }
+            }else{
+
+                $this->setServiceError("Invalid ScopePath: " . $scopePath);
+            }
+        }else{
+
+            $this->setServiceError("Invalid Params");
+        }
+    }
+
     //SELECTOR
     public function moduleSelectorService(){
-        \sleep(1);
+        //\sleep(3);
         
         if($this->hasJsonParam()){
-            
+
             $params                         = $this->getJsonParam();
-            
-            $scopePath                      = (isset($params["scopePath"])) ? $params["scopePath"] : false;
-            
+
+            $scopePath                      = $this->getScopePath($params);
+
             if($scopePath !== false){
 
                 if(isset($params["model"])){
@@ -671,33 +676,6 @@ class AppModule extends VueUiService {
                         $query["filters"]               = $params["filters"];
                     }
 
-                    //HARD FILTERS
-                    if(isset($params["hardFilters"])){
-
-                        if(!isset($query["hardfilters"])){
-
-                            $query["hardfilters"]       = array();
-                        }
-
-                        foreach($params["hardFilters"] as $filterIndex=>$filterData){
-
-                            $query["hardfilters"][$filterIndex]     = $filterData;
-                        }
-                    }
-
-                    if(isset(($this->getLocal($scopePath))['hardFilters'])){
-
-                        if(!isset($query["hardfilters"])){
-
-                            $query["hardfilters"]       = array();
-                        }
-
-                        foreach(($this->getLocal($scopePath))['hardFilters'] as $filterIndex=>$filterData){
-
-                            $query["hardfilters"][$filterIndex]     = $filterData;
-                        }
-                    }
-
                     //KEYWORD
                     if(isset($params["keyword"])){
 
@@ -721,9 +699,9 @@ class AppModule extends VueUiService {
 
                         $query["aggregations"]          = $params["aggregations"];
                     }
-                    
+
                     $result                             = $this->getModelObjects($params['model'], $query);
-                    
+
                     //NOT RENDERED FIELDS
                     if(isset(($this->getLocal($scopePath))['notRenderedFields']) && isset($result["fields"])){
 
@@ -789,6 +767,26 @@ class AppModule extends VueUiService {
                                 $filterTmp['model']                     = $definition['typeOptions']->model;
 
                                 $result["filters"][$definition['id']]   = $filterTmp;
+                            }
+                        }
+                    }
+                    
+                    //HARD FILTERS
+                    if(isset(($this->getLocal($scopePath))['hardFilters'])){
+
+                        foreach(($this->getLocal($scopePath))['hardFilters'] as $filterIndex=>$filterData){
+
+                            $result["filters"][$filterIndex]        = $filterData;
+                        }
+                    }
+
+                    if(isset($params['filters'])){
+
+                        foreach($params['filters'] as $filter=>$value){
+
+                            if($result['filters'][$filter]){
+
+                                $result['filters'][$filter]['value'] = $value;
                             }
                         }
                     }
@@ -885,20 +883,6 @@ class AppModule extends VueUiService {
                     $query["filters"]               = $params["filters"];
                 }
 
-                //HARD FILTERS
-                if(isset($params["hardFilters"])){
-
-                    if(!isset($query["hardfilters"])){
-
-                        $query["hardfilters"]       = array();
-                    }
-
-                    foreach($params["hardFilters"] as $filterIndex=>$filterData){
-
-                        $query["hardfilters"][$filterIndex]     = $filterData;
-                    }
-                }
-
                 //ORDERS
                 if(isset($params["orders"])){
 
@@ -922,41 +906,25 @@ class AppModule extends VueUiService {
                 if(isset($queryResult['objects'])){
 
                     foreach($queryResult['objects'] as $objectData){
-                        
+
                         $objectDataTmp                  = array();
 
-                        $objectNameFields               = $this->getModelObjectNameFields($params['model']);
+                        $objectNameField                = $this->getModelObjectNameField($params['model']);
                         $objectImageField               = $this->getModelObjectImageField($params['model']);
                         $objectIconField                = $this->getModelObjectIconField($params['model']);
-                        
 
                         $objectDataTmp['id']            = $objectData["_id"];
 
-                        //NAME
-                        $objectDataTmp['name']          = "";
-                        
-                        if(\is_array($objectNameFields)){
+                        if(isset($objectData[$objectNameField])){
 
-                            $objectDataNameValues       = array();
-
-                            foreach($objectNameFields as $fieldId){
-
-                                $objectDataNameValues[] = $objectData[$fieldId];
-                            }
-
-                            $objectDataTmp['name']      = \implode(" ", $objectDataNameValues);
-                        }else{
-
-                            $objectDataTmp['name']      = $objectDataTmp['id'];
+                            $objectDataTmp['name']      = $objectData[$objectNameField];
                         }
-                        
-                        //IMAGE
+    
                         if(isset($objectData[$objectImageField])){
     
                             $objectDataTmp['image']     = $objectData[$objectImageField];
                         }
-                        
-                        //ICON
+    
                         if(isset($objectData[$objectIconField])){
     
                             $objectDataTmp['icon']      = $objectData[$objectIconField];
@@ -986,7 +954,7 @@ class AppModule extends VueUiService {
 
             $params                         = $this->getJsonParam();
 
-            $scopePath                      = (isset($params["scopePath"])) ? $params["scopePath"] : false;
+            $scopePath                      = $this->getScopePath($params);
             
             if($scopePath !== false){
 
@@ -999,7 +967,7 @@ class AppModule extends VueUiService {
                     //TODO CUSTOM FIELDS
 
                     //PRE DATA MANIPULATIONS
-                    if(isset($params["data"]) && count($params["data"]) > 0){
+                    if(isset($params["data"])){
 
                         //HIDDEN FIELDS
                         $dataTmp = array();
@@ -1030,7 +998,7 @@ class AppModule extends VueUiService {
                     
                     if(isset($params["id"])){
                         //EDIT
-                        if(isset($params["data"]) && count($params["data"]) > 0){
+                        if(isset($params["data"])){
                             
                             //EDIT DATA
                             $editResult                 = $this->editModelObject($params['model'], $params["id"], $params["data"]);
@@ -1051,7 +1019,7 @@ class AppModule extends VueUiService {
                     }else{
 
                         //ADD
-                        if(isset($params["data"]) && count($params["data"]) > 0){
+                        if(isset($params["data"])){
                             //ADD DATA
                             $addResult                  = $this->addModelObject($params['model'], $params["data"]);
                             
@@ -1166,7 +1134,7 @@ class AppModule extends VueUiService {
 
             $params                         = $this->getJsonParam();
             
-            $scopePath                      = (isset($params["scopePath"])) ? $params["scopePath"] : false;
+            $scopePath                      = $this->getScopePath($params);
 
             if($scopePath !== false){
 
@@ -1361,38 +1329,23 @@ class AppModule extends VueUiService {
 
                 if($objectData){
 
-                    $objectNameFields       = $this->getModelObjectNameFields($params['model']);
+                    $objectNameField        = $this->getModelObjectNameField($params['model']);
                     $objectImageField       = $this->getModelObjectImageField($params['model']);
                     $objectIconField        = $this->getModelObjectIconField($params['model']);
 
-                    //NAME
-                    $result['name']         = "";
-                        
-                    if(\is_array($objectNameFields)){
+                    if(isset($objectData[$objectNameField])){
 
-                        $objectDataNameValues       = array();
-
-                        foreach($objectNameFields as $fieldId){
-
-                            $objectDataNameValues[] = $objectData[$fieldId];
-                        }
-
-                        $result['name']      = \implode(" ", $objectDataNameValues);
-                    }else{
-
-                        $result['name']      = $objectDataTmp['id'];
+                        $result['name']     = $objectData[$objectNameField];
                     }
-                    
-                    //IMAGE
+
                     if(isset($objectData[$objectImageField])){
 
                         $result['image']     = $objectData[$objectImageField];
                     }
-                    
-                    //ICON
+
                     if(isset($objectData[$objectIconField])){
 
-                        $result['icon']      = $objectData[$objectIconField];
+                        $result['icon']     = $objectData[$objectIconField];
                     }
                 }
                 
@@ -1520,18 +1473,11 @@ class AppModule extends VueUiService {
         return $dataSource->getDataFieldDefinitions($p_field);
     }
     
-    protected function getModelObjectFirstNameField($p_model){
+    protected function getModelObjectNameField($p_model){
 
         $dataSource                         = new ModuleDataSource($this->getDI());
 
-        return $dataSource->getFirstNameField($p_model);
-    }
-
-    protected function getModelObjectNameFields($p_model){
-
-        $dataSource                         = new ModuleDataSource($this->getDI());
-
-        return $dataSource->getNameFields($p_model);
+        return $dataSource->getNameField($p_model);
     }
 
     protected function getModelObjectImageField($p_model){

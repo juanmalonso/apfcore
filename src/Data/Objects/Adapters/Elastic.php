@@ -227,7 +227,7 @@ class Elastic extends Common
 
             foreach ($p_filters as $term=>$values){
 
-                if(is_array($values) && count($values) > 0){
+                if(is_array($values)){
                     
                     $queryAND->addFilter(new \Elastica\Query\Terms($term, $values));
                 }
@@ -361,6 +361,7 @@ class Elastic extends Common
 
         //var_dump(json_encode($query->getQuery()->toArray()));
         //echo "<hr>";
+        //exit();
 
         $resultSet = $p_type->search($query);
 

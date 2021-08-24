@@ -22,13 +22,14 @@ Vue.component("___idReference_", {
     },
     customValidation: function(value, valid){
 
-      this.doHashFieldValue();
-
       if(valid && (this.getFieldValue() != this.getFieldRepeatValue())){
 
         this.doMessageToast("Las contraseñas deben ser iguales");
 
         valid = false;
+      }else{
+
+        this.doHashFieldValue();
       }
 
       return valid;

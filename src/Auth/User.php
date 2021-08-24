@@ -55,16 +55,32 @@ class User extends Common {
                 }
 
                 $result                             = array();
-                $result['id']                       = $userData['_id'];
                 $result['model']                    = $userModel;
-                $result['nombre']                   = $userData['nombre'];
-                $result['apellido']                 = $userData['apellido'];
-                $result['login']                    = $userData['login'];
+
+                $hiddenFields = array("password",
+                                "api_key",
+                                "objUserAdd",
+                                "objDateUpdated",
+                                "objUserUpdated",
+                                "objErased",
+                                "objDateErased",
+                                "objUserErased",
+                                "objIndexed",
+                                "objDateIndexed",
+                                "objStatesLog",
+                                "objStateData");
+
+                foreach($userData as $key=>$value){
+
+                    if(!\in_array($key, $hiddenFields)){
+
+                        $result[$key]               = $userData[$key];
+                    }
+                }
+
+                $result['id']                       = $userData['_id'];
                 $result['password_reset']           = ($userData['password_reset'] == "1") ? true : false;
                 $result['avatar']                   = (isset($userData['avatar'])) ? $userData['avatar'] : "avatar_noavatar";
-                $result['genero']                   = $userData['genero'];
-                $result['role']                     = $userData['role'];
-                $result['roles']                    = $userData['roles'];
             }
         }
         
@@ -109,16 +125,32 @@ class User extends Common {
                 }
 
                 $result                             = array();
-                $result['id']                       = $userData['_id'];
                 $result['model']                    = $userModel;
-                $result['nombre']                   = $userData['nombre'];
-                $result['apellido']                 = $userData['apellido'];
-                $result['login']                    = $userData['login'];
+                
+                $hiddenFields = array("password",
+                                "api_key",
+                                "objUserAdd",
+                                "objDateUpdated",
+                                "objUserUpdated",
+                                "objErased",
+                                "objDateErased",
+                                "objUserErased",
+                                "objIndexed",
+                                "objDateIndexed",
+                                "objStatesLog",
+                                "objStateData");
+
+                foreach($userData as $key=>$value){
+
+                    if(!\in_array($key, $hiddenFields)){
+
+                        $result[$key]               = $userData[$key];
+                    }
+                }
+
+                $result['id']                       = $userData['_id'];
                 $result['password_reset']           = ($userData['password_reset'] == "1") ? true : false;
                 $result['avatar']                   = (isset($userData['avatar'])) ? $userData['avatar'] : "avatar_noavatar";
-                $result['genero']                   = $userData['genero'];
-                $result['role']                     = $userData['role'];
-                $result['roles']                    = $userData['roles'];
             }
         }
         
@@ -254,7 +286,7 @@ class User extends Common {
         $userData                           = array();
         $userData['password']               = $p_password;
         $userData['password_reset']         = "0";
-
+        
         $result                             = $dataSource->editData($p_id, $userData);
         
         return $result;

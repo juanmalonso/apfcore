@@ -49,7 +49,7 @@
                         
                         <template v-if="_.size(tabs) > 0">
                             
-                            <div class="ui top attached tabular menu" style="padding-left: 14px; padding-right: 14px; margin-top: 0px;">
+                            <div v-if="_.size(tabs) > 1" class="ui top attached tabular menu" style="padding-left: 14px; padding-right: 14px; margin-top: 0px;">
                                 <a v-for="(tabData, tabIndex, index) in tabs" :key="tabIndex" class="item" v-bind:class="(index == 0) ? 'active' : ''" v-bind:data-tab="tabIndex" v-on:click="doActivateTab(tabIndex)">${tabData.label}</a>
                             </div>
                             

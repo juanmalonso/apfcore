@@ -7,17 +7,18 @@
                     <div class="ui horizontal basic segments" style="margin:0px;">
 
                         <div class="ui basic segment" style="padding:0px;">
-
+                            <!--
                             <template v-if="hasFilters()">
                                 <ElementFilters v-bind:id="referenceName + '_filter'" v-bind:filters="filters" v-bind:urlMaps="urlMaps"></ElementFilters>
                             </template>
-
+                            -->
                         </div>
                         <div class="ui right aligned basic segment" style="padding:0px;">
-
+                            <!--
                             <template v-if="isSearchable()">
                                 <ElementSearchBox v-bind:id="referenceName + '_search'" v-bind:keyword="keyword" v-bind:urlMaps="urlMaps" style="display:inline-flex !important;"></ElementSearchBox>
                             </template>
+                            -->
                             <template v-if="hasActions()">
                                 <div class="ui input" v-for="(action, actionIndex) in actions" style="margin: 14px 0px 0px 14px;">
                                     <a v-if="action.type == 'link'" v-bind:class="'ui ' + action.style + ' button'" v-bind:href="parseStringBlocks(action.urlMap, {})">
@@ -35,10 +36,17 @@
                 </div>
 
             </div>
+
             <div class="row">
+
                 <div class="column">
+
+                    <template v-if="_.size(objects) > 0">
                         <!-- TABLE SEGMENT -->
                         <div class="ui segment" style="padding:0px;">
+                            
+
+
                             <table class="ui celled striped table" style="border: 0px;">
                                 <thead>
                                     <tr>
@@ -87,6 +95,7 @@
                                     </tr>
                                 </tbody>
                             </table>
+
                         </div>
 
                         <!-- PAGINATION SEGMENT -->
@@ -108,8 +117,23 @@
                                 </thead>
                             </table>
                         </div>
+                    </template>
+                    <template v-else>
+                        <div class="ui basic segment" style="padding:0px;">
+                            <div class="ui icon message">
+                                <i class="exclamation icon"></i>
+                                <div class="content">
+                                    <!-- 
+                                    <div class="header">
+                                    UPS!
+                                    </div>
+                                    -->
+                                    <p>No se encontraron registros.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
                         
-                    
                 </div>
             </div>
         </div>

@@ -278,7 +278,7 @@ class Objects extends DataSourceAdapter {
     }
 
     public function editObjectData($p_id, $p_data){
-
+        
         if(isset($this->options['toSaveDefaultValues'])){
 
             foreach($this->options['toSaveDefaultValues'] as $field=>$value){

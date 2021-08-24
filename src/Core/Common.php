@@ -213,7 +213,7 @@ class Common extends Injectable
             $matched    = true;
         }
 
-        //FUNCTIONS MATCH
+        //EXPRESSIONS MATCH
         if(!$matched && preg_match('/^(exp)\((.*)\)$/', $result, $matches)){
 
             $result     = $this->parseExpression($matches[2]);
@@ -275,6 +275,23 @@ class Common extends Injectable
         }
         
         return $result;
+    }
+
+    protected function parseData($p_data){
+        
+        $result = new \Adbar\Dot();
+        $dot    = new \Adbar\Dot($p_data);
+        
+        foreach($dot->flatten() as $key=>$value){
+            
+            $value = str_replace("___var", "var", $value);
+            $value = str_replace("___fun", "fun", $value);
+            $value = str_replace("___exp", "exp", $value);
+
+            $result->add($key, $this->parseBlocks($value));
+        }
+        
+        return \json_decode($result->toJson());
     }
 
     protected function toObject($p_data){

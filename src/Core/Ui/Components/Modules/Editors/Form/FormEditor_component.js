@@ -23,6 +23,10 @@ Vue.component("___idReference_", {
 
       this.modLoadDataService(this.generateDataServiceOptions({}),false);
     },
+    onCustomModLoadDataServiceStart: function(options){
+
+      this.setScopeData("fields",[]);
+    },
     doSendData: function(params, event){
 
       if(this.validateFormData()){
@@ -126,9 +130,9 @@ Vue.component("___idReference_", {
       console.log("GET FIELDS GROUPS", result);
       return result;
     },
-    setTab: function(id){
+    setTabs: function(id){
       
-      $("#" + id).tab();
+      $(".formtab").tab();
     },
   },
   computed: {

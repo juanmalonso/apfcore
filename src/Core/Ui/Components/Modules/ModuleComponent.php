@@ -13,23 +13,28 @@ class ModuleComponent extends VueUiComponent {
 
             $this->registerReference($this->getLocal("referenceName"));
         }
+        
+        $this->setDataSercvice();
 
+        $this->setJsDataVar("dataScopeRegister", []);
+        
+    }
+
+    protected function setDataSercvice(){
+        
         $dataService                            = array();
         $dataService['name']                    = "";
         $dataService['type']                    = "service";
         $dataService['scope']                   = "service";
         $dataService['emitter']                 = "";
         $dataService['params']                  = array();
-        
-        $this->setDataSercvice($dataService);
 
-        $this->setJsDataVar("dataScopeRegister", []);
-        
-    }
+        if(method_exists($this,"getInitialDataService")){
 
-    protected function setDataSercvice($p_data){
+            $dataService                        = $this->getInitialDataService($dataService);
+        }
+
         
-        $dataService                            = $p_data;
 
         if($this->hasLocal("dataService")){
             
@@ -40,19 +45,12 @@ class ModuleComponent extends VueUiComponent {
             }
         }
 
-        if($this->hasLocal("moduleAction")){
+        foreach($this->allLocal() as $key=>$value){
 
-            $dataService["params"]["moduleAction"]          = $this->getLocal("moduleAction");
-        }
+            if($key != "dataService"){
 
-        if($this->hasLocal("actionLayout")){
-
-            $dataService["params"]["actionLayout"]          = $this->getLocal("actionLayout");
-        }
-
-        if($this->hasLocal("componentIndex")){
-
-            $dataService["params"]["componentIndex"]        = (string)$this->getLocal("componentIndex");
+                $dataService["params"][$key]          = $value;
+            }
         }
 
         $this->setJsDataVar("loadingElement", "");

@@ -28,10 +28,11 @@
             <div v-if="_.size(getFieldsGroups()) > 1" class="ui top attached tabular menu" style="padding-left: 14px; padding-right: 14px;">
                 <template v-for="(fieldsGroup, fieldsGroupIndex, index) in getFieldsGroups()">
                     <a class="item formtab" v-bind:id="fieldsGroup.key + '_tab'" v-bind:class="(index == 0) ? 'active' : ''" v-bind:data-tab="fieldsGroup.key">${fieldsGroup.label}</a>
-                    <template v-if="setTab(fieldsGroup.key + '_tab')"></template>
                 </template>
+                <template v-if="setTabs()"></template>
             </div>
 
+            <!-- TODO ver el tema de la relaciones FIELD -->
             <template v-for="(fieldsGroup, fieldsGroupIndex, index) in getFieldsGroups()">
                 <div class="ui bottom attached tab segment" v-bind:class="(index == 0) ? 'active' : ''" v-bind:data-tab="fieldsGroup.key" style="padding: 0px; border-width: 0px; margin-top: -1px;">
                 
@@ -39,8 +40,8 @@
                             
                             <tbody>
             
-                                <tr v-if="!field.uiOptions.hidden" v-for="(field, fieldIndex) in getGroupFields(fieldsGroup.key)" :key="fieldIndex">
-                                    <td style="width: 15%;vertical-align: top;">
+                                <tr v-if="!field.uiOptions.hidden && !field.isRelation" v-for="(field, fieldIndex) in getGroupFields(fieldsGroup.key)" :key="fieldIndex">
+                                    <td style="width: 30%;vertical-align: top;">
                                         
                                         <div class="ui large label" style="background-color: transparent;">
                                             <i v-bind:class="field.uiOptions.icon + ' icon hidden-in-tablet'"></i> ${field.uiOptions.label}

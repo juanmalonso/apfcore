@@ -13,11 +13,12 @@ Vue.component("___idReference_", {
       //
     },
     setFieldValue: function (value) {
+      var self = this;
 
       $(this.$refs.realField).val(value);
       $(this.$refs.realField).flatpickr({
-        enableTime: true,
-        dateFormat: "Y-m-d H:i",
+        enableTime: (self.getTypeOption("enableTime") != undefined) ? self.getTypeOption("enableTime") : true,
+        dateFormat: (self.getTypeOption("dateFormat") != undefined) ? self.getTypeOption("dateFormat") : true,
         defaultDate: value
       });
     },
