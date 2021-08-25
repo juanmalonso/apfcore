@@ -17,6 +17,7 @@ Vue.component("___idReference_", {
 
       $(this.$refs.realField).val(value);
       $(this.$refs.realField).flatpickr({
+        allowInput: (self.getTypeOption("allowInput") != undefined) ? self.getTypeOption("allowInput") : false,
         enableTime: (self.getTypeOption("enableTime") != undefined) ? self.getTypeOption("enableTime") : true,
         dateFormat: (self.getTypeOption("dateFormat") != undefined) ? self.getTypeOption("dateFormat") : true,
         defaultDate: value
