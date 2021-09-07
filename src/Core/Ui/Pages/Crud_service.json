@@ -38,6 +38,7 @@
     "urlMaps": {
       "LIST": "{var(global:urlbase)}crud/{var(url:5)}/list",
       "ADD": "{var(global:urlbase)}crud/{var(url:5)}/add",
+      "IMPORT": "{var(global:urlbase)}crud/{var(url:5)}/import",
       "EDIT": "{var(global:urlbase)}crud/{var(url:5)}/edit/%(data:_id)%",
       "DELETE": "{var(global:urlbase)}crud/{var(url:5)}/delete/%(data:_id)%",
       "IMAGE": "{var(global:urlbase)}image/sq60/%(data:imagen.image)%.jpg",
@@ -56,6 +57,19 @@
             "urlMap": "var(local:application.urlMaps.ADD)",
             "style": "green",
             "icon": "plus icon"
+          },
+          {
+            "type": "actions",
+            "label": "importar",
+            "actions": [
+              {
+                "scope": "importer",
+                "name": "doOpenImporterSidebar",
+                "params": {}
+              }
+            ],
+            "style": "blue",
+            "icon": "upload icon"
           }
         ]
       },
@@ -119,6 +133,10 @@
           }
         ]
       }
+    },
+    "importer":{
+      "type": "upload",
+      "dataSource": "objects"
     },
     "editor": {
       "type": "form",

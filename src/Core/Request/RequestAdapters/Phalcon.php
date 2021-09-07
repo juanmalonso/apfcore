@@ -53,7 +53,7 @@ class Phalcon extends Common {
         $files      = array();
 
         foreach($this->requestObject->getUploadedFiles() as $file){
-
+            
             $fileTmp                        = array();
 
             $fileTmp['key']                 = $file->getKey();

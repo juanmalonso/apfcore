@@ -197,6 +197,298 @@ class Elastic extends Common
         $queryString->setQuery($p_keyword);
         $queryString->setDefaultOperator("OR");
 
+        //BOOL
+        $queryBOOL       = new \Elastica\Query\BoolQuery();
+        $queryBOOL->addMust($queryString);
+
+        /*
+        //AND
+        $queryAND       = new \Elastica\Query\BoolQuery();
+        $queryAND->addMust($queryString);
+
+        //OR
+        $queryOR       = new \Elastica\Query\BoolQuery();
+
+        //NOT
+        $queryNOT       = new \Elastica\Query\BoolQuery();
+        */
+
+        foreach($p_filters as $filterKey=>$filterValue){
+
+            if($filterKey == "and"){
+
+                foreach ($filterValue as $term=>$values){
+
+                    if(is_array($values)){
+                        
+                        $queryBOOL->addMust(new \Elastica\Query\Terms($term, $values));
+                        //$queryAND->addFilter(new \Elastica\Query\Terms($term, $values));
+                    }
+                }
+
+            }else if($filterKey == "or"){
+
+                foreach ($filterValue as $term=>$values){
+
+                    if(is_array($values)){
+                        
+                        $queryBOOL->addShould(new \Elastica\Query\Terms($term, $values));
+                        //$queryOR->addFilter(new \Elastica\Query\Terms($term, $values));
+
+                        $queryBOOL->setMinimumShouldMatch(1);
+                    }
+                }
+            }else if($filterKey == "not"){
+
+                foreach ($filterValue as $term=>$values){
+
+                    if(is_array($values)){
+                        
+                        $queryBOOL->addMustNot(new \Elastica\Query\Terms($term, $values));
+                        //$queryNOT->addFilter(new \Elastica\Query\Terms($term, $values));
+                    }
+                }
+            }else{
+
+                if(is_array($filterValue)){
+                    
+                    $queryBOOL->addMust(new \Elastica\Query\Terms($filterKey, $filterValue));
+                    //$queryAND->addFilter(new \Elastica\Query\Terms($filterKey, $filterValue));
+                }
+            }
+        }
+
+        /*
+        if(isset($p_filters['and'])){
+
+            foreach ($p_filters['and'] as $term=>$values){
+
+                if(is_array($values) && count($values) > 0){
+
+                    $queryAND->addFilter(new \Elastica\Query\Terms($term, $values));
+                }
+            }
+        }else{
+
+            foreach ($p_filters as $term=>$values){
+
+                if(is_array($values)){
+                    
+                    $queryAND->addFilter(new \Elastica\Query\Terms($term, $values));
+                }
+            }
+        }
+        */
+
+        foreach($p_ranges as $field=>$range){
+            
+            $queryRange     = new \Elastica\Query\Range();
+            $queryRange->addField($field, $range);
+
+            $queryBOOL->addFilter($queryRange);
+            //$queryAND->addFilter($queryRange);
+        }
+
+        /*
+        $queryMain      = new \Elastica\Query\BoolQuery();
+
+        //AND
+        if($queryAND->count() > 0){
+
+            $queryMain->addMust($queryAND);
+        }
+
+        //OR
+        if($queryOR->count() > 0){
+            
+            $queryMain->addShould($queryOR);
+        }
+
+        //NOT
+        if($queryNOT->count() > 0){
+            
+            $queryMain->addMustNot($queryNOT);
+        }
+        */
+
+        //TODO AGGREGATIONS EN UNA FUNCION RECURSIVA
+        foreach($p_facets as $field=>$aggregation){
+            
+            if($aggregation['type'] == 'terms'){
+
+                $termsAgg = new \Elastica\Aggregation\Terms($aggregation['name']);
+                $termsAgg->setField($field);
+
+                if(isset($aggregation['size'])){
+
+                    $termsAgg->setSize($aggregation['size']);
+                }
+                
+                $query->addAggregation($termsAgg);
+            }
+        }
+
+        /*
+        if(strlen($p_keyword) > 0){
+
+            $queryMultiMatch = new \Elastica\Query\MultiMatch();
+
+            $queryMultiMatch->setOperator('AND');
+            $queryMultiMatch->setFields($p_fields);
+            $queryMultiMatch->setQuery($p_keyword);
+
+            $query->setQuery($queryMultiMatch);
+
+
+
+            $query->setQuery($queryString);
+        }
+
+        if( || isset($p_filters['or']) || isset($p_filters['not'])){
+            /*
+            $filterBool = new \Elastica\Filter\Bool();
+
+            $count = 0;
+
+            if(isset($p_filters['and'])){
+
+
+            }
+
+            if(isset($p_filters['or'])){
+
+                foreach ($p_filters['or'] as $term=>$values){
+
+                    if(is_array($values) && count($values) > 0){
+
+                        $filter = new \Elastica\Filter\Terms();
+                        $filter->setTerms($term, $values);
+
+                        $filterBool->addShould($filter);
+
+                        $count ++;
+                    }
+
+                }
+            }
+
+            if(isset($p_filters['not'])){
+
+                foreach ($p_filters['not'] as $term=>$values){
+
+                    if(is_array($values) && count($values) > 0){
+
+                        $filter = new \Elastica\Filter\Terms();
+                        $filter->setTerms($term, $values);
+
+                        $filterBool->addMustNot($filter);
+
+                        $count ++;
+                    }
+
+                }
+            }
+
+            if($count > 0){
+
+                $query->setPostFilter($filterBool);
+            }
+        }else{
+
+            $queryAND    = new \Elastica\Query\BoolQuery();
+
+            $count = 0;
+            foreach ($p_filters as $term=>$values){
+
+                if(is_array($values) && count($values) > 0){
+
+                    $terms = new \Elastica\Query\Terms();
+                    $terms->setTerms($term, $values);
+
+                    $queryAND->addFilter($terms);
+
+                    $count ++;
+                }
+
+            }
+
+            if($count > 0){
+
+                $query->setPostFilter($queryAND);
+            }
+        }*/
+
+        //TODO : FALTA FACETS
+        
+        if(count($p_sorts) > 0){
+
+            $query->addSort($p_sorts);
+        }
+
+        $query->setQuery($queryBOOL);
+        //$query->setQuery($queryMain);
+
+        //var_dump(json_encode($query->getQuery()->toArray()));
+        //echo "<hr>";
+        //exit();
+
+        $resultSet = $p_type->search($query);
+
+        //var_dump(json_encode($resultSet->getQuery()->toArray()));
+        //echo "<hr>";
+        //exit();
+
+        $result = array();
+        $result['totals'] = $resultSet->getTotalHits();
+
+        $result['facets']       = array();
+
+        if($resultSet->hasAggregations()){
+
+            foreach($resultSet->getAggregations() as $aggregation=>$aggregationData){
+
+                $buckets = array();
+
+                if(isset($aggregationData['buckets']) && \is_array($aggregationData['buckets'])){
+
+                    foreach($aggregationData['buckets'] as $bucket){
+
+                        $buckets[$bucket['key']] = $bucket['doc_count'];
+                    }
+                }
+            }
+
+            $result['facets'][$aggregation]   = $buckets;
+        }
+
+        $result['docs'] = array();
+
+        foreach ($resultSet->getDocuments() as $doc) {
+
+            $result['docs'][] = $doc;
+        }
+        
+        return $result;
+    }
+
+    public function searchDocsOLD(\Elastica\Type $p_type, $p_keyword, $p_fields, $p_sorts, $p_page, $p_rows, $p_facets, $p_filters, $p_ranges){
+        
+        $result = false;
+
+        $query = new \Elastica\Query();
+        
+        $query->setFrom(($p_page*$p_rows)-$p_rows);
+        $query->setSize($p_rows);
+
+        //QUERYSTRING
+        $queryString    = new \Elastica\Query\QueryString();
+        //$queryString    = new \Elastica\Query\SimpleQueryString();
+
+        //$queryString->setFields($p_fields);
+        
+        $queryString->setQuery($p_keyword);
+        $queryString->setDefaultOperator("OR");
+
         //AND
         $queryAND       = new \Elastica\Query\BoolQuery();
         $queryAND->addMust($queryString);

@@ -34,7 +34,7 @@ class Expressions
     }
 
     public static function evaluateDataExpression($p_data, $p_expression){
-
+        
         $dot = new \Adbar\Dot($p_data);
         
         $expression = self::normalizeDataExpresion($dot->flatten(), $p_expression);
@@ -49,6 +49,10 @@ class Expressions
         if(is_array($p_expression) && count($p_expression) > 0){
 
             $language = new Language();
+
+            $language->set('if',function ($c, $i, $e) {
+                return ($c) ? $i : $e;
+            });
 
             $language->set('or',function (bool $l, bool $r) : bool {
                 return $l || $r;

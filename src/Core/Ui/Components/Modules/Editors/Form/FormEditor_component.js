@@ -64,11 +64,50 @@ Vue.component("___idReference_", {
       _.each(this.getFieldsReferences(), function (value, key, list){
         
         if(valid && self.hasByReferenceName(value)){
-          
-          valid = (self.getByReferenceName(value)).doValidateField();
+
+          var fieldValidations  = {};
+
+          if(_.has(self.validations, key)){
+
+            fieldValidations    = self.validations[key]; 
+          }
+
+          valid = (self.getByReferenceName(value)).doValidateField(fieldValidations);
         }
       });
+      
+      //EXPRESSION FORM
+      
+      if(valid && _.has(self.validations, 'expression')){
+       
+        var expressionValidation    = self.validations.expression;
+        
+        var scope                   = self.recopileFormData();
+        scope.fields                = self.fields;
+        scope.model                 = self.model;
+        scope.isPhoneDevice         = self.isPhoneDevice;
+        scope.referenceName         = self.referenceName;
+        
+        var expressionResult        = math.evaluate(expressionValidation.expression, scope);
+        
+        if(_.isBoolean(expressionResult)){
 
+          if(!expressionResult){
+
+            valid                   = false;
+
+            if (_.has(expressionValidation, 'message')) {
+
+              self.alertToast('error', 'ERROR', expressionValidation.message);
+              
+            } else {
+
+              self.alertToast('error', 'ERROR', "Expression " + expressionValidation.expression + " Unsuccessfully in Form");
+            }
+          }
+        }
+      }
+      
       return valid;
     },
     recopileFormData: function(){
@@ -153,6 +192,9 @@ Vue.component("___idReference_", {
     },
     fieldsGroups:function(){
       return this.getScopeData("fieldsGroups");
+    },
+    validations:function(){
+      return this.getScopeData("validations", {});
     },
     objects:function(){
       return this.getScopeData("objects");

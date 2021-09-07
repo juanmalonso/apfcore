@@ -18,7 +18,7 @@ class AppModule extends VueUiService {
         $this->componentsReferences = new Register();
         
         $this->callServiceAction();
-
+        
         //SLIDERSJS SERVICE VARS
         $this->setJsDataVar("maxzindex", 5000);
         $this->setJsDataVar("componentsReferences", $this->componentsReferences->all());
@@ -289,51 +289,6 @@ class AppModule extends VueUiService {
         return $result;
     }
 
-    /*
-    private function placeActionComponents($p_action){
-
-        $layouts                                        = $this->getActionComponents($p_action);
-
-        $this->setActionPageTitle($p_action);
-        
-        foreach($layouts as $layout=>$components){
-
-            foreach($components as $componentIndex=>$component){
-                
-                if(class_exists($component["classPath"])){
-                
-                    $componentClassPath                 = $component["classPath"];
-                    
-                    $componentInstance                  = new $componentClassPath($this->getDI());
-    
-                    $componentParams                    = array();
-                    $componentParams["moduleAction"]    = $p_action;
-                    $componentParams["actionLayout"]    = $layout;
-                    $componentParams["componentIndex"]  = $componentIndex;
-                    $componentParams["referenceName"]   = $component["referenceName"];
-                    $componentParams["dataService"]     = $component["dataService"];
-
-                    if(isset($component["tabs"])){
-                        
-                        $componentParams["tabs"]        = $component["tabs"];
-                    }
-
-                    if(isset($component["sliders"])){
-
-                        $componentParams["sliders"]     = $component["sliders"];
-                    }
-
-                    if(isset($component["customFields"])){
-
-                        $componentParams["customFields"]= $component["customFields"];
-                    }
-                    
-                    $this->appendComponent($layout, $componentInstance, $componentParams);
-                }
-            }   
-        }
-    }
-    */
     private function setActionPageTitle($p_action){
         
         $scopePath          = "actions." . $p_action . ".title";
@@ -366,46 +321,7 @@ class AppModule extends VueUiService {
             $this->setCache($cacheKey, $eventParams['sesid'], $cacheLifetime);
         }
     }
-
-    /*
-    private function getActionComponents($p_action){
-        
-        $result             = array();
-        $scopePath          = "actions." . $p_action . ".layout";
-        
-        if($this->hasLocal($scopePath)){
-            
-            foreach($this->getLocal($scopePath) as $layout=>$layoutData){
-                
-                if(isset($layoutData['components'])){
-
-                    $result[$layout] = $layoutData['components'];
-
-                    //TODO ACTION/LAYOUT COMPONENTS PROSPROCESSOR METHOD $this->actionLayoutComponentsPostprocessor($action, $layout, $result[$layout]) --> <Action><Layout>ComponentsPostProcessor($p_data)
-                }
-
-                if(isset($layoutData['tabs'])){
-
-                    $result[$layout] = $layoutData['tabs'];
-
-                    //TODO ACTION/LAYOUT COMPONENTS PROSPROCESSOR METHOD $this->actionLayoutComponentsPostprocessor($action, $layout, $result[$layout]) --> <Action><Layout>ComponentsPostProcessor($p_data)
-                }
-
-                if(isset($layoutData['sliders'])){
-
-                    $result[$layout] = $layoutData['sliders'];
-
-                    //TODO ACTION/LAYOUT COMPONENTS PROSPROCESSOR METHOD $this->actionLayoutComponentsPostprocessor($action, $layout, $result[$layout]) --> <Action><Layout>ComponentsPostProcessor($p_data)
-                }
-            }
-        }else{
-            
-            exit("Module -> " . $scopePath . " Not Found");
-        }
-        
-        return $result;
-    }
-    */
+    
     //MODULE DATA SERVICES
 
     //SET RELATIONS
@@ -936,7 +852,7 @@ class AppModule extends VueUiService {
                         $objectDataTmp['name']          = "";
                         
                         if(\is_array($objectNameFields)){
-
+                            
                             $objectDataNameValues       = array();
 
                             foreach($objectNameFields as $fieldId){
@@ -961,7 +877,7 @@ class AppModule extends VueUiService {
     
                             $objectDataTmp['icon']      = $objectData[$objectIconField];
                         }
-
+                        
                         $result['objects'][]            = $objectDataTmp; 
                     }
                 }
@@ -1125,6 +1041,13 @@ class AppModule extends VueUiService {
                                 $definition['uiOptions']->hidden = true;
                             }
                         }
+                    }
+
+                    //VALIDATIONS
+                    $result["validations"]      = array();
+                    if(isset(($this->getLocal($scopePath))['validations'])){
+
+                        $result['validations']  = ($this->getLocal($scopePath))['validations'];
                     }
 
                     //ACTIONS

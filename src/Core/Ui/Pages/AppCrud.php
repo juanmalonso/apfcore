@@ -248,9 +248,9 @@ class AppCrud extends VueUiService {
                 $sheetData          = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);
                 
                 $importData         = array();
-
+                
                 $index              = 2;
-                while($index < count($sheetData)){
+                while($index <= count($sheetData)){
 
                     $importDataRow = array();
 
@@ -258,20 +258,23 @@ class AppCrud extends VueUiService {
 
                         $importDataRow[$field] = $sheetData[$index][$column];
                     }
-
+                    
                     $importData[]   = $importDataRow;
 
                     $index++;
                 }
                 
                 $objectsEditorDataSource        = $this->getDataSource($this->getLocal("application.importer.dataSource"));
+                
+                $importDataResult               = $objectsEditorDataSource->importData($importData);
 
-                $importDataResult                 = $objectsEditorDataSource->importData($importData);
+                header("Location: " . $this->getLocal("application.urlMaps.LIST"));
+                exit();
+            }else{
+
+                var_dump($file);
             }
         }
-        
-        header("Location: " . $this->getLocal("application.urlMaps.LIST"));
-        exit();
     }
 
     //CALL SERVICE ACTION

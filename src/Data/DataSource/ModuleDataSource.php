@@ -99,18 +99,109 @@ class ModuleDataSource extends Common {
             //FILTERS
             if(isset($p_query['filters']) && \is_array($p_query['filters'])){
 
+                //TODO VER EL CASO DE LOS BASE FIELDS (DATETIMES, BOOLEANOS, NUMERICOS)
+                //BASE FIELDS FILTERS
+                if(\in_array($definition['id'], array('objActive', 'objUserAdd', 'objUserUpdated', 'objErased', 'objUserErased', 'objIndexed', 'objState'))){
+
+                    //AND DEFAULT FILTERS
+                    if(isset($p_query['filters'][$definition['id']])){
+
+                        $validFilters[$definition['id']]                = (array)$p_query['filters'][$definition['id']];
+                    }
+
+                    //AND FILTERS
+                    if(isset($p_query['filters']['and'])){
+
+                        if(isset($p_query['filters']['and'][$definition['id']])){
+
+                            if(!isset($validFilters['and'])){
+
+                                $validFilters['and']                    = array();
+                            }
+
+                            $validFilters['and'][$definition['id']]     = (array)$p_query['filters']['and'][$definition['id']];
+                        }
+                    }
+
+                    //OR FILTERS
+                    if(isset($p_query['filters']['or'])){
+
+                        if(isset($p_query['filters']['or'][$definition['id']])){
+
+                            if(!isset($validFilters['or'])){
+
+                                $validFilters['or']                     = array();
+                            }
+
+                            $validFilters['or'][$definition['id']]      = (array)$p_query['filters']['or'][$definition['id']];
+                        }
+                    }
+
+                    //NOT FILTERS
+                    if(isset($p_query['filters']['not'])){
+
+                        if(isset($p_query['filters']['not'][$definition['id']])){
+
+                            if(!isset($validFilters['not'])){
+
+                                $validFilters['not']                    = array();
+                            }
+
+                            $validFilters['not'][$definition['id']]     = (array)$p_query['filters']['not'][$definition['id']];
+                        }
+                    }
+                }
+                
+                //DEFINITIONS FILTERS
                 if(property_exists($definition['uiOptions'],'filterable')){
 
                     if($definition['uiOptions']->filterable == true){
 
+                        //AND DEFAULT FILTERS
                         if(isset($p_query['filters'][$definition['id']])){
 
-                            if(in_array($definition['id'], array('objActive', 'objUserAdd', 'objUserUpdated', 'objErased', 'objUserErased', 'objIndexed', 'objState'))){
+                            $validFilters['objData.' . $definition['id']]   = (array)$p_query['filters'][$definition['id']];
+                        }
 
-                                $validFilters[$definition['id']] = (array)$p_query['filters'][$definition['id']];
-                            }else{
+                        //AND FILTERS
+                        if(isset($p_query['filters']['and'])){
 
-                                $validFilters['objData.' . $definition['id']] = (array)$p_query['filters'][$definition['id']];
+                            if(isset($p_query['filters']['and'][$definition['id']])){
+
+                                if(!isset($validFilters['and'])){
+
+                                    $validFilters['and']                    = array();
+                                }
+
+                                $validFilters['and']['objData.' . $definition['id']] = (array)$p_query['filters']['and'][$definition['id']];
+                            }
+                        }
+
+                        //OR FILTERS
+                        if(isset($p_query['filters']['or'])){
+
+                            if(isset($p_query['filters']['or'][$definition['id']])){
+
+                                if(!isset($validFilters['or'])){
+
+                                    $validFilters['or']                     = array();
+                                }
+
+                                $validFilters['or']['objData.' . $definition['id']] = (array)$p_query['filters']['or'][$definition['id']];
+                            }
+                        }
+
+                        //NOT FILTERS
+                        if(isset($p_query['filters']['not'])){
+
+                            if(isset($p_query['filters']['not'][$definition['id']])){
+
+                                if(!isset($validFilters['not'])){
+
+                                    $validFilters['not']                     = array();
+                                }
+
+                                $validFilters['not']['objData.' . $definition['id']] = (array)$p_query['filters']['not'][$definition['id']];
                             }
                         }
                     }

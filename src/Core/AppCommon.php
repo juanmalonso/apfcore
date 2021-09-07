@@ -556,16 +556,59 @@ class AppCommon extends Common
         
         if(file_exists($path)){
 
-            $serviceMainData             = json_decode(file_get_contents($path), true);
+            $serviceMainData                = json_decode(file_get_contents($path), true);
             
             //TODO : REPLACE VARS AQUI
-            //var_dump($serviceMainData);
+            
+            $clausulesPaths                     = array();
 
             $dot = new \Adbar\Dot($serviceMainData);
-
+            
             foreach($dot->flatten() as $key=>$value){
+                
+                //IF CLAUSULE
+                $IfclausuleIndex = strpos($key,".if.");
+
+                if($IfclausuleIndex != false){
+
+                    if(!isset($clausulesPaths[\substr($key, 0, $IfclausuleIndex)])){
+
+                        $clausulesPaths[\substr($key, 0, $IfclausuleIndex)] = "IF";
+                    }
+                }
 
                 $this->setLocal($key, $this->parseBlocks($value));
+                
+            }
+
+            if(count($clausulesPaths) > 0){
+
+                $clausulesDataScope = new \ stdClass();
+
+                foreach($clausulesPaths as $clausuleParentPath=>$clausuleType){
+                    
+                    if($clausuleType == "IF"){
+
+                        $clausuleData               = $this->getLocal($clausuleParentPath . ".if");
+                        
+                        if(isset($clausuleData['condition']) && isset($clausuleData['then'])){
+
+                            if(\Nubesys\Core\Utils\Expressions::evaluateDataExpression($clausulesDataScope, $clausuleData['condition'])){
+
+                                $this->setLocal($clausuleParentPath, $clausuleData['then']);
+                            }else{
+
+                                if(isset($clausuleData['else'])){
+
+                                    $this->setLocal($clausuleParentPath, $clausuleData['else']);
+                                }else{
+
+                                    $this->setLocal($clausuleParentPath, new \ stdClass());
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     }

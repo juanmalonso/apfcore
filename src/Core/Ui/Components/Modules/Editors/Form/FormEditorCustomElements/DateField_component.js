@@ -12,7 +12,7 @@ Vue.component("___idReference_", {
 
       //
     },
-    setFieldValue: function (value) {
+    setFieldValue: function (value) { 
       var self = this;
 
       $(this.$refs.realField).val(value);

@@ -9,6 +9,12 @@ Vue.component("___idReference_", {
   methods: {
     initField: function(){
       var newItems = [];
+      var excludeValues = [];
+
+      if(this.getTypeOption("excludeValues") != undefined){
+
+        excludeValues = this.getTypeOption("excludeValues");
+      }
 
       if(this.field.type == "options"){
         
@@ -16,7 +22,10 @@ Vue.component("___idReference_", {
 
           _.each(this.getTypeOption("data"), function (value, key, list) {
 
-            newItems.push({"label":value.label, "value":value.value});
+            if(_.indexOf(excludeValues, value.value) == -1){
+
+              newItems.push({"label":value.label, "value":value.value});
+            }
           });
 
           this.setScopeData("items", newItems);
@@ -40,7 +49,6 @@ Vue.component("___idReference_", {
 
           var cacheKey        = "object_name_and_image_" + this.getTypeOption("model");
           cacheKey.replace("-", "_");
-          
 
           if(this.getTypeOption("hardFilters") != undefined){
 
@@ -58,12 +66,22 @@ Vue.component("___idReference_", {
       console.log("BEFORE UPDATE SCOPE DATA", newDataScopeRegisterData);
 
       var newItems = [];
+      var excludeValues = [];
+
+      if(this.getTypeOption("excludeValues") != undefined){
+
+        excludeValues   = this.getTypeOption("excludeValues");
+      }
 
       if(_.has(newDataScopeRegisterData,"objects")){
 
         _.each(newDataScopeRegisterData.objects, function (value, key, list) {
 
-          newItems.push({"label":value.name, "value":value.id});
+          if(_.indexOf(excludeValues, value.id) == -1){
+
+            newItems.push({"label":value.name, "value":value.id});
+          }
+          
         });
 
         this.setScopeData("items", newItems);

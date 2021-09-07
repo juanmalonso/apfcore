@@ -194,7 +194,7 @@ Vue.component("___idReference_", {
           if(!_.has(value.$attrs,"toStateAction")){
 
             console.log("CHILD", key, value.id, value.$attrs);
-            valid = value.doValidateField();
+            valid = value.doValidateField({});
           }
         }
       });

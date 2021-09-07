@@ -1,4 +1,4 @@
-<div class="ui grid" v-bind:class="(_.size($attrs) > 1) ? '' : 'padded'">
+<div class="ui grid" v-bind:class="(_.size($attrs) > 1) ? '' : 'padded'" v-bind:style="(isHidden()) ? 'display:none !important;' : ''">
     <div class="column">
         <div class="ui basic segment loadingElement" style="padding:0px;">
 

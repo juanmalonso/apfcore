@@ -11,6 +11,8 @@ class Importer extends VueUiComponent {
 
         $this->registerReference("importer");
 
+        $this->setJsDataVar("referenceName", "importer");
+
         $this->setJsDataVar("datasource", $this->getLocal("datasource"));
         $this->setJsDataVar("form_action", $this->getLocal("form_action"));
 

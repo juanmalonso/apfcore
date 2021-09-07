@@ -123,8 +123,9 @@ class Common extends Injectable
     }
 
     protected function parseExpression($p_input){
-    
-        return "_expressionResult_";
+        
+        var_dump($p_input);exit();
+        return var_dump($p_input);
     }
     
     protected function parseVariable($p_group, $p_name){

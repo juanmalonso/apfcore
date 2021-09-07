@@ -47,8 +47,6 @@ class UiComponent extends AppCommon {
         $this->initScope($globalScopeKey);
 
         $this->getScope($globalScopeKey)->set($p_name, $this->getId());
-
-        //$this->setJsDataVar("referenceName", $p_name);
     }
 
     //ID
