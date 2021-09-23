@@ -568,8 +568,6 @@ class Objects extends DataSourceAdapter {
             $stateRow['attachFileOptions']                  = new \stdClass();
 
             $this->modelDataDefinitions[$stateRow["id"]]    = $stateRow;
-            
-
 
             //STATELOGS
             
@@ -614,15 +612,22 @@ class Objects extends DataSourceAdapter {
 
     public function reindexData(){
         $result                     = 0;
-
-        $modelData                  = $this->dataEngine->getModel($this->options['model']);
         
-        if($this->dataEngine->isIndexableModel($modelData['modId'])){
+        $modelData                  = $this->dataEngine->getModel($this->options['model']);
+
+        $indexable                  = false;
+
+        if(isset($this->modelData['indexOptions']) && property_exists($this->modelData['indexOptions'],'indexable')){
+
+            $indexable = $modelData['modIndexOptions']->indexable;
+        }
+        
+        if($indexable){
 
             $indexName              = $this->dataEngine->getModelIndexName($modelData['modId']);
 
-            $deleteIndexResult  = $this->dataEngine->deleteIndex($indexName);
-
+            $deleteIndexResult      = $this->dataEngine->deleteIndex($indexName);
+            
             //$deleteIndexResult      = true;
             
             if($deleteIndexResult){

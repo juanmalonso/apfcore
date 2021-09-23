@@ -103,11 +103,11 @@ class Relation extends Common
         return $result;
     }
 
-    public function getByModel($p_modId, $p_direction = 'LEFT'){
+    public function getByModel($p_modId, $p_direction = 'IN'){
         
         $result = array();
-
-        $cacheKey       = 'data_relations_' . $p_modId . '_in_' . $p_direction;
+        
+        $cacheKey       = 'data_relations_' . $p_modId . '_' . $p_direction . '_relations' . time();
         $cacheLifetime  = 3600;
         
         if($this->hasCache($cacheKey)){
@@ -118,16 +118,10 @@ class Relation extends Common
             $relationDataOptions     = array();
             $relationDataOptions['rows'] = 1000;
 
-            if($p_direction == 'LEFT'){
-
-                $relationDataOptions['conditions'] = "relLeftModId = '" . $p_modId . "'";
-            }elseif($p_direction == 'RIGHT'){
-
-                $relationDataOptions['conditions'] = "relRightModId = '" . $p_modId . "'";
-            }
+            $relationDataOptions['conditions']      = "(relLeftModId = '" . $p_modId . "' AND relLeftDirection = '" . $p_direction . "') OR (relRightModId = '" . $p_modId . "' AND relRightDirection = '" . $p_direction . "')";
 
             $resultSet = $this->database->select('data_relations', $relationDataOptions);
-
+            
             if(is_array($resultSet)){
 
                 $result = array();

@@ -40,27 +40,26 @@ class NbsObject extends Common
     }
 
     private function getRelationsObjects($p_model, $p_id){
-
+        
         $result = array();
 
         $modelData              = $this->model->get($p_model);
 
-        $tableName = $this->model->getModelObjectsTableName($p_model, 'RELATION');
-
+        $tableName              = $this->model->getModelObjectsTableName($p_model, 'RELATION');
+        
         //TODO : Validacion si la tabla existe
 
         $selectOptions                  = array();
-        $selectOptions['conditions']    = "modId = '" . $p_model . "' AND relLeftObjId = '" . $p_id . "'";
-
+        $selectOptions['conditions']    = "modId = '" . $p_model . "' AND (relLeftObjId = '" . $p_id . "' OR relRightObjId = '" . $p_id . "')";
+        
         $selectResult = $this->database->select($tableName,$selectOptions);
-
+        
         if(is_array($selectResult)){
 
             foreach($selectResult as $object){
 
                 $result[$object['_id']] = $object;
             }
-
         }
 
         return $result;
@@ -272,13 +271,13 @@ class NbsObject extends Common
         return $result;
     }
 
-    private function removeObjectRelations($p_model, $p_leftId){
+    private function removeObjectRelations($p_model, $p_id){
 
         $result = false;
 
         $tableName = $this->model->getModelObjectsTableName($p_model, 'RELATION');
 
-        $deleteConditions = "modId = '" . $p_model . "' AND relLeftObjId = '" . $p_leftId . "'";
+        $deleteConditions = "modId = '" . $p_model . "' AND (relLeftObjId = '" . $p_id . "' OR relRightObjId = '" . $p_id . "')";
 
         $deleteResult = $this->database->delete($tableName, $deleteConditions);
 
@@ -315,28 +314,29 @@ class NbsObject extends Common
     }
 
     private function setRelations($p_id, $p_relationsData){
-        
-        $relLeftId = $p_id;
 
         $addRelations = array();
         $editRelations = array();
         $removeRelations = array();
 
-        foreach($p_relationsData as $relModelId => $relobjects){
+        foreach($p_relationsData as $relModelId=>$relDatajObects){
 
-            $currentRelationsObjects = $this->getRelationsObjects($relModelId, $relLeftId);
+            $currentRelationsObjects    = $this->getRelationsObjects($relModelId, $p_id);
 
             $currentRelationsObjectsIds = (is_array($currentRelationsObjects)) ? array_keys($currentRelationsObjects) : array();
 
-            foreach($relobjects as $data){
+            foreach($relDatajObects['values'] as $data){
 
-                $relObjectData = new \stdClass();
-                $relRightId = $data;
-                if(is_object($data)){
+                $relObjectData          = new \stdClass();
 
-                    //TODO
-                    //procesar los datos
-                    //$relRightId seria la clave
+                if($relDatajObects['direction'] == "LEFT"){
+
+                    $relLeftId          = $p_id;
+                    $relRightId         = $data;
+                }else if($relDatajObects['direction'] == "RIGHT"){
+
+                    $relLeftId          = $data;
+                    $relRightId         = $p_id;
                 }
 
                 $relObjectId = $this->getRelationId($relModelId, $relLeftId, $relRightId);
@@ -356,7 +356,7 @@ class NbsObject extends Common
                     $addRelations[$relObjectId] = $_relTmp;
                 }
             }
-            
+
             //REMOVE RELATIONS
             foreach($currentRelationsObjectsIds as $relCurrentObjectId){
 
@@ -546,34 +546,41 @@ class NbsObject extends Common
                     $insertData['objStatesLog'] = json_encode($insertData['objStatesLog'], JSON_UNESCAPED_UNICODE);
                 }
                 
-                $tableName = $this->model->getModelObjectsTableName($p_model, $modelData['modType']);
+                $tableName              = $this->model->getModelObjectsTableName($p_model, $modelData['modType']);
                 
-                $insertObjectResult = $this->database->insert($tableName, $insertData);              
+                $insertObjectResult     = $this->database->insert($tableName, $insertData);              
                 
                 if ($insertObjectResult) {
 
                     //SET RELATIONS
                     $indexData['relData'] = array();
-                    
+
                     if (count($modelRelations) > 0) {
 
                         foreach ($modelRelations as $modelRelation) {
                             
-                            $_relationsDataTmp = array();
-
                             $fieldId = 'rel_' . $modelRelation['modId'];
-
-                            $relationsData[$modelRelation['modId']] = array();
-
+    
+                            $relationsData[$modelRelation['modId']]                     = array();
+                            $relationsData[$modelRelation['modId']]['values']           = array();
+    
+                            if($modelRelation['relLeftModId'] == $p_model){
+    
+                                $relationsData[$modelRelation['modId']]['direction']    = "LEFT";
+                            }else if($modelRelation['relRightModId'] == $p_model){
+    
+                                $relationsData[$modelRelation['modId']]['direction']    = "RIGHT";
+                            }
+                            
                             if (isset($p_data[$fieldId])) {
-                                //TODO ojo cuando halla datos de relacion
-                                $indexData['relData'][$fieldId] = $p_data[$fieldId];
-
-                                $relationsData[$modelRelation['modId']] = $p_data[$fieldId];
+                                //TODO: ojo cuando halla datos de objeto (objData) de relacion
+                                $indexData['relData'][$fieldId]                         = $p_data[$fieldId];
+    
+                                $relationsData[$modelRelation['modId']]['values']       = $p_data[$fieldId];
                             }
                         }
                         
-                        $this->setRelations($id, $relationsData);  
+                        $this->setRelations($p_id, $relationsData);  
                     }
 
                     $result = $id;
@@ -756,26 +763,33 @@ class NbsObject extends Common
 
                     //SET RELATIONS
                     $indexData['relData'] = array();
-                    
+
                     if (count($modelRelations) > 0) {
 
                         foreach ($modelRelations as $modelRelation) {
                             
-                            $_relationsDataTmp = array();
-
                             $fieldId = 'rel_' . $modelRelation['modId'];
-
-                            $relationsData[$modelRelation['modId']] = array();
-
-                            if (property_exists($p_data, $fieldId)) {
-                                //TODO ojo cuando halla datos de relacion
-                                $indexData['relData'][$fieldId] = $p_data->$fieldId;
-
-                                $relationsData[$modelRelation['modId']] = $p_data->$fieldId;
+    
+                            $relationsData[$modelRelation['modId']]                     = array();
+                            $relationsData[$modelRelation['modId']]['values']           = array();
+    
+                            if($modelRelation['relLeftModId'] == $p_model){
+    
+                                $relationsData[$modelRelation['modId']]['direction']    = "LEFT";
+                            }else if($modelRelation['relRightModId'] == $p_model){
+    
+                                $relationsData[$modelRelation['modId']]['direction']    = "RIGHT";
+                            }
+                            
+                            if (isset($p_data[$fieldId])) {
+                                //TODO: ojo cuando halla datos de objeto (objData) de relacion
+                                $indexData['relData'][$fieldId] = $p_data[$fieldId];
+    
+                                $relationsData[$modelRelation['modId']]['values'] = $p_data[$fieldId];
                             }
                         }
                         
-                        $this->setRelations($id, $relationsData);  
+                        $this->setRelations($p_id, $relationsData);  
                     }
 
                     $result = $id;
@@ -990,7 +1004,7 @@ class NbsObject extends Common
             $updateConditions = "_id = '" . $p_id . "'";
             
             $updateResult = $this->database->update($tableName, $updateData, $updateConditions);
-
+            
             if($updateResult){
 
                 //SET RELATIONS
@@ -1000,17 +1014,24 @@ class NbsObject extends Common
 
                     foreach ($modelRelations as $modelRelation) {
                         
-                        $_relationsDataTmp = array();
-
                         $fieldId = 'rel_' . $modelRelation['modId'];
 
-                        $relationsData[$modelRelation['modId']] = array();
+                        $relationsData[$modelRelation['modId']]                     = array();
+                        $relationsData[$modelRelation['modId']]['values']           = array();
 
+                        if($modelRelation['relLeftModId'] == $p_model){
+
+                            $relationsData[$modelRelation['modId']]['direction']    = "LEFT";
+                        }else if($modelRelation['relRightModId'] == $p_model){
+
+                            $relationsData[$modelRelation['modId']]['direction']    = "RIGHT";
+                        }
+                        
                         if (isset($p_data[$fieldId])) {
-                            //TODO: ojo cuando halla datos de objeto de relacion
+                            //TODO: ojo cuando halla datos de objeto (objData) de relacion
                             $indexNewData['relData'][$fieldId] = $p_data[$fieldId];
 
-                            $relationsData[$modelRelation['modId']] = $p_data[$fieldId];
+                            $relationsData[$modelRelation['modId']]['values'] = $p_data[$fieldId];
                         }
                     }
                     
@@ -1151,7 +1172,7 @@ class NbsObject extends Common
 
         $modelDefinition        = $this->definition->get($p_modelData['modId'], null);
         $modelRelations         = $this->model->getRelations($p_modelData['modId'], 'IN');
-
+        
         return $this->indexAdd($p_modelData, $modelDefinition, $modelRelations, $p_id, \Nubesys\Core\Utils\Struct::toArray($p_data));
     }
 
@@ -1159,7 +1180,7 @@ class NbsObject extends Common
 
         $modelDefinition        = $this->definition->get($p_modelData['modId'], null);
         $modelRelations         = $this->model->getRelations($p_modelData['modId'], 'IN');
-
+        
         return $this->indexBulkAdd($p_modelData, $modelDefinition, $modelRelations, \Nubesys\Core\Utils\Struct::toArray($p_data));
     }
 
@@ -1174,7 +1195,7 @@ class NbsObject extends Common
         if (isset($modelData['modIndexOptions']) && is_object($modelData['modIndexOptions'])) {
 
             if (property_exists($modelData['modIndexOptions'], 'indexable') && $modelData['modIndexOptions']->indexable == true) {
-
+                
                 $idsResults = $this->indexSearchIds($modelData, $modelDefinition, $modelRelations, $p_query);
                 
                 if ($idsResults != false && isset($idsResults['ids']) && isset($idsResults['totals']) && isset($idsResults['facets'])) {
@@ -1758,25 +1779,31 @@ class NbsObject extends Common
         $result['objData'] = $_dataTemp;
 
         $_relTemp = array();
-
+        
         foreach($p_modelRelations as $relation){
-
+            
             $propertyName = "rel_" . $relation['modId'];
+            
+            if(isset($relation['relIndexOptions'])){
 
-            if(isset($definition['relIndexOptions'])){
+                if(is_object($relation['relIndexOptions']) && property_exists($relation['relIndexOptions'],'indexable')){
+                    
+                    if($relation['relIndexOptions']->indexable == true){
+                        
+                        if(!is_null($p_data['objData'][$propertyName]) && is_array($p_data['objData'][$propertyName])){
 
-                if(is_object($definition['relIndexOptions']) && property_exists($definition['relIndexOptions'],'indexable')){
+                            $_relTemp[$propertyName] = $p_data['objData'][$propertyName];
+                        }else{
 
-                    if($definition['relIndexOptions']->indexable == true){
-
-                        $_relTemp[$propertyName] = $p_data['relData'][$propertyName];
+                            $_relTemp[$propertyName] = array();
+                        }
                     }
                 }
             }
         }
 
         $result['objData'] = $_dataTemp;
-        $result['RELData'] = $_relTemp;
+        $result['relData'] = $_relTemp;
         
         return $result;
     }
@@ -1785,16 +1812,15 @@ class NbsObject extends Common
         
         $result = false;
 
-        $cacheKey       = 'data_object_' . $p_id;
+        $cacheKey       = 'data_object_' . $p_id . time();
         $cacheLifetime  = 3600;
         $cacheType      = 'file';
         
-
         if($this->hasCache($cacheKey)){
 
             $result = $this->getCache($cacheKey, array());
         }else {
-
+            
             $modelData              = $this->model->get($p_model);
             $modelRelations         = $this->model->getRelations($p_model, 'IN');
             
@@ -1835,26 +1861,32 @@ class NbsObject extends Common
     
                         $selectResult['objStateData'] = new \stdClass();
                     }
-
+                    
                     foreach ($modelRelations as $modelRelation) {
 
                         $fieldId = 'rel_' . $modelRelation['modId'];
-
-                        $currentRelationsObjects = $this->getRelationsObjects($modelRelation['modId'], $p_id);
                         
-                        $rightObjects = array();
-                        foreach($currentRelationsObjects as $relId => $relData){
-                            
-                            $rightObjects[] = $relData['relRightObjId'];
-                        }
+                        $selectResult['objData']->$fieldId = array();
 
-                        $selectResult['objData']->$fieldId = $rightObjects;
+                        $currentRelationsObjects        = $this->getRelationsObjects($modelRelation['modId'], $p_id);
+                        
+                        foreach($currentRelationsObjects as $relId=>$relData){
+
+                            if($relData['relLeftObjId'] == $p_id){
+
+                                $selectResult['objData']->$fieldId[] = $relData['relRightObjId'];
+                            }else if($relData['relRightObjId'] == $p_id){
+
+                                $selectResult['objData']->$fieldId[] = $relData['relLeftObjId'];
+                            }
+                        }
                     }
                     
                     $result = $selectResult;
                 }
                 
             }
+
             $this->setCache($cacheKey, $result, $cacheLifetime);
         }
         
@@ -1922,7 +1954,8 @@ class NbsObject extends Common
         //TODO : Validacion si la tabla existe
 
         $modelData              = $this->model->get($p_model);
-
+        $modelRelations         = $this->model->getRelations($p_model, 'IN');
+        
         $tableName              = $this->model->getModelObjectsTableName($p_model, $modelData['modType']);
 
         $selectOptions          = array();
@@ -1962,7 +1995,7 @@ class NbsObject extends Common
         if($selectResult){
 
             foreach($selectResult as $object){
-
+                
                 if(isset($object['objData'])){
 
                     $object['objData'] = json_decode($object['objData']);
@@ -1990,7 +2023,75 @@ class NbsObject extends Common
                     $object['objStateData'] = new \stdClass();
                 }
 
+                foreach ($modelRelations as $modelRelation) {
+
+                    $fieldId = 'rel_' . $modelRelation['modId'];
+
+                    $object['objData']->$fieldId = array();
+
+                    $currentRelationsObjects = $this->getRelationsObjects($modelRelation['modId'], $object['_id']);
+
+                    foreach($currentRelationsObjects as $relId=>$relData){
+
+                        if($relData['relLeftObjId'] == $object['_id']){
+
+                            $object['objData']->$fieldId[] = $relData['relRightObjId'];
+                        }else if($relData['relRightObjId'] == $object['_id']){
+
+                            $object['objData']->$fieldId[] = $relData['relLeftObjId'];
+                        }
+                    }
+                }
+
                 $result[] = $object;
+            }
+        }
+
+        return $result;
+    }
+
+    public function listObjectRelations($p_model, $p_id){
+        $result = false;
+
+        //TODO : Validacion si la tabla existe
+
+        $modelData              = $this->model->get($p_model);
+
+        $tableName              = $this->model->getModelObjectsTableName($p_model, $modelData['modType']);
+
+        $selectOptions          = array();
+
+        $rows = 100;
+
+        if(isset($p_options['rows'])){
+
+            $rows = $p_options['rows'];
+
+            $selectOptions['rows'] = $rows;
+        }
+
+        $page = 1;
+
+        if(isset($p_options['page'])){
+
+            $page = $p_options['page'];
+
+            $selectOptions['offset'] = ($page - 1) * $rows;
+        }
+
+        //TODO: Falta orders y todo lo demas para hacer similar al elasticsearch
+
+        $selectResult = $this->database->select($tableName,$selectOptions);
+
+        if($selectResult){
+
+            foreach($selectResult as $object){
+
+                $objectTemp = new \stdClass();
+                $objectTemp->_id = $object['_id'];
+                $objectTemp->name  = $this->name($p_model, $object['_id']);
+
+                $result[] = $objectTemp;
             }
 
         }

@@ -6,6 +6,7 @@ use Nubesys\Core\Response\ResponseAdapters;
 
 class Data extends ResponseAdapter {
 
+    private $customBody;
     private $status;
     private $info;
     private $data;
@@ -14,6 +15,8 @@ class Data extends ResponseAdapter {
     public function __construct($p_di)
     {
         parent::__construct($p_di);
+
+        $this->customBody   = null;
 
         $this->status       = "KO";
         $this->info         = "ERROR";
@@ -47,6 +50,11 @@ class Data extends ResponseAdapter {
         $this->setInfo($p_message);
     }
 
+    public function setCustomBody($p_object){
+
+        $this->customBody = $p_object;
+    }
+
     public function setSuccess($p_data){
 
         $this->setStatus("OK");
@@ -55,13 +63,22 @@ class Data extends ResponseAdapter {
     }
 
     public function getBody(){
+        $result                     = "{}";
 
-        $jsonObject             = new \stdClass();
-        $jsonObject->status     = $this->status;
-        $jsonObject->info       = $this->info;
-        $jsonObject->data       = $this->data;
-        $jsonObject->debug      = $this->debug;
+        if($this->customBody !== null){
 
-        return json_encode($jsonObject);
+            $result                 = json_encode($this->customBody);
+        }else{
+
+            $jsonObject             = new \stdClass();
+            $jsonObject->status     = $this->status;
+            $jsonObject->info       = $this->info;
+            $jsonObject->data       = $this->data;
+            $jsonObject->debug      = $this->debug;
+
+            $result                 = json_encode($jsonObject);
+        }
+
+        return $result;
     }
 }

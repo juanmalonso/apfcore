@@ -119,6 +119,7 @@ class Model extends Common
         if($p_direction == 'IN'){
 
             $result = $this->getInRelations($p_modId);
+            
         }elseif($p_direction == 'OUT'){
 
             $result = $this->getOutRelations($p_modId);
@@ -132,12 +133,12 @@ class Model extends Common
     
     private function getInRelations($p_modId){
         
-        return $this->relation->getByModel($p_modId, 'LEFT');
+        return $this->relation->getByModel($p_modId, 'IN');
     }
 
     private function getOutRelations($p_modId){
 
-        return $this->relation->getByModel($p_modId, 'RIGHT');
+        return $this->relation->getByModel($p_modId, 'OUT');
     }
 
     public function isIndexable($p_modId){

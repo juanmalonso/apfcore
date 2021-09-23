@@ -39,11 +39,11 @@ class AppModule extends VueUiService {
         }
         
         //TODO BEFORE ACTION OVERWRITE METHOD $this->beforeAction($action) --> <action>BeforeAction()
-
+        
         $this->setActionPageTitle($action);
 
         $initialScope       = "actions." . $action;
-
+        
         $actionTree         = $this->getScopeTree($initialScope);
 
         $this->buildTreeEntities($initialScope, $actionTree);
@@ -56,11 +56,11 @@ class AppModule extends VueUiService {
         
         $accessControl      = true;
 
-        if($this->getLocal("accessControl")){
+        if($this->hasLocal("accessControl")){
 
             $accessControl  = $this->getLocal("accessControl");
         }
-
+        
         if($accessControl){
 
             $loginurl = $this->getDI()->get('config')->main->url->base . "login";
@@ -274,7 +274,7 @@ class AppModule extends VueUiService {
     }
 
     private function getScopeTree($p_scopePath){
-
+        
         $result             = array();
         
         if($this->hasLocal($p_scopePath)){
@@ -553,7 +553,7 @@ class AppModule extends VueUiService {
     //SELECTOR
     public function moduleSelectorService(){
         \sleep(1);
-        
+
         if($this->hasJsonParam()){
             
             $params                         = $this->getJsonParam();
@@ -561,7 +561,7 @@ class AppModule extends VueUiService {
             $scopePath                      = (isset($params["scopePath"])) ? $params["scopePath"] : false;
             
             if($scopePath !== false){
-
+                
                 if(isset($params["model"])){
                     
                     $result                             = array();
@@ -588,19 +588,6 @@ class AppModule extends VueUiService {
                     }
 
                     //HARD FILTERS
-                    if(isset($params["hardFilters"])){
-
-                        if(!isset($query["hardfilters"])){
-
-                            $query["hardfilters"]       = array();
-                        }
-
-                        foreach($params["hardFilters"] as $filterIndex=>$filterData){
-
-                            $query["hardfilters"][$filterIndex]     = $filterData;
-                        }
-                    }
-
                     if(isset(($this->getLocal($scopePath))['hardFilters'])){
 
                         if(!isset($query["hardfilters"])){
@@ -609,6 +596,19 @@ class AppModule extends VueUiService {
                         }
 
                         foreach(($this->getLocal($scopePath))['hardFilters'] as $filterIndex=>$filterData){
+
+                            $query["hardfilters"][$filterIndex]     = $filterData;
+                        }
+                    }
+                    
+                    if(isset($params["hardFilters"])){
+
+                        if(!isset($query["hardfilters"])){
+
+                            $query["hardfilters"]       = array();
+                        }
+
+                        foreach($params["hardFilters"] as $filterIndex=>$filterData){
 
                             $query["hardfilters"][$filterIndex]     = $filterData;
                         }
@@ -764,6 +764,76 @@ class AppModule extends VueUiService {
         }else{
 
             $this->setServiceError("Invalid Params");
+        }
+    }
+
+    //OBJECT LIST QUERY
+    public function objectsListQueryService(){
+        //\sleep(3);
+        
+        if($this->hasUrlParam("model") && $this->hasUrlParam("query")){
+
+            $result                         = array();
+            
+            $result['success']              = true;
+            $result['results']              = array();
+
+            $query                          = array();
+            $query["keyword"]               = "*" . $this->getUrlParam("query") . "*";
+
+            $queryResult                    = $this->getModelObjects($this->getUrlParam("model"), $query);
+
+            if(isset($queryResult['objects'])){
+
+                foreach($queryResult['objects'] as $objectData){
+                    
+                    $objectDataTmp                  = array();
+
+                    $objectNameFields               = $this->getModelObjectNameFields($params['model']);
+                    $objectImageField               = $this->getModelObjectImageField($params['model']);
+                    $objectIconField                = $this->getModelObjectIconField($params['model']);
+
+                    $objectDataTmp['value']         = $objectData["_id"];
+
+                    //NAME
+                    $objectDataTmp['name']          = "";
+                    
+                    if(\is_array($objectNameFields)){
+                        
+                        $objectDataNameValues       = array();
+
+                        foreach($objectNameFields as $fieldId){
+
+                            $objectDataNameValues[] = $objectData[$fieldId];
+                        }
+
+                        $objectDataTmp['name']      = \implode(" ", $objectDataNameValues);
+                    }else{
+
+                        $objectDataTmp['name']      = $objectDataTmp['value'];
+                    }
+                    
+                    //IMAGE
+                    if(isset($objectData[$objectImageField])){
+
+                        $objectDataTmp['image']     = $objectData[$objectImageField];
+                    }
+                    
+                    //ICON
+                    if(isset($objectData[$objectIconField])){
+
+                        $objectDataTmp['icon']      = $objectData[$objectIconField];
+                    }
+                    
+                    $result['results'][]             = $objectDataTmp; 
+                }
+            }
+            
+            $this->setServiceCustomBody($result);
+
+        }else{
+
+            $this->setServiceError("Model OR Query Params Not Found");
         }
     }
 
@@ -1472,7 +1542,7 @@ class AppModule extends VueUiService {
     }
 
     protected function getModelObjects($p_model, $p_query){
-
+        
         $dataSource                         = new ModuleDataSource($this->getDI());
 
         return $dataSource->getModelObjects($p_model , $p_query);
@@ -1481,7 +1551,7 @@ class AppModule extends VueUiService {
     protected function editModelObject($p_model, $p_id, $p_data){
 
         $dataSource                         = new ModuleDataSource($this->getDI());
-
+        
         return $dataSource->editModelObjectData($p_model, $p_id, $p_data);
     }
 

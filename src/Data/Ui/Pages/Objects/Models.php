@@ -401,7 +401,7 @@ class Models extends AppCrud {
 
                 $dataSourceOptions                  = array();
                 $dataSourceOptions['model']         = $param["model"];
-
+                
                 $dataSource                         = new DataSource($this->getDI(), new ObjectsDataSource($this->getDI(), $dataSourceOptions));
                 
                 $this->setServiceSuccess($dataSource->reindexData());

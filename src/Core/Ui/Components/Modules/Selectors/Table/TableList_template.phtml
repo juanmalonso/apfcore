@@ -3,10 +3,22 @@
 
             <div v-if="hasActions() || hasFilters() || isSearchable()" class="row" style="padding:0px;">
                 
-                <div class="sixteen column">
+                <div class="sixteen column" style="padding-left: 0px;">
                     <div class="ui horizontal basic segments" style="margin:0px;">
 
                         <div class="ui basic segment" style="padding:0px;">
+
+                            <template v-if="hasActions()">
+                                <div v-if="_.has(action, 'side') && action.side == 'left'" class="ui input" v-for="(action, actionIndex) in actions" style="margin: 14px 0px 0px 14px;">
+                                    <a v-if="action.type == 'link'" v-bind:class="'ui ' + action.style + ' button'" v-bind:href="parseStringBlocks(action.urlMap, {})">
+                                        <i v-bind:class="action.icon"></i> ${action.label}
+                                    </a>
+                                    <button v-if="action.type == 'actions'" v-bind:class="'ui ' + doActionStyle(actionIndex, action) + ' button'" v-on:click="doComponentAction(action.actions, {}, $event); doActiveAction(actionIndex, action)">
+                                        <i v-bind:class="action.icon"></i> ${action.label}
+                                    </button>
+                                </div>
+                            </template>
+
                             <!--
                             <template v-if="hasFilters()">
                                 <ElementFilters v-bind:id="referenceName + '_filter'" v-bind:filters="filters" v-bind:urlMaps="urlMaps"></ElementFilters>
@@ -20,7 +32,7 @@
                             </template>
                             -->
                             <template v-if="hasActions()">
-                                <div class="ui input" v-for="(action, actionIndex) in actions" style="margin: 14px 0px 0px 14px;">
+                                <div v-if="(!_.has(action, 'side')) || (_.has(action, 'side') && action.side == 'right')" class="ui input" v-for="(action, actionIndex) in actions" style="margin: 14px 0px 0px 14px;">
                                     <a v-if="action.type == 'link'" v-bind:class="'ui ' + action.style + ' button'" v-bind:href="parseStringBlocks(action.urlMap, {})">
                                         <i v-bind:class="action.icon"></i> ${action.label}
                                     </a>

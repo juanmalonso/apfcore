@@ -7,24 +7,24 @@ Vue.component("___idReference_", {
     var self = this;
   },
   methods: {
-    initField: function(){
+    initField: function () {
       var newItems = [];
       var excludeValues = [];
 
-      if(this.getTypeOption("excludeValues") != undefined){
+      if (this.getTypeOption("excludeValues") != undefined) {
 
         excludeValues = this.getTypeOption("excludeValues");
       }
 
-      if(this.field.type == "options"){
-        
-        if(this.getTypeOption("data") != undefined){
+      if (this.field.type == "options") {
+
+        if (this.getTypeOption("data") != undefined) {
 
           _.each(this.getTypeOption("data"), function (value, key, list) {
 
-            if(_.indexOf(excludeValues, value.value) == -1){
+            if (_.indexOf(excludeValues, value.value) == -1) {
 
-              newItems.push({"label":value.label, "value":value.value});
+              newItems.push({ "label": value.label, "value": value.value });
             }
           });
 
@@ -32,56 +32,116 @@ Vue.component("___idReference_", {
         }
       }
 
-      if(this.field.type == "objectr" || this.field.type == "objectsr"){
+      if (this.field.type == "objectr" || this.field.type == "objectsr") {
 
-        if(this.getTypeOption("model") != undefined){
+        if (this.getTypeOption("model") != undefined) {
 
-          var newDataService        = {
-            "type":"service",
-            "name":"objects-list",
-            "scope":"service",
+          var newDataService = {
+            "type": "service",
+            "name": "objects-list",
+            "scope": "service",
             "params": {
-              "rows":1000
+              "rows": 1000
             }
           };
 
-          newDataService.params.model = this.getTypeOption("model");
+          if (this.getTypeOption("remoteSearch") != undefined) {
 
-          var cacheKey        = "object_name_and_image_" + this.getTypeOption("model");
-          cacheKey.replace("-", "_");
+            var minSearchCharacters = 3;
 
-          if(this.getTypeOption("hardFilters") != undefined){
+            if (this.getTypeOption("minCharacters") != undefined) {
 
-            newDataService.params.hardFilters = this.getTypeOption("hardFilters");
+              minSearchCharacters = this.getTypeOption("minCharacters");
+            }
+
+            var saveData = true;
+
+            if (this.getTypeOption("saveRemoteData") != undefined) {
+
+              saveData = this.getTypeOption("saveRemoteData");
+            }
+
+            $(this.$refs.realField).dropdown({
+              minCharacters: minSearchCharacters,
+              saveRemoteData: saveData,
+              apiSettings: {
+                url: this.getScopeDataServiceUrl("_service", "objects-list-query") + "/model:" + this.getTypeOption("model") + "/query:{query}"
+              }
+            });
+
+            newDataService = {
+              "type": "service",
+              "name": "objects-list",
+              "scope": "service",
+              "params": {
+                "rows": 1000
+              }
+            };
+
+            var value = this.field.defaultValue;
+
+            if (_.has(this.data, this.field.id)) {
+
+                value = this.data[this.field.id];
+            }
+
+            var selectedItems = (_.isArray(value)) ? value : [value];
+
+            newDataService.params.hardFilters = {"_id":selectedItems};
+
+            console.log("REMOTEEDIT", selectedItems);
+
+          }else{
+
+            newDataService = {
+              "type": "service",
+              "name": "objects-list",
+              "scope": "service",
+              "params": {
+                "rows": 1000
+              }
+            };
+
+            if (this.getTypeOption("hardFilters") != undefined) {
+
+              newDataService.params.hardFilters = this.getTypeOption("hardFilters");
+            }
           }
 
+          newDataService.params.model = this.getTypeOption("model");
+
+          var cacheKey = "object_name_and_image_" + this.getTypeOption("model");
+          cacheKey.replace("-", "_");
+
           Vue.set(this, 'dataService', newDataService);
-              
+
           this.modLoadDataService(this.generateDataServiceOptions({}), false);
+
         }
       }
+
     },
-    onBeforeUpdateScope: function (newDataScopeRegisterData){
+    onBeforeUpdateScope: function (newDataScopeRegisterData) {
 
       console.log("BEFORE UPDATE SCOPE DATA", newDataScopeRegisterData);
 
       var newItems = [];
       var excludeValues = [];
 
-      if(this.getTypeOption("excludeValues") != undefined){
+      if (this.getTypeOption("excludeValues") != undefined) {
 
-        excludeValues   = this.getTypeOption("excludeValues");
+        excludeValues = this.getTypeOption("excludeValues");
       }
 
-      if(_.has(newDataScopeRegisterData,"objects")){
+      if (_.has(newDataScopeRegisterData, "objects")) {
 
         _.each(newDataScopeRegisterData.objects, function (value, key, list) {
 
-          if(_.indexOf(excludeValues, value.id) == -1){
+          if (_.indexOf(excludeValues, value.id) == -1) {
 
-            newItems.push({"label":value.name, "value":value.id});
+            newItems.push({ "label": value.name, "value": value.id });
           }
-          
+
         });
 
         this.setScopeData("items", newItems);
@@ -95,41 +155,41 @@ Vue.component("___idReference_", {
     },
     setFieldValue: function (value) {
       var self = this;
-      var selectedItems   = (_.isArray(value)) ? value : [value];
-      var dropdownValues  = [];
-      
+      var selectedItems = (_.isArray(value)) ? value : [value];
+      var dropdownValues = [];
+
       $(this.$refs.realField).empty();
-      
-      if(_.isArray(this.items)){
+
+      if (_.isArray(this.items)) {
 
         _.each(this.items, function (value, key, list) {
 
           var tempItem = { "name": value.label, "value": value.value };
 
-          if(_.indexOf(selectedItems, value.value) !== -1){
+          if (_.indexOf(selectedItems, value.value) !== -1) {
 
             tempItem['selected'] = true;
           }
 
-          if(_.has(tempItem,"selected")){
+          if (_.has(tempItem, "selected")) {
 
-            $(self.$refs.realField).append( '<option value="'+value.value+'" selected="true">'+value.label+'</option>' );
-          }else{
+            $(self.$refs.realField).append('<option value="' + value.value + '" selected="true">' + value.label + '</option>');
+          } else {
 
-            $(self.$refs.realField).append( '<option value="'+value.value+'">'+value.label+'</option>' );
+            $(self.$refs.realField).append('<option value="' + value.value + '">' + value.label + '</option>');
           }
 
           dropdownValues.push(tempItem);
         });
       }
 
-      if(dropdownValues.length == 0 && selectedItems.length > 0){
+      if (dropdownValues.length == 0 && selectedItems.length > 0) {
 
         _.each(selectedItems, function (value, key, list) {
 
-          $(self.$refs.realField).append( '<option value="'+value+'" selected="selected">'+value+'</option>' );
+          $(self.$refs.realField).append('<option value="' + value + '" selected="selected">' + value + '</option>');
 
-          dropdownValues.push({ "name": value, "value": value, "selected":true });
+          dropdownValues.push({ "name": value, "value": value, "selected": true });
         });
       }
 
@@ -140,9 +200,8 @@ Vue.component("___idReference_", {
       });
 
       $(this.$refs.realField).dropdown("set selected", selectedItems);
-      
-      $(this.$refs.realField).val(selectedItems);
 
+      $(this.$refs.realField).val(selectedItems);
     },
     getFieldValue: function () {
 
@@ -151,7 +210,7 @@ Vue.component("___idReference_", {
     isMultiple: function () {
       var result = false;
 
-      if(this.field.type == "objectsr"){
+      if (this.field.type == "objectsr") {
 
         result = true;
       }
@@ -165,22 +224,22 @@ Vue.component("___idReference_", {
     }
   },
   computed: {
-    forForm:function(){
+    forForm: function () {
       return this.getScopeData("forForm", this.$attrs.forForm);
     },
-    field:function(){
+    field: function () {
       return this.getScopeData("field", this.$attrs.field);
     },
-    fieldIndex:function(){
+    fieldIndex: function () {
       return this.getScopeData("fieldIndex", this.$attrs.fieldIndex);
     },
-    data:function(){
+    data: function () {
       return this.getScopeData("data", this.$attrs.data);
     },
-    items:function(){
+    items: function () {
       return this.getScopeData("items", []);
     },
-    urlMaps:function(){
+    urlMaps: function () {
       return this.getScopeData("urlMaps", this.$attrs.urlMaps);
     }
   },

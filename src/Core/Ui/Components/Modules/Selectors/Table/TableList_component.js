@@ -5,19 +5,18 @@ Vue.component("___idReference_", {
   },
   mounted: function () {
     var _self = this;
-    
   },
   methods: {
-    onAttrWatchers: function(){
-            
-      this.modLoadDataService(this.generateDataServiceOptions({}),false);
+    onAttrWatchers: function () {
+
+      this.modLoadDataService(this.generateDataServiceOptions({}), false);
     },
     isFieldRender: function (fieldData) {
       var result = false;
 
       if (!fieldData.uiOptions.hidden) {
 
-        if (fieldData.uiOptions.listable){
+        if (fieldData.uiOptions.listable) {
 
           result = true;
         }
@@ -25,50 +24,50 @@ Vue.component("___idReference_", {
 
       return result;
     },
-    hasRowLinks: function(){
+    hasRowLinks: function () {
       var result = false;
-      
-      if(_.size(this.rowLinks) > 0){
+
+      if (_.size(this.rowLinks) > 0) {
 
         result = true;
       }
 
       return result;
     },
-    hasRowActions: function(){
+    hasRowActions: function () {
       var result = false;
 
-      if(_.size(this.rowActions) > 0){
+      if (_.size(this.rowActions) > 0) {
 
         result = true;
       }
 
       return result;
     },
-    hasActions: function(){
+    hasActions: function () {
       var result = false;
 
-      if(_.size(this.actions) > 0){
+      if (_.size(this.actions) > 0) {
 
         result = true;
       }
 
       return result;
     },
-    hasFilters: function(){
+    hasFilters: function () {
       var result = false;
 
-      if(_.size(this.filters) > 0){
+      if (_.size(this.filters) > 0) {
 
         result = true;
       }
 
       return result;
     },
-    isSearchable: function(){
+    isSearchable: function () {
       var result = false;
 
-      if(_.size(this.filters) > 0){
+      if (_.size(this.filters) > 0) {
 
         result = true;
       }
@@ -84,6 +83,35 @@ Vue.component("___idReference_", {
       });
 
       this.modLoadDataService(this.generateDataServiceOptions({}), false);
+    },
+    doActionStyle: function (actionIndex, action) {
+      var result = action.style;
+
+      if (_.has(action, "activeStyle")) {
+
+        if(this.hasScopeData("activeAction")){
+          
+          if (this.getScopeData("activeAction", "") == "action_" + actionIndex) {
+
+            result = action.activeStyle;
+          }
+        }else{
+          
+          if (_.has(action, "active") && action.active) {
+
+            result = action.activeStyle;
+          }
+        }
+      }
+
+      return result;
+    },
+    doActiveAction: function (actionIndex, action) {
+
+      if (_.has(action, "activeStyle") || _.has(action, "activeIcon")) {
+
+        this.setScopeData("activeAction", "action_" + actionIndex);
+      }
     }
   },
   computed: {
@@ -128,52 +156,52 @@ Vue.component("___idReference_", {
 
       return result;
     },
-    model:function(){
+    model: function () {
       return this.getScopeData("model");
     },
-    fields:function(){
+    fields: function () {
       return this.getScopeData("fields");
     },
-    filters:function(){
+    filters: function () {
       return this.getScopeData("filters");
     },
-    keyword:function(){
+    keyword: function () {
       return this.getScopeData("keyword");
     },
-    page:function(){
+    page: function () {
       return this.getScopeData("page");
     },
-    rows:function(){
+    rows: function () {
       return this.getScopeData("rows");
     },
-    totals:function(){
+    totals: function () {
       return this.getScopeData("totals");
     },
-    pages:function(){
+    pages: function () {
       return this.getScopeData("pages");
     },
-    objects:function(){
+    objects: function () {
       return this.getScopeData("objects");
     },
-    facets:function(){
+    facets: function () {
       return this.getScopeData("facets");
     },
-    rowLinks:function(){
+    rowLinks: function () {
       return this.getScopeData("rowLinks");
     },
-    rowActions:function(){
+    rowActions: function () {
       return this.getScopeData("rowActions");
     },
-    actions:function(){
+    actions: function () {
       return this.getScopeData("actions");
     },
-    linkAction:function(){
+    linkAction: function () {
       return this.getScopeData("linkAction");
     },
-    urlMaps:function(){
+    urlMaps: function () {
       return this.getScopeData("urlMaps");
     },
-    options:function(){
+    options: function () {
       return this.getScopeData("options");
     }
   },

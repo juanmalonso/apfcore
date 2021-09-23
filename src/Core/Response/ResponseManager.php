@@ -117,4 +117,9 @@ class ResponseManager extends Common {
 
         $this->adapter->setSuccess($p_data);
     }
+
+    public function setCustomBody($p_data){
+
+        $this->adapter->setCustomBody($p_data);
+    }
 }

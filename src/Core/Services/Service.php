@@ -182,4 +182,9 @@ class Service extends AppCommon {
 
         $this->getDI()->get("responseManager")->setSuccess($p_data);
     }
+
+    public function setServiceCustomBody($p_data){
+
+        $this->getDI()->get("responseManager")->setCustomBody($p_data);
+    }
 }

@@ -82,131 +82,113 @@ class ModuleDataSource extends Common {
             }
         }
 
-        //ID FILTERS
+        //FILTERS
         if(isset($p_query['filters']) && \is_array($p_query['filters'])){
-
-            foreach($p_query['filters'] as $filter=>$terms){
-
-                if(\in_array($filter, array("_id"))){
-
-                    $validFilters[$filter] = (array)$terms;
-                }
-            }
-        }
-
-        foreach($result["fields"] as $definition){
             
-            //FILTERS
-            if(isset($p_query['filters']) && \is_array($p_query['filters'])){
+            foreach($p_query['filters'] as $filterName=>$filterData){
 
-                //TODO VER EL CASO DE LOS BASE FIELDS (DATETIMES, BOOLEANOS, NUMERICOS)
-                //BASE FIELDS FILTERS
-                if(\in_array($definition['id'], array('objActive', 'objUserAdd', 'objUserUpdated', 'objErased', 'objUserErased', 'objIndexed', 'objState'))){
+                //DEFAULT FILTERS
+                if(!in_array($filterName, array("and", "or", "not"))){
 
-                    //AND DEFAULT FILTERS
-                    if(isset($p_query['filters'][$definition['id']])){
+                    if(in_array($filterName, array("_id", "objState", "objActive", "objErased", "objUserAdd", "objUserUpdated", "objUserErased"))){
+                        
+                        $validFilters[$filterName] = (array)$filterData;
+                    }else if(isset($result["fields"][$filterName])){
 
-                        $validFilters[$definition['id']]                = (array)$p_query['filters'][$definition['id']];
+                        if(property_exists($result["fields"][$filterName]['uiOptions'],'filterable')){
+
+                            if($result["fields"][$filterName]['uiOptions']->filterable == true){
+
+                                $validFilters['objData.' . $filterName]   = (array)$filterData;
+                            }
+                        }
                     }
 
-                    //AND FILTERS
-                    if(isset($p_query['filters']['and'])){
+                }else{
 
-                        if(isset($p_query['filters']['and'][$definition['id']])){
+                    //AND
+                    if($filterName == "and"){
+
+                        foreach($filterData as $andFilterName=>$andFilterData){
 
                             if(!isset($validFilters['and'])){
 
                                 $validFilters['and']                    = array();
                             }
 
-                            $validFilters['and'][$definition['id']]     = (array)$p_query['filters']['and'][$definition['id']];
+                            if(in_array($andFilterName, array("_id", "objState", "objActive", "objErased", "objUserAdd", "objUserUpdated", "objUserErased"))){
+                        
+                                $validFilters['and'][$andFilterName] = (array)$andFilterData;
+                            }else if(isset($result["fields"][$andFilterName])){
+        
+                                if(property_exists($result["fields"][$andFilterName]['uiOptions'],'filterable')){
+        
+                                    if($result["fields"][$andFilterName]['uiOptions']->filterable == true){
+        
+                                        $validFilters['and']['objData.' . $andFilterName]   = (array)$andFilterData;
+                                    }
+                                }
+                            }
                         }
                     }
 
-                    //OR FILTERS
-                    if(isset($p_query['filters']['or'])){
+                    //AND
+                    if($filterName == "or"){
 
-                        if(isset($p_query['filters']['or'][$definition['id']])){
+                        foreach($filterData as $orFilterName=>$orFilterData){
 
                             if(!isset($validFilters['or'])){
 
-                                $validFilters['or']                     = array();
+                                $validFilters['or']                    = array();
                             }
 
-                            $validFilters['or'][$definition['id']]      = (array)$p_query['filters']['or'][$definition['id']];
+                            if(in_array($orFilterName, array("_id", "objState", "objActive", "objErased", "objUserAdd", "objUserUpdated", "objUserErased"))){
+                        
+                                $validFilters['or'][$orFilterName] = (array)$orFilterData;
+                            }else if(isset($result["fields"][$orFilterName])){
+        
+                                if(property_exists($result["fields"][$orFilterName]['uiOptions'],'filterable')){
+        
+                                    if($result["fields"][$orFilterName]['uiOptions']->filterable == true){
+        
+                                        $validFilters['or']['objData.' . $orFilterName]   = (array)$orFilterData;
+                                    }
+                                }
+                            }
                         }
                     }
 
-                    //NOT FILTERS
-                    if(isset($p_query['filters']['not'])){
+                    //NOT
+                    if($filterName == "not"){
 
-                        if(isset($p_query['filters']['not'][$definition['id']])){
+                        foreach($filterData as $notFilterName=>$notFilterData){
 
                             if(!isset($validFilters['not'])){
 
                                 $validFilters['not']                    = array();
                             }
 
-                            $validFilters['not'][$definition['id']]     = (array)$p_query['filters']['not'][$definition['id']];
+                            if(in_array($notFilterName, array("_id", "objState", "objActive", "objErased", "objUserAdd", "objUserUpdated", "objUserErased"))){
+                        
+                                $validFilters['not'][$notFilterName] = (array)$notFilterData;
+                            }else if(isset($result["fields"][$notFilterName])){
+        
+                                if(property_exists($result["fields"][$notFilterName]['uiOptions'],'filterable')){
+        
+                                    if($result["fields"][$notFilterName]['uiOptions']->filterable == true){
+        
+                                        $validFilters['not']['objData.' . $notFilterName]   = (array)$notFilterData;
+                                    }
+                                }
+                            }
                         }
                     }
                 }
                 
-                //DEFINITIONS FILTERS
-                if(property_exists($definition['uiOptions'],'filterable')){
-
-                    if($definition['uiOptions']->filterable == true){
-
-                        //AND DEFAULT FILTERS
-                        if(isset($p_query['filters'][$definition['id']])){
-
-                            $validFilters['objData.' . $definition['id']]   = (array)$p_query['filters'][$definition['id']];
-                        }
-
-                        //AND FILTERS
-                        if(isset($p_query['filters']['and'])){
-
-                            if(isset($p_query['filters']['and'][$definition['id']])){
-
-                                if(!isset($validFilters['and'])){
-
-                                    $validFilters['and']                    = array();
-                                }
-
-                                $validFilters['and']['objData.' . $definition['id']] = (array)$p_query['filters']['and'][$definition['id']];
-                            }
-                        }
-
-                        //OR FILTERS
-                        if(isset($p_query['filters']['or'])){
-
-                            if(isset($p_query['filters']['or'][$definition['id']])){
-
-                                if(!isset($validFilters['or'])){
-
-                                    $validFilters['or']                     = array();
-                                }
-
-                                $validFilters['or']['objData.' . $definition['id']] = (array)$p_query['filters']['or'][$definition['id']];
-                            }
-                        }
-
-                        //NOT FILTERS
-                        if(isset($p_query['filters']['not'])){
-
-                            if(isset($p_query['filters']['not'][$definition['id']])){
-
-                                if(!isset($validFilters['not'])){
-
-                                    $validFilters['not']                     = array();
-                                }
-
-                                $validFilters['not']['objData.' . $definition['id']] = (array)$p_query['filters']['not'][$definition['id']];
-                            }
-                        }
-                    }
-                }
             }
+        }
+
+        foreach($result["fields"] as $definition){
             
             //SEARCH FIELDS
             if(property_exists($definition['uiOptions'],'searchable')){
