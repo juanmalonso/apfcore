@@ -633,7 +633,7 @@ class Objects extends DataSourceAdapter {
             if($deleteIndexResult){
 
                 $options                    = array();
-                $options['rows']            = 10000;
+                $options['rows']            = 100000;
                 $options['page']            = 1;
                 
                 $objects = $this->dataEngine->getObjects($modelData['modId'], $options);
