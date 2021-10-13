@@ -87,6 +87,8 @@ Vue.component("___idReference_", {
         scope.model                 = self.model;
         scope.isPhoneDevice         = self.isPhoneDevice;
         scope.referenceName         = self.referenceName;
+
+        console.log("EXPRESSION VALIDATION", scope, expressionValidation.expression, math.evaluate(expressionValidation.expression, scope));     
         
         var expressionResult        = math.evaluate(expressionValidation.expression, scope);
         

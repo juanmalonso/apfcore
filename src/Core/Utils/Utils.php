@@ -398,4 +398,29 @@ class Utils
         }
         return strtoupper($pin);
     }
+
+    public static function transformTextValue($p_value, $p_transformations){
+        
+        $result = $p_value;
+
+        foreach($p_transformations as $transform){
+
+            switch($transform){
+                case "TOUPPER" :
+                    $result = strtoupper($result);
+                    break;
+                case "TOLOWER" :
+                    $result = strtolower($result);
+                    break;
+                case "UCFIRST" :
+                    $result = ucfirst($result);
+                    break;
+                case "UCWORDS" :
+                    $result = ucwords($result);
+                    break;
+            }
+        }
+
+        return $result;
+    }
 }

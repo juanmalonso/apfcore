@@ -502,8 +502,16 @@ class NbsObject extends Common
                                 }
                                 
                             }else{
-    
-                                $_dataTemp[$fieldId] = $p_data[$fieldId];
+                                
+                                if($modelField['typId'] == 'text' && property_exists($modelField["defDafTypOptions"], "transformations")){
+
+                                    $_dataTemp[$fieldId] = \Nubesys\Core\Utils\Utils::transformTextValue($p_data[$fieldId], $modelField["defDafTypOptions"]->transformations);
+
+
+                                }else{
+
+                                    $_dataTemp[$fieldId] = $p_data[$fieldId];
+                                }                                
                             }
 
                             $indexData['objData'][$fieldId] = $_dataTemp[$fieldId];
@@ -560,27 +568,31 @@ class NbsObject extends Common
                         foreach ($modelRelations as $modelRelation) {
                             
                             $fieldId = 'rel_' . $modelRelation['modId'];
-    
-                            $relationsData[$modelRelation['modId']]                     = array();
-                            $relationsData[$modelRelation['modId']]['values']           = array();
-    
-                            if($modelRelation['relLeftModId'] == $p_model){
-    
-                                $relationsData[$modelRelation['modId']]['direction']    = "LEFT";
-                            }else if($modelRelation['relRightModId'] == $p_model){
-    
-                                $relationsData[$modelRelation['modId']]['direction']    = "RIGHT";
-                            }
                             
                             if (isset($p_data[$fieldId])) {
+
+                                $relationsData[$modelRelation['modId']]                     = array();
+                                $relationsData[$modelRelation['modId']]['values']           = array();
+        
+                                if($modelRelation['relLeftModId'] == $p_model){
+        
+                                    $relationsData[$modelRelation['modId']]['direction']    = "LEFT";
+                                }else if($modelRelation['relRightModId'] == $p_model){
+        
+                                    $relationsData[$modelRelation['modId']]['direction']    = "RIGHT";
+                                }
+                            
                                 //TODO: ojo cuando halla datos de objeto (objData) de relacion
                                 $indexData['relData'][$fieldId]                         = $p_data[$fieldId];
     
                                 $relationsData[$modelRelation['modId']]['values']       = $p_data[$fieldId];
                             }
                         }
+
+                        if(count($relationsData) > 0){
                         
-                        $this->setRelations($p_id, $relationsData);  
+                            $this->setRelations($p_id, $relationsData);
+                        }
                     }
 
                     $result = $id;
@@ -679,7 +691,15 @@ class NbsObject extends Common
                         
                         if (property_exists($data, $fieldId)) {
 
-                            $_dataTemp[$fieldId] = $data->$fieldId;
+                            if($modelField['typId'] == 'text' && property_exists($modelField["defDafTypOptions"], "transformations")){
+
+                                $_dataTemp[$fieldId] = \Nubesys\Core\Utils\Utils::transformTextValue($data->$fieldId, $modelField["defDafTypOptions"]->transformations);
+
+                            }else{
+
+                                $_dataTemp[$fieldId] = $data->$fieldId;
+                            }
+
                         } else {
 
                             $_dataTemp[$fieldId] = $modelField['defDafDefaultValue'];
@@ -769,27 +789,31 @@ class NbsObject extends Common
                         foreach ($modelRelations as $modelRelation) {
                             
                             $fieldId = 'rel_' . $modelRelation['modId'];
-    
-                            $relationsData[$modelRelation['modId']]                     = array();
-                            $relationsData[$modelRelation['modId']]['values']           = array();
-    
-                            if($modelRelation['relLeftModId'] == $p_model){
-    
-                                $relationsData[$modelRelation['modId']]['direction']    = "LEFT";
-                            }else if($modelRelation['relRightModId'] == $p_model){
-    
-                                $relationsData[$modelRelation['modId']]['direction']    = "RIGHT";
-                            }
-                            
+
                             if (isset($p_data[$fieldId])) {
+    
+                                $relationsData[$modelRelation['modId']]                     = array();
+                                $relationsData[$modelRelation['modId']]['values']           = array();
+        
+                                if($modelRelation['relLeftModId'] == $p_model){
+        
+                                    $relationsData[$modelRelation['modId']]['direction']    = "LEFT";
+                                }else if($modelRelation['relRightModId'] == $p_model){
+        
+                                    $relationsData[$modelRelation['modId']]['direction']    = "RIGHT";
+                                }
+
                                 //TODO: ojo cuando halla datos de objeto (objData) de relacion
                                 $indexData['relData'][$fieldId] = $p_data[$fieldId];
     
                                 $relationsData[$modelRelation['modId']]['values'] = $p_data[$fieldId];
                             }
                         }
+
+                        if(count($relationsData) > 0){
                         
-                        $this->setRelations($p_id, $relationsData);  
+                            $this->setRelations($p_id, $relationsData);
+                        }
                     }
 
                     $result = $id;
@@ -954,7 +978,14 @@ class NbsObject extends Common
                             
                         }else{
 
-                            $_dataTemp[$fieldId] = $p_data[$fieldId];
+                            if($modelField['typId'] == 'text' && property_exists($modelField["defDafTypOptions"], "transformations")){
+
+                                $_dataTemp[$fieldId] = \Nubesys\Core\Utils\Utils::transformTextValue($p_data[$fieldId], $modelField["defDafTypOptions"]->transformations);
+
+                            }else{
+
+                                $_dataTemp[$fieldId] = $p_data[$fieldId];
+                            }
                         }
 
                         $indexNewData['objData'][$fieldId] = $_dataTemp[$fieldId];
@@ -1011,31 +1042,36 @@ class NbsObject extends Common
                 $indexNewData['relData'] = array();
                 
                 if (count($modelRelations) > 0) {
-
+                    
                     foreach ($modelRelations as $modelRelation) {
                         
                         $fieldId = 'rel_' . $modelRelation['modId'];
 
-                        $relationsData[$modelRelation['modId']]                     = array();
-                        $relationsData[$modelRelation['modId']]['values']           = array();
-
-                        if($modelRelation['relLeftModId'] == $p_model){
-
-                            $relationsData[$modelRelation['modId']]['direction']    = "LEFT";
-                        }else if($modelRelation['relRightModId'] == $p_model){
-
-                            $relationsData[$modelRelation['modId']]['direction']    = "RIGHT";
-                        }
-                        
                         if (isset($p_data[$fieldId])) {
+
+                            $relationsData[$modelRelation['modId']]                     = array();
+                            $relationsData[$modelRelation['modId']]['values']           = array();
+
+                            if($modelRelation['relLeftModId'] == $p_model){
+
+                                $relationsData[$modelRelation['modId']]['direction']    = "LEFT";
+                            }else if($modelRelation['relRightModId'] == $p_model){
+
+                                $relationsData[$modelRelation['modId']]['direction']    = "RIGHT";
+                            }
+                        
                             //TODO: ojo cuando halla datos de objeto (objData) de relacion
                             $indexNewData['relData'][$fieldId] = $p_data[$fieldId];
 
                             $relationsData[$modelRelation['modId']]['values'] = $p_data[$fieldId];
                         }
+                        
                     }
                     
-                    $this->setRelations($p_id, $relationsData);  
+                    if(count($relationsData) > 0){
+
+                        $this->setRelations($p_id, $relationsData);
+                    }  
                 }
                 
                 $result = $p_id;

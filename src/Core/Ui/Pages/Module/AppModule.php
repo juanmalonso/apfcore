@@ -553,7 +553,7 @@ class AppModule extends VueUiService {
     //SELECTOR
     public function moduleSelectorService(){
         \sleep(1);
-
+        
         if($this->hasJsonParam()){
             
             $params                         = $this->getJsonParam();
@@ -626,6 +626,21 @@ class AppModule extends VueUiService {
                         $query["orders"]                = $params["orders"];
                     }
 
+                    //HARD ORDERS
+                    if(isset(($this->getLocal($scopePath))['hardOrders'])){
+
+                        if(!isset($query["hardorders"])){
+
+                            $query["hardorders"]       = array();
+                        }
+
+                        foreach(($this->getLocal($scopePath))['hardOrders'] as $orderIndex=>$orderData){
+                            
+                            $query["hardorders"][$orderIndex]    = $orderData;
+                        }
+
+                    }
+                    
                     //RANGES
                     if(isset($params["ranges"])){
 

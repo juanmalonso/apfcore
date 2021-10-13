@@ -249,14 +249,35 @@ class ModuleDataSource extends Common {
         $searchQuery['keyword']     = (count($validSearchFields) > 0) ? ((isset($p_query['keyword'])) ? $p_query['keyword'] : '*') : '*';
         $searchQuery['fields']      = (count($validSearchFields) > 0) ? $validSearchFields : array('*');
         
+        //ORDERS
         if(isset($p_query['orders']) && \is_array($p_query['orders']) && count($p_query['orders']) > 0){
 
             $searchQuery['orders']  = $p_query['orders'];
         }
 
+        //HARD ORDERS (OPTIONS)
         if(isset($this->options['hardorders'])){
 
+            if(!isset($searchQuery['orders'])){
+
+                $searchQuery['orders']              = array();
+            }
+
             foreach($this->options['hardorders'] as $field=>$order){
+
+                $searchQuery['orders'][$field]      = $order; 
+            }
+        }
+
+        //HARD ORDERS (PARAMS)
+        if(isset($p_query['hardorders'])){
+
+            if(!isset($searchQuery['orders'])){
+
+                $searchQuery['orders']              = array();
+            }
+
+            foreach($p_query['hardorders'] as $field=>$order){
 
                 $searchQuery['orders'][$field]      = $order; 
             }

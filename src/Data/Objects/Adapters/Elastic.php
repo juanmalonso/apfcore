@@ -417,20 +417,21 @@ class Elastic extends Common
                 $query->setPostFilter($queryAND);
             }
         }*/
-
-        //TODO : FALTA FACETS
         
         if(count($p_sorts) > 0){
-
+            
             $query->addSort($p_sorts);
         }
 
         $query->setQuery($queryBOOL);
         //$query->setQuery($queryMain);
+        
+        /*$query->addSort(['objDateAdd' => ['order' => 'desc'],
+        'objData.denom_comercial'=>['order' => 'asc']]);*/
 
         //var_dump(json_encode($query->getQuery()->toArray()));
         //echo "<hr>";
-        //exit();
+        
 
         $resultSet = $p_type->search($query);
 
