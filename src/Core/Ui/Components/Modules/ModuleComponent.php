@@ -34,8 +34,6 @@ class ModuleComponent extends VueUiComponent {
             $dataService                        = $this->getInitialDataService($dataService);
         }
 
-        
-
         if($this->hasLocal("dataService")){
             
             //OVERWRITE INITIAL DATA

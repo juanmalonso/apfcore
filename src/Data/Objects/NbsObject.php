@@ -1116,11 +1116,11 @@ class NbsObject extends Common
         if($objectData){
 
             $tableName = $this->model->getModelObjectsTableName($p_model, $modelData['modType']);
-
+            
             $deleteConditions = "_id = '" . $p_id . "'";
 
             $deleteResult = $this->database->delete($tableName, $deleteConditions);
-
+            
             if($deleteResult){
 
                 //RELATIONS
@@ -1154,7 +1154,7 @@ class NbsObject extends Common
 
             //TODO : No se pudo encontrar el objeto para editarlo
         }
-
+        
         return $result;
     }
 
@@ -1532,15 +1532,15 @@ class NbsObject extends Common
 
                 if (property_exists($p_modelData['modIndexOptions'], 'indexable') && $p_modelData['modIndexOptions']->indexable == true) {
 
-                    $indexName  = $this->getIndexName($p_modelData);
+                    $indexName      = $this->getIndexName($p_modelData);
 
-                    $typeName   = $this->getTypeName($p_modelData);
+                    $typeName       = $this->getTypeName($p_modelData);
 
-                    $index = $this->getIndex($indexName, $p_modelData);
+                    $index          = $this->getIndex($indexName, $p_modelData);
 
                     if($index !== false){
 
-                        $type = $this->getType($index, $typeName);
+                        $type       = $this->getType($index, $typeName);
 
                         if($type !== false) {
 

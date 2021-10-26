@@ -342,13 +342,29 @@ class AppModule extends VueUiService {
 
                 if(isset($params["relData"])){
 
-                    $relData    = $params["relData"];
+                    $relData                        = $params["relData"];
                 }
 
                 //ADD
                 if(isset($params["relAdd"])){
 
-                    $relData[] = $params["relAdd"];
+                    $relData[]                      = $params["relAdd"];
+                }
+
+                //REMOVE
+                if(isset($params["relRemove"])){
+
+                    $relDataTmp                     = array();
+
+                    foreach($relData as $relDataKey){
+
+                        if($relDataKey != $params['relRemove']){
+
+                            $relDataTmp[]           = $relDataKey;
+                        }
+                    }
+
+                    $relData                        = $relDataTmp;
                 }
 
                 //TODO : EDIT/REMOVE
@@ -356,7 +372,7 @@ class AppModule extends VueUiService {
                 $data                               = array();
 
                 $data['rel_' . $params['relation']] = $relData;
-
+                
                 $editResult                         = $this->editModelObject($params['model'], $params["id"], $data);
                 
                 $this->setLocal("relData", $relData);
@@ -395,6 +411,53 @@ class AppModule extends VueUiService {
                 if(isset($params['onResponseActions'])){
 
                     $result["dataActions"] = array_merge($result["dataActions"], $this->parseData($params['onResponseActions']));
+                }
+                
+                $this->setServiceSuccess($result);
+            }else{
+
+                $this->setServiceError("Some required param not found");
+            }
+
+        }else{
+
+            $this->setServiceError("Invalid Params");
+        }
+    }
+
+    //REMOVE OBJECTS
+    public function moduleRemoveObjectService(){
+        //\sleep(3);
+        
+        if($this->hasJsonParam()){
+
+            $params                                 = $this->getJsonParam();
+            
+            $scopePath                              = (isset($params["scopePath"])) ? $params["scopePath"] : false;
+
+            if(isset($params["model"]) && isset($params["id"])){
+                
+                $resul                              = array();
+                $result["dataActions"]              = array();
+
+                $removeResult                       = $this->removeModelObject($params['model'], $params["id"]);
+                
+                $this->setLocal("relData", $relData);
+                
+                //TODO CONTROL DE ERROR
+                
+                //DATA ACTIONS
+                if($scopePath !== false){
+
+                    if(isset(($this->getLocal($scopePath))['onRemoveActions'])){
+
+                        $result["dataActions"]      = ($this->getLocal($scopePath))['onRemoveActions'];
+                    }
+                }
+                
+                if(isset($params['onRemoveActions'])){
+                    
+                    $result["dataActions"]          = array_merge($result["dataActions"], $this->parseData($params['onRemoveActions']));
                 }
                 
                 $this->setServiceSuccess($result);
@@ -552,7 +615,7 @@ class AppModule extends VueUiService {
 
     //SELECTOR
     public function moduleSelectorService(){
-        \sleep(1);
+        //\sleep(1);
         
         if($this->hasJsonParam()){
             
@@ -1575,6 +1638,13 @@ class AppModule extends VueUiService {
         $dataSource                         = new ModuleDataSource($this->getDI());
 
         return $dataSource->addModelObjectData($p_model, $p_data);
+    }
+
+    protected function removeModelObject($p_model, $p_id){
+
+        $dataSource                         = new ModuleDataSource($this->getDI());
+        
+        return $dataSource->removeModelObject($p_model, $p_id);
     }
 
     protected function getModelObject($p_model, $p_id){

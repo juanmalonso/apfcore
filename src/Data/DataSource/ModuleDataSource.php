@@ -39,6 +39,7 @@ class ModuleDataSource extends Common {
         $validRanges        = array();
         $validAggregations  = array();
         //$validSearchFields      = array('_id');
+        $validOrders        = array();
 
         //HARD FILTERS (OPTIONS)
         if(isset($this->options['hardfilters'])){
@@ -188,6 +189,54 @@ class ModuleDataSource extends Common {
             }
         }
 
+        //ORDERS
+        if(!isset($p_query['orders'])){
+
+            $p_query['orders']                      = array();
+        }
+
+        //HARD ORDERS (OPTIONS)
+        if(isset($this->options['hardorders'])){
+
+            foreach($this->options['hardorders'] as $field=>$order){
+
+                $p_query['orders'][$field]          = $order; 
+            }
+        }
+
+        //HARD ORDERS (PARAMS)
+        if(isset($p_query['hardorders'])){
+
+            foreach($p_query['hardorders'] as $field=>$order){
+
+                $p_query['orders'][$field]          = $order; 
+            }
+        }
+
+        if(isset($p_query['orders']) && \is_array($p_query['orders'])){
+            
+            foreach($p_query['orders'] as $orderName=>$orderData){
+
+                if(in_array($orderName, array("_id", "objTime", "objOrder", "objState", "objActive", "objDateAdd", "objDateUpdated", "objDateErased", "objErased", "objUserAdd", "objUserUpdated", "objUserErased"))){
+
+                    $validOrders[$orderName] = $orderData;
+
+                }elseif(in_array($orderName, array("objData"))){
+
+                    $orderDataDot           = new \Adbar\Dot(array($orderName => $orderData));
+
+                    foreach($orderDataDot->flatten() as $orderDotName => $orderpParamValue){
+
+                        if(substr($orderDotName, -6)== ".order"){
+
+                            $validOrders[str_replace(".order","",$orderDotName)] = $orderDataDot->get(str_replace(".order","",$orderDotName));
+                        }
+                    }
+                }
+            }
+        
+        }
+        
         foreach($result["fields"] as $definition){
             
             //SEARCH FIELDS
@@ -248,40 +297,7 @@ class ModuleDataSource extends Common {
         $searchQuery['facets']      = $validAggregations;
         $searchQuery['keyword']     = (count($validSearchFields) > 0) ? ((isset($p_query['keyword'])) ? $p_query['keyword'] : '*') : '*';
         $searchQuery['fields']      = (count($validSearchFields) > 0) ? $validSearchFields : array('*');
-        
-        //ORDERS
-        if(isset($p_query['orders']) && \is_array($p_query['orders']) && count($p_query['orders']) > 0){
-
-            $searchQuery['orders']  = $p_query['orders'];
-        }
-
-        //HARD ORDERS (OPTIONS)
-        if(isset($this->options['hardorders'])){
-
-            if(!isset($searchQuery['orders'])){
-
-                $searchQuery['orders']              = array();
-            }
-
-            foreach($this->options['hardorders'] as $field=>$order){
-
-                $searchQuery['orders'][$field]      = $order; 
-            }
-        }
-
-        //HARD ORDERS (PARAMS)
-        if(isset($p_query['hardorders'])){
-
-            if(!isset($searchQuery['orders'])){
-
-                $searchQuery['orders']              = array();
-            }
-
-            foreach($p_query['hardorders'] as $field=>$order){
-
-                $searchQuery['orders'][$field]      = $order; 
-            }
-        }
+        $searchQuery['orders']      = $validOrders;
         
         $searchResult               = $this->dataEngine->searchObjects($result["model"]["id"], $searchQuery);
         
@@ -345,6 +361,11 @@ class ModuleDataSource extends Common {
     public function addModelObjectData($p_model, $p_data){
 
         return $this->dataEngine->addObject($p_model, $p_data);
+    }
+
+    public function removeModelObject($p_model, $p_id){
+        
+        return $this->dataEngine->removeObject($p_model, $p_id);
     }
 
     public function getFirstNameField($p_model){

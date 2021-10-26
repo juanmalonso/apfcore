@@ -63,7 +63,7 @@ Vue.component("___idReference_", {
 
             $(this.$refs.realField).dropdown({
               minCharacters: minSearchCharacters,
-              saveRemoteData: saveData,
+              saveRemoteData: false,
               apiSettings: {
                 url: this.getScopeDataServiceUrl("_service", "objects-list-query") + "/model:" + this.getTypeOption("model") + "/query:{query}"
               }

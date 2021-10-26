@@ -426,12 +426,13 @@ class Elastic extends Common
         $query->setQuery($queryBOOL);
         //$query->setQuery($queryMain);
         
-        /*$query->addSort(['objDateAdd' => ['order' => 'desc'],
-        'objData.denom_comercial'=>['order' => 'asc']]);*/
+        /*
+        $query->addSort(['objDateAdd' => ['order' => 'desc'],
+        'objData.denom_comercial'=>['order' => 'asc']]);
+        */
 
         //var_dump(json_encode($query->getQuery()->toArray()));
         //echo "<hr>";
-        
 
         $resultSet = $p_type->search($query);
 
@@ -866,7 +867,7 @@ class Elastic extends Common
         $doc = new \Elastica\Document($p_id);
 
         $esResult = $p_type->deleteDocument($doc);
-
+        
         if($esResult->isOk()){
 
             $result = $esResult;
