@@ -27,7 +27,7 @@ class Logger extends Injectable {
     }
 
     private function logToStream($p_type, $p_msg, $p_context, $p_data){
-        
+        //var_dump($p_data);exit();
         $datetime                       = strftime("%Y-%m-%dT%H:%M:%S%z");
         $timestamp                      = microtime(true);
 
@@ -42,22 +42,6 @@ class Logger extends Injectable {
             $contexts                   = array_merge($contexts,explode("|", $p_context));
         }
 
-        $data                           = new \stdClass();
-        if(is_string($p_data)){
-
-            $data->string               = $p_data; 
-        }else if(is_object($p_data) || is_array($p_data)){
-
-            $serialized                 = serialize($p_data);
-
-            if(strlen($serialized) > 4600){
-                $data->serialized       = base64_encode($serialized);
-            }else{
-
-                $data                   = $p_data;
-            }
-        }
-
         $logobj                         = array();
         $logobj['datetime']             = "$datetime";
         $logobj['timestamp']            = "$timestamp";
@@ -65,11 +49,30 @@ class Logger extends Injectable {
         $logobj['sesid']                = $sesid;
         $logobj['server']               = $server;
         $logobj['type']                 = "APPLOG";
-        $logobj['contexts']             = $contexts;
-        $logobj['line']                 = array();
-        $logobj['line']['message']      = $p_msg;
-        $logobj['line']['type']         = strtoupper($p_type);
-        $logobj['line']['data']         = $data;
+        $logobj['contexts']             = implode(" ",$contexts);
+        $logobj['message']              = strtoupper($p_type) . " " . $p_msg;
+
+        if(is_string($p_data)){
+
+            $logobj['info']             = $p_data; 
+        }else if(is_object($p_data) || is_array($p_data)){
+
+            $serialized                 = serialize($p_data);
+
+            if(strlen($serialized) > 4600){
+
+                //$logobj['serialized']   =  base64_encode($serialized);
+            }else{
+
+                foreach($p_data as $key=>$value){
+
+                    if(!is_object($value) && !is_array($value)){
+
+                        $logobj['info_' . $key] = $value;
+                    }
+                }
+            }
+        }
         
         $this->logger->$p_type(json_encode($logobj, JSON_UNESCAPED_SLASHES));
     }

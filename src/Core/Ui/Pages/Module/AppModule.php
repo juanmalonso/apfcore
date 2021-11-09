@@ -299,6 +299,7 @@ class AppModule extends VueUiService {
 
             //TODO LLEVAR A LA SUB CLASE DEL SERVICIO
             $this->logInfo("PAGE-VIEW", "NOSVAMOOS|EVENT", $this->getLocal($scopePath));
+            
         }elseif($this->hasLocal("title")){
 
             $this->setTitle($this->getLocal("title"));
@@ -531,13 +532,12 @@ class AppModule extends VueUiService {
                 if($this->hasSession("user_loged") && $this->getSession("user_loged") == true){
 
                     $userData               = $this->getSession("user_data");
-
+                    
                     $user                   = array();
                     $user['label']          = $userData['login'];
                     $user['url']            = $this->getDI()->get('config')->main->url->base . "profile/";
                     $user['avatar']         = $this->getDI()->get('config')->main->url->base . "avatar/sq100/" . $userData['avatar'] . ".jpg";
-
-
+                    
                     $items                  = array();
 
                     if(isset($userData['role']['menus'])){
@@ -563,36 +563,34 @@ class AppModule extends VueUiService {
                         }
                     }
 
-                    /*
-                    MULTI ROLE
-                    $userData['roles'][]    = $userData['role'];
-                    
-                    foreach($userData['roles'] as $role){
+                    if(isset($userData['roles'])){
                         
-                        if(isset($role['menus'])){
+                        foreach($userData['roles'] as $role){
 
-                            foreach($role['menus'] as $menu){
+                            if(isset($role['menus'])){
 
-                                if(isset($menu['items'])){
+                                foreach($role['menus'] as $menu){
 
-                                    foreach($menu['items'] as $item){
+                                    if(isset($menu['items'])){
 
-                                        if(!isset($items[$item['id']])){
-
-                                            $itemTmp                = array();
-                                            $itemTmp['label']       = $item['label'];
-                                            $itemTmp['icon']        = $item['icon'];
-                                            $itemTmp['url']         = $this->getDI()->get('config')->main->url->base . $item['path'];
-                                            $itemTmp['order']       = $item['order'];
-
-                                            $items[$item['id']]     = $itemTmp;
+                                        foreach($menu['items'] as $item){
+                                            
+                                            if(!isset($items[$item['id']])){
+        
+                                                $itemTmp                = array();
+                                                $itemTmp['label']       = $item['name'];
+                                                $itemTmp['icon']        = $item['icon'];
+                                                $itemTmp['url']         = $this->getDI()->get('config')->main->url->base . $item['path'];
+                                                $itemTmp['order']       = $item['order'];
+        
+                                                $items[$item['id']]     = $itemTmp;
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
                     }
-                    */
                 }
 
                 $result["user"]         = $user;
@@ -600,7 +598,7 @@ class AppModule extends VueUiService {
 
                 //REFERENCE NAME
                 $result["referenceName"]    = $params["referenceName"];
-
+                
                 $this->setServiceSuccess($result);
             }else{
 
@@ -1048,9 +1046,9 @@ class AppModule extends VueUiService {
         
         if($this->hasJsonParam()){
 
-            $params                         = $this->getJsonParam();
-
-            $scopePath                      = (isset($params["scopePath"])) ? $params["scopePath"] : false;
+            $params                             = $this->getJsonParam();
+            
+            $scopePath                          = (isset($params["scopePath"])) ? $params["scopePath"] : false;
             
             if($scopePath !== false){
 
@@ -1077,7 +1075,7 @@ class AppModule extends VueUiService {
                                 }
                             }
 
-                            $params["data"] = $dataTmp;
+                            $params["data"]     = $dataTmp;
                         }
                         
                         //HARD FIELDS VALUE

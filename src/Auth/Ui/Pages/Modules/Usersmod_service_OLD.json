@@ -18,7 +18,7 @@
             "name": "module-top-bar",
             "params": {}
           },
-          "title": "Administración de Usuarios",
+          "title": "Administración de Contactos",
           "actions": []
         }
       },
@@ -48,13 +48,7 @@
               "model": "usuario"
             }
           },
-          "hardFilters": {
-          },
-          "hardOrders": {
-          },
           "hiddenFields": [
-            "contact_type",
-            "roles",
             "password_reset"
           ],
           "notRenderedFields": [
@@ -68,25 +62,23 @@
           "rowLinks": [
             {
               "type": "actions",
-              "label": "Reset Password",
+              "label": "Resetear Password",
               "style": "blue",
-              "icon": "check icon",
               "actions": [
                 {
                   "scope": "_service",
                   "name": "doOpenSlider",
                   "params": {
-                    "slider": "passwordabm",
-                    "componentsParams": {
-                      "passwordabmform": {
+                    "slider": "passwordreset",
+                    "slidersParams": {
+                      "passwordesetform": {
                         "dataService": {
                           "type": "service",
                           "scope": "service",
                           "name": "module-editor",
                           "params": {
                             "model": "usuario",
-                            "id": "%(data:_id)%",
-                            "data": {}
+                            "id": "%(data:_id)%"
                           }
                         }
                       }
@@ -101,23 +93,22 @@
               "type": "actions",
               "label": "editar",
               "style": "edit green",
-              "urlMap": "var(local:urlMaps.LIST)",
+              "urlMap": "var(local:urlMaps.MANAGE)",
               "actions": [
                 {
-                  "scope": "service",
+                  "scope": "_service",
                   "name": "doOpenSlider",
                   "params": {
-                    "slider": "usuariosedit",
-                    "componentsParams": {
-                      "usuarioseditform": {
+                    "slider": "usuarioedit",
+                    "slidersParams": {
+                      "usuarioeditform": {
                         "dataService": {
                           "type": "service",
                           "scope": "service",
                           "name": "module-editor",
                           "params": {
                             "model": "usuario",
-                            "id": "%(data:_id)%",
-                            "data": {}
+                            "id": "%(data:_id)%"
                           }
                         }
                       }
@@ -135,19 +126,18 @@
               "icon": "plus icon",
               "actions": [
                 {
-                  "scope": "service",
+                  "scope": "_service",
                   "name": "doOpenSlider",
                   "params": {
-                    "slider": "usuariosadd",
-                    "componentsParams": {
-                      "usuariosaddform": {
+                    "slider": "usuarioadd",
+                    "slidersParams": {
+                      "usuarioaddform": {
                         "dataService": {
                           "type": "service",
-                          "scope": "_service",
+                          "scope": "service",
                           "name": "module-editor",
                           "params": {
-                            "model": "usuario",
-                            "data": {}
+                            "model": "usuario"
                           }
                         }
                       }
@@ -161,11 +151,11 @@
       },
       "modSliders": {
         "type": "pagelayout",
-        "usuariosadd": {
+        "usuarioadd": {
           "type": "slider",
           "sliderTop": {
             "type": "sliderlayout",
-            "usuariosaddtopbar": {
+            "usuarioaddtopbar": {
               "type": "component",
               "classPath": "Nubesys\\Core\\Ui\\Components\\Modules\\TopBar\\TopBar",
               "dataService": {
@@ -186,7 +176,7 @@
                       "scope": "service",
                       "name": "doCloseSlider",
                       "params": {
-                        "slider": "usuariosadd"
+                        "slider": "usuarioadd"
                       }
                     }
                   ]
@@ -199,7 +189,7 @@
                   "icon": "save icon",
                   "actions": [
                     {
-                      "scope": "usuariosaddform",
+                      "scope": "usuarioaddform",
                       "name": "doSendData",
                       "params": {}
                     }
@@ -210,7 +200,7 @@
           },
           "sliderMain": {
             "type": "sliderlayout",
-            "usuariosaddform": {
+            "usuarioaddform": {
               "type": "component",
               "classPath": "\\Nubesys\\Core\\Ui\\Components\\Modules\\Editors\\Form\\FormEditor",
               "dataService": {
@@ -242,19 +232,18 @@
                   "scope": "_service",
                   "name": "doCloseSlider",
                   "params": {
-                    "slider": "usuariosadd"
+                    "slider": "usuarioadd"
                   }
                 }
-              ],
-              "hiddenFields": []
+              ]
             }
           }
         },
-        "usuariosedit": {
+        "usuarioedit":{
           "type": "slider",
           "sliderTop": {
             "type": "sliderlayout",
-            "usuariosedittopbar": {
+            "usuarioedittopbar": {
               "type": "component",
               "classPath": "Nubesys\\Core\\Ui\\Components\\Modules\\TopBar\\TopBar",
               "dataService": {
@@ -275,7 +264,7 @@
                       "scope": "service",
                       "name": "doCloseSlider",
                       "params": {
-                        "slider": "usuariosedit"
+                        "slider": "usuarioedit"
                       }
                     }
                   ]
@@ -288,7 +277,7 @@
                   "icon": "save icon",
                   "actions": [
                     {
-                      "scope": "usuarioseditform",
+                      "scope": "usuarioeditform",
                       "name": "doSendData",
                       "params": {}
                     }
@@ -297,9 +286,9 @@
               ]
             }
           },
-          "sliderMain": {
-            "type": "sliderlayout",
-            "usuarioseditform": {
+          "sliderMain":{
+            "type":"sliderlayout",
+            "usuarioeditform": {
               "type": "component",
               "classPath": "\\Nubesys\\Core\\Ui\\Components\\Modules\\Editors\\Form\\FormEditor",
               "dataService": {
@@ -322,29 +311,28 @@
                 "numero_idoc",
                 "password"
               ],
-              "hiddenFields": [],
-              "onEditActions": [
+              "onAddActions": [
                 {
                   "scope": "usuarioslist",
                   "name": "doReloadData",
                   "params": {}
                 },
                 {
-                  "scope": "service",
+                  "scope": "_service",
                   "name": "doCloseSlider",
                   "params": {
-                    "slider": "usuariosedit"
+                    "slider": "usuarioedit"
                   }
                 }
               ]
             }
           }
         },
-        "passwordabm": {
+        "passwordreset":{
           "type": "slider",
           "sliderTop": {
             "type": "sliderlayout",
-            "passwordabmtopbar": {
+            "passwordresettopbar": {
               "type": "component",
               "classPath": "Nubesys\\Core\\Ui\\Components\\Modules\\TopBar\\TopBar",
               "dataService": {
@@ -365,7 +353,7 @@
                       "scope": "service",
                       "name": "doCloseSlider",
                       "params": {
-                        "slider": "passwordabm"
+                        "slider": "passwordreset"
                       }
                     }
                   ]
@@ -378,7 +366,7 @@
                   "icon": "save icon",
                   "actions": [
                     {
-                      "scope": "passwordabmform",
+                      "scope": "passwordresetform",
                       "name": "doSendData",
                       "params": {}
                     }
@@ -387,9 +375,9 @@
               ]
             }
           },
-          "sliderMain": {
-            "type": "sliderlayout",
-            "passwordabmform": {
+          "sliderMain":{
+            "type":"sliderlayout",
+            "passwordresetform": {
               "type": "component",
               "classPath": "\\Nubesys\\Core\\Ui\\Components\\Modules\\Editors\\Form\\FormEditor",
               "dataService": {
@@ -418,19 +406,17 @@
                 "roles",
                 "login"
               ],
-              "onAddActions": [],
-              "hiddenFields": [],
-              "onEditActions": [
+              "onAddActions": [
                 {
                   "scope": "usuarioslist",
                   "name": "doReloadData",
                   "params": {}
                 },
                 {
-                  "scope": "service",
+                  "scope": "_service",
                   "name": "doCloseSlider",
                   "params": {
-                    "slider": "passwordabm"
+                    "slider": "passwordreset"
                   }
                 }
               ]

@@ -42,7 +42,7 @@ class DataSource extends Common {
 
     //getData(ID) || getData(QueryArray)
     public function getData($p_query = array()){
-
+        
         return $this->adapter->getData($p_query);
     }
 

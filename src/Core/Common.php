@@ -118,8 +118,8 @@ class Common extends Injectable
     }
 
     protected function deleteMultipleCache($p_keys = array()){
-
-        return $this->getDI()->get('cache')->deleteMultiple($p_keys);
+        
+        $result = $this->getDI()->get('cache')->deleteMultiple($p_keys);
     }
 
     protected function parseExpression($p_input){

@@ -286,7 +286,7 @@ class Objects extends DataSourceAdapter {
                 $p_data[$field]       = $value; 
             }
         }
-
+        
         return $this->dataEngine->editObject($this->options['model'], $p_id, $p_data);
     }
 

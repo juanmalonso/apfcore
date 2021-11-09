@@ -205,7 +205,13 @@ Vue.component("___idReference_", {
     },
     getFieldValue: function () {
 
-      return $(this.$refs.realField).val();
+      if($(this.$refs.realField).val() == null){
+
+        return "";
+      }else{
+
+        return $(this.$refs.realField).val();
+      }
     },
     isMultiple: function () {
       var result = false;

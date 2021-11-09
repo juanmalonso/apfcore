@@ -45,12 +45,12 @@ class User extends Common {
         
                         $userRolesData[$role]       = $this->getUserRoleData($role);
                     }
-        
+                    
                     $userData['roles']              = $userRolesData;
                 }
 
                 if(isset($userData['role'])){
-
+                    
                     $userData['role']               = $this->getUserRoleData($userData['role']);
                 }
 
@@ -187,7 +187,7 @@ class User extends Common {
 
     private function getUserRoleData($p_role){
         $result                             = false;
-
+        
         $dataSourceOptions                  = array();
         $dataSourceOptions['model']         = "roles";
 
@@ -223,14 +223,14 @@ class User extends Common {
     }
 
     private function getRoleMenuData($p_menu){
-
+        
         $dataSourceOptions                  = array();
         $dataSourceOptions['model']         = "menus";
 
-        $dataSource                         = new DataSource($this->getDI(), new ObjectsDataSource($this->getDI(), $dataSourceOptions));
-
+        $dataSource                         = new DataSource($this->getDI(), new ObjectsDataSource($this->getDI(), $dataSourceOptions));                      
+        
         $menuData                           = $dataSource->getData($p_menu);
-
+        
         if(isset($menuData['rel_menu_menuitems'])){
 
             $menuItemsData                  = array();

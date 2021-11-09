@@ -5,13 +5,13 @@
         ${user.label}
     </a>
     
-    <a v-for="(item, index) in items" :key="index" class="item" style="padding-right: 8px; padding-left: 8px; min-width:100%;" v-bind:href="item.url">
+    <a v-for="(item, index) in items" :key="index" class="item" style="padding-right: 8px; padding-left: 8px; min-width:100%; font-size:11px;" v-bind:href="item.url">
         <i v-bind:class="item.icon"></i>
-        <div style="max-width: 70px !important;">${ item.label }</div>
+        <div style="max-width: 70px !important;">${item.label}</div>
     </a>
     
-    <a class="item" style="padding-right: 8px; padding-left: 8px; min-width:100%;" v-bind:href="basepath + 'logout'">
+    <a class="item" style="padding-right: 8px; padding-left: 8px; min-width:100%; font-size:11px;" v-bind:href="basepath + 'logout'">
         <i class="sign out alternate red icon"></i>
-        <div style="max-width: 70px !important;">Salir</div>
+        <div style="max-width: 70px !important;">SALIR</div>
     </a>
 </div>

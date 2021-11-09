@@ -1,11 +1,11 @@
 <div class="ui visible left vertical inverted sidebar labeled icon menu" style="min-width:70px;">
-    
-    <a v-if="user !== false" class="item" style="padding-right: 8px; padding-left: 8px; min-width:100%;" v-bind:href="user.url">
+
+    <a v-if="user !== false" class="item" style="padding-right: 8px; padding-left: 8px; min-width:100%; font-size:11px;" v-bind:href="user.url">
         <img class="ui mini circular image" v-bind:src="user.avatar" style="margin-left: auto; margin-right: auto; margin-bottom: 14px;"></img>
         ${user.label}
     </a>
     
-    <a v-for="(item, index) in items" :key="index" class="item" style="padding-right: 8px; padding-left: 8px; min-width:100%;" v-bind:href="item.url">
+    <a v-for="(item, index) in items" :key="index" class="item" style="padding-right: 8px; padding-left: 8px; min-width:100%; font-size:11px;" v-bind:href="item.url">
         <i v-bind:class="item.icon"></i>
         <div style="max-width: 70px !important;">${ item.label }</div>
     </a>

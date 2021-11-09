@@ -87,7 +87,7 @@ class NbsObject extends Common
     }
 
     private function addRelation($p_model, $p_leftId, $p_rightId, $p_data){
-
+        
         $result                 = false;
 
         $insertData             = array();
@@ -169,6 +169,7 @@ class NbsObject extends Common
         }
         
         $tableName = $this->model->getModelObjectsTableName($p_model, 'RELATION');
+        
         
         $insertObjectResult = $this->database->insert($tableName, $insertData);
         
@@ -315,9 +316,9 @@ class NbsObject extends Common
 
     private function setRelations($p_id, $p_relationsData){
 
-        $addRelations = array();
-        $editRelations = array();
-        $removeRelations = array();
+        $addRelations               = array();
+        $editRelations              = array();
+        $removeRelations            = array();
 
         foreach($p_relationsData as $relModelId=>$relDatajObects){
 
@@ -340,7 +341,7 @@ class NbsObject extends Common
                 }
 
                 $relObjectId = $this->getRelationId($relModelId, $relLeftId, $relRightId);
-
+                
                 $_relTmp = array();
                 $_relTmp['relModelId']      = $relModelId;
                 $_relTmp['relLeftId']       = $relLeftId;
@@ -369,7 +370,7 @@ class NbsObject extends Common
                 }
             }
         }
-
+        
         //REMOVE
         foreach($removeRelations as $relObjectId => $relData){
 
@@ -853,8 +854,6 @@ class NbsObject extends Common
         
         $result = false;
 
-        $cacheKey       = 'data_object_' . $p_id;
-
         //TODO : Validacion IsTable Exsist
 
         $updateData             = array();
@@ -1067,7 +1066,7 @@ class NbsObject extends Common
                         }
                         
                     }
-                    
+
                     if(count($relationsData) > 0){
 
                         $this->setRelations($p_id, $relationsData);
@@ -1080,7 +1079,7 @@ class NbsObject extends Common
 
                 $this->indexUpdate($modelData, $modelDefinition, $modelRelations, $p_id, $indexData);
 
-                $this->deleteObjectCache($p_id);
+                $this->deleteObjectCache($p_model, $p_id);
             }else{
 
                 //TODO : NOT Updated
@@ -1136,7 +1135,7 @@ class NbsObject extends Common
 
                 $this->indexRemove($modelData, $p_id);
 
-                $this->deleteObjectCache($p_id);
+                $this->deleteObjectCache($p_model, $p_id);
             }else{
 
                 //TODO : NOT Updated
@@ -1158,10 +1157,11 @@ class NbsObject extends Common
         return $result;
     }
 
-    protected function deleteObjectCache($p_id){
+    protected function deleteObjectCache($p_model, $p_id){
 
         $keys   = array();
-        $keys[] = 'data_object_' . $p_id;
+        $keys[] = 'data_object_' . $p_model . '_' . $p_id;
+        $keys[] = 'data_object_name_' . $p_model . '_' . $p_id;
         $keys[] = 'data_object_all';
 
         $this->deleteMultipleCache($keys);
@@ -1222,7 +1222,7 @@ class NbsObject extends Common
 
     public function search($p_model, $p_query){
         
-        $result = false;
+        $result                 = false;
 
         $modelData              = $this->model->get($p_model);
         $modelDefinition        = $this->definition->get($p_model, null);
@@ -1643,6 +1643,7 @@ class NbsObject extends Common
 
                                 $fullTextPropertyMapping            = new \stdClass();
                                 $fullTextPropertyMapping->type      = "text";
+                                $fullTextPropertyMapping->fielddata = true;
                                 //$fullTextPropertyMapping->analizer  = "nbs_analyzer";
 
                                 $datamapping->properties->$fullTextPropertyName = $fullTextPropertyMapping;
@@ -1654,6 +1655,7 @@ class NbsObject extends Common
 
                                 $fullTextPropertyMapping            = new \stdClass();
                                 $fullTextPropertyMapping->type      = "text";
+                                $fullTextPropertyMapping->fielddata = true;
                                 //$fullTextPropertyMapping->analizer  = "nbs_analyzer";
 
                                 $datamapping->properties->$fullTextPropertyName = $fullTextPropertyMapping;
@@ -1848,7 +1850,7 @@ class NbsObject extends Common
         
         $result = false;
 
-        $cacheKey       = 'data_object_' . $p_id . time();
+        $cacheKey       = 'data_object_' . $p_model . '_' . $p_id . time();
         $cacheLifetime  = 3600;
         $cacheType      = 'file';
         
@@ -1867,7 +1869,7 @@ class NbsObject extends Common
                 $selectOptions = array();
                 $selectOptions['conditions'] = "_id = '" . $p_id . "'";
                 
-                $selectResult = $this->database->selectOne($tableName, $selectOptions);
+                $selectResult       = $this->database->selectOne($tableName, $selectOptions);
                 
                 if ($selectResult) {
                     
@@ -2216,9 +2218,9 @@ class NbsObject extends Common
         
         if($p_model['modIdStrategy'] == 'SLUGPREFIX' || $p_model['modIdStrategy'] == 'SLUG'){
 
-            $nameField = $this->getNameField($p_definition);
+            $nameField      = $this->getNameField($p_definition);
 
-            $nameFieldId = $nameField['dafId'];
+            $nameFieldId    = $nameField['dafId'];
 
             if(isset($p_data[$nameFieldId])){
 

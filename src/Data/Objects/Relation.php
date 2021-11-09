@@ -170,6 +170,7 @@ class Relation extends Common
         $keys   = array();
         $keys[] = 'data_relation_all';
         $keys[] = 'data_relation_' . $p_relId;
+        
         $keys[] = 'data_relations_' . $p_relId . '_in_LEFT';
         $keys[] = 'data_relations_' . $p_relId . '_in_RIGHT';
 
