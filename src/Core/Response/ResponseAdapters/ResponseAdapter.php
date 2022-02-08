@@ -7,13 +7,15 @@ use Nubesys\Core\Register;
 
 class ResponseAdapter extends Common {
 
+    protected   $httpCode;
     protected   $headers;
 
     public function __construct($p_di)
     {
         parent::__construct($p_di);
 
-        $this->headers = new Register();
+        $this->httpCode     = 200;
+        $this->headers      = new Register();
     }
 
     public function setHeader($p_key, $p_value){
@@ -24,5 +26,15 @@ class ResponseAdapter extends Common {
     public function getHeaders(){
 
         return $this->headers->all();
+    }
+
+    public function setHttpCode($p_httpCode){
+
+        $this->httpCode = $p_httpCode;
+    }
+
+    public function getHttpCode(){
+
+        return $this->httpCode;
     }
 }

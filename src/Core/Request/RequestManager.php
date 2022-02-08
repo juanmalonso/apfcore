@@ -65,4 +65,39 @@ class RequestManager extends Common {
 
         return $this->adapter->getCookie($p_key);
     }
+
+    public function getClientAddress(){
+
+        return $this->adapter->getClientAddress();
+    }
+
+    public function getReferer(){
+
+        return $this->adapter->getReferer();
+    }
+
+    public function getURI(){
+
+        return $this->adapter->getURI();
+    }
+
+    public function getUserAgent(){
+        
+        return $this->adapter->getUserAgent();
+    }
+
+    public function getUserBrowser(){
+
+        return $this->adapter->getUserBrowser();
+    }
+
+    public function getUserOs(){
+
+        return $this->adapter->getUserOs();
+    }
+
+    public function getUserDevice(){
+
+        return $this->adapter->getUserDevice();
+    }
 }

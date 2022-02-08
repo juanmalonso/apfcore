@@ -31,14 +31,23 @@ class LoginForm extends VueUiComponent {
                     }
                 }
 
-                $startpage                  = $this->getDI()->get('config')->main->url->base . 'board/';
+                $startpage                              = $this->getDI()->get('config')->main->url->base . 'board/';
 
                 if($userData['role']['path']){
 
-                    $startpage              = $this->getDI()->get('config')->main->url->base . $userData['role']['path'];
+                    $startpage                          = $this->getDI()->get('config')->main->url->base . $userData['role']['path'];
                 }
     
                 $this->setSession("user_startpage", $startpage);
+                
+                $userLogedEventData                     = array();
+
+                $userLogedEventData['user']             = array(
+                                                                "userid" => $userData['_id'],
+                                                                "userLogin" => $userData['login']
+                                                            );
+        
+                $this->trackEvent("USER-LOGED", $userLogedEventData);
                 
                 header("Location: " . $startpage);
                 exit();

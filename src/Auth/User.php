@@ -87,7 +87,7 @@ class User extends Common {
         return $result;
     }
 
-    public function loginApiUser($p_userId, $p_apiKey){
+    public function loginApiUser($p_userId, $p_key){
         
         $result                     = false;
 
@@ -98,14 +98,14 @@ class User extends Common {
             $userId                 = $queryResult[0]['_id'];
             $userModel              = $queryResult[0]['modId'];
 
-            $objectsDataSourceOptions                  = array();
-            $objectsDataSourceOptions['model']         = $userModel;
+            $objectsDataSourceOptions               = array();
+            $objectsDataSourceOptions['model']      = $userModel;
 
             $objectsDataSource      = new ObjectsDataSource($this->getDI(), $objectsDataSourceOptions);
 
             $userData               = $objectsDataSource->getData($userId);
             
-            if($userData['api_key'] == $p_apiKey){
+            if(sha1($userData['password'] . $userData['api_key']) == $p_key){
                 
                 if(isset($userData['roles'])){
 

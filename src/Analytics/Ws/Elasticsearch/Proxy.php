@@ -2,11 +2,11 @@
 
 namespace Nubesys\Analytics\Ws\Elasticsearch;
 
-use Nubesys\Core\Services\WsService;
+use Nubesys\Auth\Services\SecureWsService;
 use Nubesys\Data\Objects\Adapters\Elastic;
 use Flow\JSONPath\JSONPath;
 
-class Proxy extends WsService {
+class Proxy extends SecureWsService {
 
     public function queryMethod(){
 

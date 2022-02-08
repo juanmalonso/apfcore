@@ -175,6 +175,13 @@ Vue.component("___idReference_", {
       
       $(".formtab").tab();
     },
+    setPopups: function(){
+
+      $('.helpPopup').popup({
+        inline     : true,
+        hoverable  : true
+      });
+    }
   },
   computed: {
     model:function(){

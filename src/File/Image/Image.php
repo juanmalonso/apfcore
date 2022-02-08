@@ -23,7 +23,7 @@ class Image extends File {
 
         $result = false;
 
-        $this->imagine      = new Imagine();
+        $this->imagine          = new Imagine();
 
         try {
 

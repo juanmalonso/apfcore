@@ -8,6 +8,7 @@ Vue.component("___idReference_", {
   },
   methods: {
     initField: function () {
+      var self = this;
       var newItems = [];
       var excludeValues = [];
 
@@ -65,7 +66,26 @@ Vue.component("___idReference_", {
               minCharacters: minSearchCharacters,
               saveRemoteData: false,
               apiSettings: {
-                url: this.getScopeDataServiceUrl("_service", "objects-list-query") + "/model:" + this.getTypeOption("model") + "/query:{query}"
+                url: self.getScopeDataServiceUrl("_service", "objects-list-query") + "/model:" + self.getTypeOption("model") + "/query:{query}/{filters}",
+                encodeParameters: false,
+                beforeSend: function(settings) {
+      
+                  settings.urlData['filters'] = self.queryFilters;
+                  
+                  return settings;
+                }
+              },
+              onChange: function (value, text, $choice){
+                
+                if(self.getTypeOption("listeners") != undefined){
+
+                  _.each(self.getTypeOption("listeners"), function (value, key, list) {
+
+                    var listenerReference = self.referenceName.replace(self.fieldIndex, value);
+
+                    self.getByReferenceName(listenerReference).doListenerEmit(self.getFieldValue());
+                  });
+                }
               }
             });
 
@@ -119,7 +139,6 @@ Vue.component("___idReference_", {
 
         }
       }
-
     },
     onBeforeUpdateScope: function (newDataScopeRegisterData) {
 
@@ -152,6 +171,20 @@ Vue.component("___idReference_", {
       newDataScopeRegisterData = [];
 
       return newDataScopeRegisterData;
+    },
+    doListenerEmit: function(value){
+      var self = this;
+
+      console.log("EMIT", this, value);
+
+      console.log("queryFilters", self.queryFilters);
+
+      if (this.getTypeOption("filterField") != undefined) {
+
+        this.setScopeData("queryFilters", this.getTypeOption("filterField")  + ":" + value);
+      }
+
+      console.log("queryFilters", self.queryFilters);
     },
     setFieldValue: function (value) {
       var self = this;
@@ -230,6 +263,9 @@ Vue.component("___idReference_", {
     }
   },
   computed: {
+    queryFilters: function(){
+      return this.getScopeData("queryFilters", "");
+    },
     forForm: function () {
       return this.getScopeData("forForm", this.$attrs.forForm);
     },

@@ -29,8 +29,6 @@ class HttpClient extends Common
             if($response->hasHeader('Content-Length') && $response->getHeader('Content-Length')[0] > 1){
                 
                 $result     = json_decode($response->getBody()->getContents());
-                
-
             }else{
 
                 //TODO Error de http CLIENT

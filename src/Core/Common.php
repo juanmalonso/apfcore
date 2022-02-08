@@ -96,6 +96,12 @@ class Common extends Injectable
         $this->getDI()->get('logger')->alert($p_msg, $p_context, $p_data);
     }
 
+    //EVENT TRACKER
+    protected function trackEvent($p_event, $p_data, $p_terms = array()){
+
+        $this->getDI()->get('tracker')->track($p_event, $p_data, $p_terms);
+    }
+
     //COMMON CACHE MANAGMENT
     protected function hasCache($p_key){
         

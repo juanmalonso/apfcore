@@ -571,7 +571,7 @@ class NbsObject extends Common
                             $fieldId = 'rel_' . $modelRelation['modId'];
                             
                             if (isset($p_data[$fieldId])) {
-
+                                
                                 $relationsData[$modelRelation['modId']]                     = array();
                                 $relationsData[$modelRelation['modId']]['values']           = array();
         
@@ -592,7 +592,7 @@ class NbsObject extends Common
 
                         if(count($relationsData) > 0){
                         
-                            $this->setRelations($p_id, $relationsData);
+                            $this->setRelations($id, $relationsData);
                         }
                     }
 

@@ -290,40 +290,103 @@ class AppModule extends VueUiService {
     }
 
     private function setActionPageTitle($p_action){
-        
-        $scopePath          = "actions." . $p_action . ".title";
-        
-        if($this->hasLocal($scopePath)){
-            
-            $this->setTitle($this->getLocal($scopePath));
 
-            //TODO LLEVAR A LA SUB CLASE DEL SERVICIO
-            $this->logInfo("PAGE-VIEW", "NOSVAMOOS|EVENT", $this->getLocal($scopePath));
-            
-        }elseif($this->hasLocal("title")){
+        $title                                  = "";
 
-            $this->setTitle($this->getLocal("title"));
+        if(method_exists($this, "getPageTitle")){
+
+            $title                              = $this->getPageTitle($p_action);
+        }else{
+
+            $scopePath                          = "actions." . $p_action . ".title";
+
+            if($this->hasLocal($scopePath)){
+
+                $title                          = $this->getLocal($scopePath);
+
+            }elseif($this->hasLocal("title")){
+
+                $title                          = $this->getLocal("title");
+            }
         }
+        
+        $this->setTitle($title);
+        
+        $this->logInfo("PAGE-VIEW", "EVENT", $title);
+        
+        $pageViewEventData                      = array();
+        $pageViewEventData['page']              = array("title" => $title);
+        
+        $this->trackEvent("PAGE-VIEW", $pageViewEventData);
 
-        //TODO LLEVAR A LA SUB CLASE DEL SERVICIO
-        $sesid                                  = $this->getSessionId();
-
-        $cacheKey                               = 'unique_visit_' . $sesid;
+        $cacheKey                               = 'unique_visit_' . $this->getSessionId();
         $cacheLifetime                          = 180000;
         $cacheType                              = 'redis';
 
         if(!$this->hasCache($cacheKey)){
 
-            $eventParams                                            = array();
-            $eventParams['sesid']                                   = $sesid;
+            $uniqueVisitEventData               = array();
+            $uniqueVisitEventData['page']       = array("title" => $title);
 
-            $this->logInfo("UNIQUE-VISIT", "NOSVAMOOS|EVENT", $eventParams);
+            $uniqueVisitEventData['device']     = $this->getDI()->get('tracker')->addDeviceData();
+            $uniqueVisitEventData['request']    = $this->getDI()->get('tracker')->addRequestData();
+            
+            $this->trackEvent("UNIQUE-VISIT", $uniqueVisitEventData);
 
-            $this->setCache($cacheKey, $eventParams['sesid'], $cacheLifetime);
+            $this->logInfo("UNIQUE-VISIT", "NOSVAMOOS|EVENT", $uniqueVisitEventData);
+
+            $this->setCache($cacheKey, $uniqueVisitEventData['sesid'], $cacheLifetime);
         }
     }
     
     //MODULE DATA SERVICES
+
+    //TRACK EVENT
+    public function moduleTrackEventService(){
+        //\sleep(3);
+        
+        if($this->hasJsonParam()){
+
+            $params                                     = $this->getJsonParam();
+            
+            $scopePath                                  = (isset($params["scopePath"])) ? $params["scopePath"] : false;
+
+            if(isset($params["eventName"]) && isset($params["eventData"])){
+
+                $resul                                  = array();
+                $result["eventName"]                    = $params["eventName"];
+                $result["eventData"]                    = $params["eventData"];
+
+                $frontEndEventData['frontend']          = array();
+
+                if(isset($params['eventData']['event'])){
+
+                    $frontEndEventData['frontend']['event']     = $params['eventData']['event'];
+                }
+
+                if(isset($params['eventData']['element'])){
+
+                    $frontEndEventData['frontend']['element']   = $params['eventData']['element'];
+                }
+
+                if(isset($params['eventData']['url'])){
+
+                    $frontEndEventData['frontend']['url']       = $params['eventData']['url'];
+                }
+                
+                $this->trackEvent($params["eventName"], $frontEndEventData);
+                
+                $this->setServiceSuccess($result);
+            }else{
+
+                $this->setServiceError("Some required param not found");
+            }
+            
+        }else{
+
+            $this->setServiceError("Invalid Params");
+        }
+    }
 
     //SET RELATIONS
     public function moduleSetRelationService(){
@@ -475,7 +538,44 @@ class AppModule extends VueUiService {
 
     //MODULE COMPONETS ACTIONS
 
-    //TOPBAR
+    //QRVIEWER
+    public function qrViewerService(){
+        //\sleep(2);
+        if($this->hasJsonParam()){
+
+            $params                         = $this->getJsonParam();
+
+            $scopePath                      = (isset($params["scopePath"])) ? $params["scopePath"] : false;
+
+            if($scopePath !== false){
+
+                $result                     = array();
+
+                //QR DATA (BASE 64)
+                $result["qrEncodedData"]    = null;
+                $result["qrData"]           = null;
+
+                if(isset($params["id"]) && $params["id"] != ""){
+
+                    $result["qrEncodedData"]        = urlencode(base64_encode($params["id"]));
+                    $result["qrData"]               = $params["id"];
+                }
+                
+                //REFERENCE NAME
+                $result["referenceName"]    = $params["referenceName"];
+
+                $this->setServiceSuccess($result);
+            }else{
+
+                $this->setServiceError("Invalid ScopePath: " . $scopePath);
+            }
+
+        }else{
+
+            $this->setServiceError("Invalid Params");
+        }
+    }
+
     public function moduleTopBarService(){
         //\sleep(2);
         if($this->hasJsonParam()){
@@ -613,7 +713,7 @@ class AppModule extends VueUiService {
 
     //SELECTOR
     public function moduleSelectorService(){
-        //\sleep(1);
+        \sleep(1);
         
         if($this->hasJsonParam()){
             
@@ -846,7 +946,7 @@ class AppModule extends VueUiService {
     //OBJECT LIST QUERY
     public function objectsListQueryService(){
         //\sleep(3);
-        
+        header("Access-Control-Allow-Origin: *");
         if($this->hasUrlParam("model") && $this->hasUrlParam("query")){
 
             $result                         = array();
@@ -855,8 +955,24 @@ class AppModule extends VueUiService {
             $result['results']              = array();
 
             $query                          = array();
-            $query["keyword"]               = "*" . $this->getUrlParam("query") . "*";
 
+            //filters
+            $filters                        = array();
+
+            $index                          = 0; 
+            foreach($this->allUrlParams() as $key=>$value){
+
+                if($index > 4){
+
+                    $filters[$key] = (array)$value;
+                }
+
+                $index++;
+            }
+
+            $query["filters"]               = $filters;
+            $query["keyword"]               = "*" . $this->getUrlParam("query") . "*";
+            
             $queryResult                    = $this->getModelObjects($this->getUrlParam("model"), $query);
 
             if(isset($queryResult['objects'])){
@@ -878,9 +994,18 @@ class AppModule extends VueUiService {
                         
                         $objectDataNameValues       = array();
 
+                        $index                      = 0;
                         foreach($objectNameFields as $fieldId){
 
-                            $objectDataNameValues[] = $objectData[$fieldId];
+                            if($objectData[$fieldId] !== ""){
+
+                                if($index < 2){
+
+                                    $objectDataNameValues[] = $objectData[$fieldId];
+                                }
+                                
+                                $index++;
+                            }
                         }
 
                         $objectDataTmp['name']      = \implode(" ", $objectDataNameValues);
@@ -892,13 +1017,13 @@ class AppModule extends VueUiService {
                     //IMAGE
                     if(isset($objectData[$objectImageField])){
 
-                        $objectDataTmp['image']     = $objectData[$objectImageField];
+                        //$objectDataTmp['image']     = $objectData[$objectImageField];
                     }
                     
                     //ICON
                     if(isset($objectData[$objectIconField])){
 
-                        $objectDataTmp['icon']      = $objectData[$objectIconField];
+                        //$objectDataTmp['icon']      = $objectData[$objectIconField];
                     }
                     
                     $result['results'][]             = $objectDataTmp; 
@@ -1001,9 +1126,18 @@ class AppModule extends VueUiService {
                             
                             $objectDataNameValues       = array();
 
+                            $index                      = 0;
                             foreach($objectNameFields as $fieldId){
 
-                                $objectDataNameValues[] = $objectData[$fieldId];
+                                if($objectData[$fieldId] !== ""){
+
+                                    if($index < 2){
+
+                                        $objectDataNameValues[] = $objectData[$fieldId];
+                                    }
+                                    
+                                    $index++;
+                                }
                             }
 
                             $objectDataTmp['name']      = \implode(" ", $objectDataNameValues);
@@ -1059,10 +1193,10 @@ class AppModule extends VueUiService {
                     $result["dataActions"]      = array();
 
                     //TODO CUSTOM FIELDS
-
+                    
                     //PRE DATA MANIPULATIONS
                     if(isset($params["data"]) && count($params["data"]) > 0){
-
+                        
                         //HIDDEN FIELDS
                         $dataTmp = array();
                         if(isset(($this->getLocal($scopePath))['hiddenFields'])){
@@ -1090,7 +1224,7 @@ class AppModule extends VueUiService {
                         }
                     }
                     
-                    if(isset($params["id"])){
+                    if(isset($params["id"]) && $params["id"] != ""){
                         //EDIT
                         if(isset($params["data"]) && count($params["data"]) > 0){
                             
@@ -1441,9 +1575,18 @@ class AppModule extends VueUiService {
 
                         $objectDataNameValues       = array();
 
+                        $index              = 1;
                         foreach($objectNameFields as $fieldId){
 
-                            $objectDataNameValues[] = $objectData[$fieldId];
+                            if($objectData[$fieldId] !== ""){
+
+                                if($index < 2){
+    
+                                    $objectDataNameValues[] = $objectData[$fieldId];
+                                }
+                                
+                                $index++;
+                            }
                         }
 
                         $result['name']      = \implode(" ", $objectDataNameValues);
@@ -1655,7 +1798,7 @@ class AppModule extends VueUiService {
     protected function getModelData($p_model){
 
         $dataSource                         = new ModuleDataSource($this->getDI());
-
+        
         return $dataSource->getModelData($p_model);
     }
 

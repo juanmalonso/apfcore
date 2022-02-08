@@ -1,0 +1,12 @@
+<div class="ui grid" v-bind:class="(_.size($attrs) > 1) ? '' : 'padded'" v-bind:style="(isHidden()) ? 'display:none !important;' : ''">
+    <div class="column">
+        <div class="ui segment loadingElement" style="padding:0px;">
+
+            <img style="max-width:250px;" v-bind:src="basepath + 'qr/' + qrEncodedData + '.svg'" type="image/svg+xml">
+            
+            <div class="ui segment">
+                ${qrData}
+            </div>
+        </div>
+    </div>
+</div>

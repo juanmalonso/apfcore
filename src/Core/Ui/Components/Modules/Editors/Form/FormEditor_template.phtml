@@ -50,6 +50,7 @@
                                         <div v-if="field.uiOptions.help != ''" class="ui icon basic mini help button right floated helpPopup" v-bind:data-html="field.uiOptions.help" data-position="right center" data-variation="very wide">
                                             <i class="help blue icon"></i>
                                         </div>
+                                        
                                     </td>
                                     <td>
             
@@ -73,8 +74,7 @@
             
                                         </template>
                                     {% endfor  %}
-            
-                                    
+                                        
                                     </td>
                                 </tr>
             
@@ -82,6 +82,9 @@
                         </table>
 
                 </div>
+                <template v-if="index == _.size(getFieldsGroups()) - 1">
+                    ${setPopups()}    
+                </template>
             </template>
         </div>
         

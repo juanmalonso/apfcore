@@ -6,7 +6,7 @@ use Nubesys\Core\Services\WsService;
 
 class ApiTest extends WsService {
 
-    public function rawQueryMethod($p_params){
+    public function rawQueryMethod(){
 
         $result = new \stdClass();
         $result->method = "TEST";
@@ -15,7 +15,7 @@ class ApiTest extends WsService {
         $this->setServiceSuccess($result);
     }
 
-    public function testMethod($p_params){
+    public function testMethod(){
 
         $result = new \stdClass();
         $result->method = "TEST";
@@ -24,7 +24,7 @@ class ApiTest extends WsService {
         $this->setServiceSuccess($result);
     }
 
-    public function getMethod($p_params){
+    public function getMethod(){
 
         $result = new \stdClass();
         $result->method = "GET";

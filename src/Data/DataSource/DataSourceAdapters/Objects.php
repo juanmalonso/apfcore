@@ -222,7 +222,7 @@ class Objects extends DataSourceAdapter {
 
     public function getDataIdNames($p_query){
         $result                 = false;
-        
+
         $nameField              = $this->getNameField();
         $imageField             = $this->getImageField();
 
@@ -260,8 +260,11 @@ class Objects extends DataSourceAdapter {
             
             $queryResult = $this->getData($p_query);
             
+            
             $result             = array();
+            
             $result['id']       = $queryResult['_id'];
+            
             $result['name']     = (isset($queryResult[$nameField])) ? $queryResult[$nameField]: "";
             $result['image']    = (isset($queryResult[$imageField])) ? $queryResult[$imageField]: "";
             $result['icon']     = (isset($queryResult['icon'])) ? $queryResult['icon'] : "";

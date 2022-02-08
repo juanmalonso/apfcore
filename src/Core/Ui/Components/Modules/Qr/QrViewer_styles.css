@@ -1,0 +1,37 @@
+#___id_ {
+}
+
+@media only screen 
+   and (max-width : 900px) {
+   
+    .hidden-in-tablet {
+
+        visibility: hidden;
+        display: none;
+    }
+}
+
+#___id_ .formtab.active {
+
+    background-color:#0E6EB8;
+    border: 0px solid #0E6EB8;
+    color: #ffffff;
+}
+
+/*
+.jsoneditor-menu, .jsoneditor-undo, .jsoneditor-redo, .jsoneditor-modes, .jsoneditor-search {
+
+    display: none;
+}
+
+#xModal {
+
+    margin-left: auto !important;
+    margin-right: 0px !important;
+    width: 1500px !important;
+    position: absolute !important;
+    top: auto !important;
+    left: auto !important;
+    right: 30px !important;
+}
+*/

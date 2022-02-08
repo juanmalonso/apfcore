@@ -42,6 +42,11 @@ class ResponseManager extends Common {
         return $this->adapterType;
     }
 
+    public function getHttpCode(){
+
+        return $this->adapter->getHttpCode();
+    }
+
     public function setHeader($p_key, $p_value){
 
         $this->adapter->setHeader($p_key, $p_value);
@@ -108,9 +113,9 @@ class ResponseManager extends Common {
         $this->adapter->setDebug($p_debug);
     }
 
-    public function setError($p_message){
+    public function setError($p_message, $p_httpCode = 500){
 
-        $this->adapter->setError($p_message);
+        $this->adapter->setError($p_message, $p_httpCode);
     }
 
     public function setSuccess($p_data){

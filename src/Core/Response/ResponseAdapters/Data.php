@@ -44,10 +44,11 @@ class Data extends ResponseAdapter {
         $this->debug = $p_debug;
     }
 
-    public function setError($p_message){
+    public function setError($p_message, $p_httpCode){
 
         $this->setStatus("KO");
         $this->setInfo($p_message);
+        $this->setHttpCode($p_httpCode);
     }
 
     public function setCustomBody($p_object){

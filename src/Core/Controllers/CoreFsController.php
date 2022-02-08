@@ -23,7 +23,7 @@ class CoreFsController extends Controller
             $params['GET']          = $this->getDI()->get('requestManager')->getGET();
 
             $uiService->doDownloadFile($params);
-
+            
         }else{
 
             //TODO: ERROR

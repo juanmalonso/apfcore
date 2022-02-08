@@ -2,10 +2,10 @@
 
 namespace Nubesys\Auth\Ws;
 
-use Nubesys\Core\Services\WsService;
+use Nubesys\Auth\Services\SecureWsService;
 use Nubesys\Auth\User;
 
-class ApiAuth extends WsService
+class ApiAuth extends SecureWsService
 {
 
     public function tokenMethod()
@@ -33,7 +33,7 @@ class ApiAuth extends WsService
 
                 } else {
 
-                    $this->setServiceError("Invalid User");
+                    $this->setServiceError("Invalid User", 403);
                 }
             }
         }
