@@ -55,7 +55,7 @@ Vue.component("___idReference_", {
               minSearchCharacters = this.getTypeOption("minCharacters");
             }
 
-            var saveData = true;
+            var saveData = false;
 
             if (this.getTypeOption("saveRemoteData") != undefined) {
 
@@ -88,6 +88,8 @@ Vue.component("___idReference_", {
                 }
               }
             });
+
+            console.log("DROPDOWN ITEMS", this.items);
 
             newDataService = {
               "type": "service",
@@ -136,13 +138,12 @@ Vue.component("___idReference_", {
           Vue.set(this, 'dataService', newDataService);
 
           this.modLoadDataService(this.generateDataServiceOptions({}), false);
-
         }
       }
     },
     onBeforeUpdateScope: function (newDataScopeRegisterData) {
 
-      console.log("BEFORE UPDATE SCOPE DATA", newDataScopeRegisterData);
+      console.log("DROPDOWN BEFORE UPDATE SCOPE DATA", newDataScopeRegisterData);
 
       var newItems = [];
       var excludeValues = [];
@@ -226,7 +227,7 @@ Vue.component("___idReference_", {
         });
       }
 
-      $(this.$refs.realField).dropdown('clear');
+      //$(this.$refs.realField).dropdown('clear');
 
       $(this.$refs.realField).dropdown({
         values: dropdownValues

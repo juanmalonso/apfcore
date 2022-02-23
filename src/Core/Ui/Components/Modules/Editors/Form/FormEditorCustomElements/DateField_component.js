@@ -14,9 +14,9 @@ Vue.component("___idReference_", {
     },
     setFieldValue: function (value) { 
       var self = this;
-      var flatpickrOptions                    = self.getDatePickrOptions();
-      
-      if(!_.has(flatpickrOptions, "defaultDate")){
+      var flatpickrOptions                    = self.getDatePickrOptions(); 
+
+      if(value != ""){
 
         flatpickrOptions.defaultDate            = value;
       }
