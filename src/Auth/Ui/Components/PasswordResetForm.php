@@ -33,6 +33,7 @@ class PasswordResetForm extends VueUiComponent {
                         $this->trackEvent("USER-RESET-PASSWORD", $userResetPasswordEventData);
 
                         header("Location: " . $this->getDI()->get('config')->main->url->base . "logout");
+                        exit();
                     }
                 }
             }

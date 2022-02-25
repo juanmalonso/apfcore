@@ -82,7 +82,7 @@ class DataEngine extends Common
         return $this->object->has($p_model, $p_id);
     }
 
-    public function countObjects($p_model, $p_options){
+    public function countObjects($p_model, $p_options = array()){
 
         return $this->object->count($p_model, $p_options);
     }

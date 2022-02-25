@@ -631,30 +631,40 @@ class Objects extends DataSourceAdapter {
 
             $deleteIndexResult      = $this->dataEngine->deleteIndex($indexName);
             
-            //$deleteIndexResult      = true;
-            
             if($deleteIndexResult){
 
-                $options                    = array();
-                $options['rows']            = 100000;
-                $options['page']            = 1;
-                
-                $objects = $this->dataEngine->getObjects($modelData['modId'], $options);
-                
-                if($objects !== false){
+                $objectsCount       = $this->dataEngine->countObjects($modelData['modId']);
+                $bulkSize           = 2000;
+                $bulkCount          = ceil($objectsCount/$bulkSize);
+                $bulkActual         = 1;
 
-                    $reindexResult = $this->dataEngine->reindexObjects($modelData, $objects);
+                while($bulkActual <= $bulkCount){
+
+                    $options                    = array();
+                    $options['rows']            = $bulkSize;
+                    $options['page']            = $bulkActual;
                     
-                    if($reindexResult === false){
+                    $objects = $this->dataEngine->getObjects($modelData['modId'], $options);
+                    
+                    if($objects !== false){
+
+                        $reindexResult = $this->dataEngine->reindexObjects($modelData, $objects);
+                        
+                        if($reindexResult === false){
+
+                            $this->logError("REINDEX ERROR" . $this->options['model'] . " BULK " . $bulkActual . "/". $bulkCount . " OBJECTS " . $result . "/" . $objectsCount, "DATA");
+                        }else{
+
+                            $this->logDebug("REINDEX " . $this->options['model'] . " BULK " . $bulkActual . "/". $bulkCount . " OBJECTS " . $result . "/" . $objectsCount, "DATA");
+                        }
+                        $result += count($objects);
+
+                    }else{
 
                         //TODO ERROR
                     }
-                
-                    $result += count($objects);
 
-                }else{
-
-                    //TODO ERROR
+                    $bulkActual += 1;
                 }
             }
         }

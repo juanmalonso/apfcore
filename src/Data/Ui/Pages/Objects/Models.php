@@ -393,6 +393,8 @@ class Models extends AppCrud {
 
     public function reindexDataService(){
 
+        ini_set('max_execution_time', 600);
+
         if($this->hasJsonParam()){
 
             $param      = $this->getJsonParam();
