@@ -261,11 +261,10 @@ class User extends Common {
         $dataSource                         = new DataSource($this->getDI(), new ObjectsDataSource($this->getDI(), $dataSourceOptions));
 
         $menuItemData                       = $dataSource->getData($p_menuitems);
-
+        
         $result                             = array();
         $result['id']                       = $menuItemData['_id'];
         $result['name']                     = $menuItemData['name'];
-        $result['label']                    = $menuItemData['label'];
         $result['description']              = $menuItemData['description'];
         $result['icon']                     = $menuItemData['icon'];
         $result['path']                     = $menuItemData['path'];

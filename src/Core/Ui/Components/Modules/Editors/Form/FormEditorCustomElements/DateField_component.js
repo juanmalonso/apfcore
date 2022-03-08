@@ -18,7 +18,7 @@ Vue.component("___idReference_", {
 
       if(value != ""){
 
-        flatpickrOptions.defaultDate            = value;
+        flatpickrOptions.defaultDate          = value;
       }
 
       $(this.$refs.realField).val(value);
