@@ -335,7 +335,7 @@ class AppModule extends VueUiService {
 
             $this->logInfo("UNIQUE-VISIT", "NOSVAMOOS|EVENT", $uniqueVisitEventData);
 
-            $this->setCache($cacheKey, $uniqueVisitEventData['sesid'], $cacheLifetime);
+            $this->setCache($cacheKey, $this->getSessionId(), $cacheLifetime);
         }
     }
     
